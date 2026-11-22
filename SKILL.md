@@ -1,63 +1,60 @@
 ---
 name: vizarc
-description: AI-powered software architecture and system diagram generator. Use when the user asks to visualize a codebase, design system architectures, map out microservices, create sequence diagrams, or export diagrams in Mermaid, D2, ASCII, or Excalidraw formats.
+description: Turn any idea, plan, or codebase into a beautiful interactive architecture diagram and one-page explainer. An agent skill for Claude Code, Antigravity, Codex, and Cursor.
 ---
 
-# VizArc: Architecture & Diagramming Skill
+# VizArc: Interactive Architecture Explainer & Diagram Skill
 
-`vizarc` transforms codebases, system requirements, and complex workflows into clean, production-grade architecture diagrams. It supports multiple formats (**Mermaid.js**, **D2 Lang**, **ASCII/Unicode**, and **Excalidraw**) with self-healing syntax validation.
+`vizarc` turns codebases, system requirements, and complex workflows into polished, self-contained **interactive HTML explainers** and diagrams. It features typed JSON Intermediate Representation (IR), live pan & zoom, **upstream/downstream link tracing**, node detail inspection drawers, and component search.
 
 ---
 
 ## When to Use This Skill
 
 Activate this skill when:
-- The user asks to **"visualize the codebase"** or map out project architecture.
-- The user wants a **flowchart**, **sequence diagram**, **C4 architecture**, or **database ERD**.
-- The user requests diagrams in **D2**, **Mermaid**, **ASCII art** (for terminal/READMEs), or **Excalidraw**.
-- The user needs an architecture diagram to accompany a PR, RFC, or documentation.
+- The user asks to **"visualize the codebase"**, create an architecture map, or plan a system.
+- The user wants an **interactive diagram or one-page explainer** to explore service dependencies.
+- The user needs to inspect **upstream/downstream dependencies** (which service calls what).
+- The user requests diagrams in **HTML**, **D2**, **Mermaid**, **ASCII art** (for terminal/PRs), or **Excalidraw**.
 
 ---
 
 ## Agent Execution Instructions
 
-When invoked to generate or update architecture diagrams:
+When the user requests an architecture diagram or system explainer:
 
-### 1. Codebase Analysis Mode
-If the user wants to diagram an existing project:
-1. Scan the repository structure (directory tree, key framework configs like `package.json`, `requirements.txt`, `docker-compose.yml`, route files, database schemas).
-2. Identify core boundaries:
-   - **Frontend / Client tier** (Web, Mobile, CLI)
-   - **Gateway / Ingress tier** (Nginx, API Gateway, Load Balancer)
-   - **Application / Services tier** (Microservices, Background Workers, Auth)
-   - **Data / Storage tier** (Databases, Redis caches, S3/Object storage)
-3. Execute the CLI analyzer or generate the diagram matching the requested format.
+### 1. Default Mode: Interactive HTML Explainer (`architecture.html`)
+Unless the user explicitly asks for raw markdown or Mermaid:
+1. Scan the project structure or analyze the system requirements.
+2. Structure components into logical tiers:
+   - **Client Tier**: Web, Mobile, CLI
+   - **Ingress / Gateway**: API Gateway, Reverse Proxy, Load Balancer
+   - **Services Layer**: Microservices, Auth, Queues, Background Workers
+   - **Data Layer**: Databases, Redis Caches, S3/Object storage
+3. Run `python cli.py scan . --format html --output architecture.html` or `python cli.py generate "..." --format html --output architecture.html`.
+4. Tell the user: *"Generated interactive architecture explainer in `architecture.html`. Double-click to open in your browser to trace dependencies, search components, and view node details."*
 
-### 2. Prompt / Specification Mode
-If the user describes a system from scratch (e.g., *"Design an event-driven notification service with Kafka and Redis"*):
-1. Clarify component roles, data flow directions, and protocols (gRPC, REST, WebSocket, Pub/Sub).
-2. Choose the best diagram format:
-   - **Mermaid**: Recommended for GitHub markdown files and documentation.
-   - **D2**: Recommended for deep system architectures with container grouping and modern styling.
-   - **ASCII**: Recommended for code comments, terminal displays, or commit messages.
-   - **Excalidraw**: Recommended when the user wants an editable whiteboard mockup.
+### 2. Markdown / GitHub Mode (`--format mermaid`)
+If the user wants an inline diagram for a GitHub `README.md` or PR comment:
+1. Generate using `--format mermaid` or `--format ascii`.
+2. Follow strict Mermaid quotation rules (`id["Label (Info)"]`) to avoid syntax crashes.
 
 ---
 
 ## CLI Quick Reference
 
 ```bash
-# Generate architecture from a description
-python cli.py generate "Microservice payment processing with Stripe and Kafka" --format mermaid
+# Generate interactive HTML architecture explainer
+python cli.py generate "Microservices payment gateway with Stripe and Kafka" --output architecture.html
 
-# Generate D2 architecture diagram
-python cli.py generate "E-commerce cloud topology on AWS" --format d2
+# Scan local codebase and generate an interactive architecture explainer
+python cli.py scan . --format html --output architecture.html
 
-# Scan a local codebase and output an architecture diagram
-python cli.py scan ./src --format mermaid --output ARCHITECTURE.md
+# Generate D2 cloud architecture
+python cli.py generate "AWS serverless topology with Lambda and DynamoDB" --format d2
 
-# Generate ASCII diagram for terminal or PR comments
-python cli.py generate "OAuth2 Authorization Code Flow" --format ascii
+# Generate ASCII diagram for PR comments or code comments
+python cli.py generate "OAuth2 Auth Flow" --format ascii
 
 # Launch the interactive web playground
 streamlit run app.py
@@ -65,27 +62,11 @@ streamlit run app.py
 
 ---
 
-## Syntax & Formatting Rules
+## Key Interactive Features
 
-To avoid broken diagrams, enforce these rules:
-
-### Mermaid Rules:
-1. Always wrap node labels containing parentheses, spaces, or brackets in double quotes:
-   `User["Client (Web App)"] --> API["API Gateway (Port 8080)"]`
-2. Explicitly specify direction (`flowchart TD` or `sequenceDiagram` or `erDiagram`).
-3. Keep node IDs alphanumeric and simple (`auth_svc`, `db_pg`).
-
-### D2 Rules:
-1. Use semantic container definitions:
-   ```d2
-   cloud: Cloud Provider {
-     api: API Gateway
-     db: PostgreSQL
-     api -> db: Read/Write
-   }
-   ```
-2. Keep styling clean and use standard connections (`->`, `<->`, `<-`).
-
-### ASCII Rules:
-1. Use Unicode box-drawing characters (`┌─┐`, `│ │`, `└─┘`, `▲`, `▼`, `◄`, `►`).
-2. Align arrows neatly with consistent spacing.
+Inside the generated `.html` file:
+* **Interactive Canvas**: Drag to pan, scroll to zoom, click center to reset.
+* **Upstream & Downstream Link Tracing**: Click any service to highlight all callers (upstream) and all outgoing calls (downstream) with glowing paths; unrelated nodes dim.
+* **Node Detail Drawer**: Displays technology stack, role description, and associated code files.
+* **Component Search**: Instant live filtering.
+* **Zero Dependencies**: Fully self-contained SVG + CSS + JS; runs 100% offline in any browser.

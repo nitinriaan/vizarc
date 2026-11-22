@@ -1,11 +1,16 @@
 """
 Core VizArc Engine: connects to Gemini Flash API and manages diagram synthesis.
+Supports Interactive HTML Explainers via Typed JSON IR, as well as Mermaid, D2, and ASCII.
 """
 
 import os
-from typing import Optional
+import json
+import re
+from typing import Optional, Dict, Any
 from dotenv import load_dotenv
 
+from .ir import IR_SCHEMA_PROMPT, validate_ir, get_demo_ir
+from .compiler import compile_to_html
 from .formats.mermaid import MERMAID_SYSTEM_PROMPT, sanitize_mermaid
 from .formats.d2 import D2_SYSTEM_PROMPT, sanitize_d2
 from .formats.ascii import ASCII_SYSTEM_PROMPT, sanitize_ascii
@@ -36,20 +41,54 @@ class VizArcEngine:
                 self._client_initialized = False
                 self.init_error = str(e)
 
+    def generate_ir(self, prompt: str, codebase_context: Optional[str] = None) -> Dict[str, Any]:
+        """
+        Generates a validated Architecture JSON Intermediate Representation (IR).
+        """
+        if not self._client_initialized:
+            return get_demo_ir()
+
+        full_prompt = (
+            f"{IR_SCHEMA_PROMPT}\n\n---\n"
+            f"USER SPECIFICATION:\n{prompt}\n"
+        )
+        if codebase_context:
+            full_prompt += f"\nCODEBASE CONTEXT:\n{codebase_context}\n"
+
+        response = self.model.generate_content(
+            full_prompt,
+            generation_config={"temperature": 0.2, "response_mime_type": "application/json"}
+        )
+        
+        raw_text = response.text or "{}"
+        try:
+            # Strip code fences if present
+            cleaned = re.sub(r"^```(?:json)?\s*|\s*```$", "", raw_text.strip(), flags=re.MULTILINE)
+            parsed = json.loads(cleaned)
+            return validate_ir(parsed)
+        except Exception:
+            # Fallback to demo if JSON parsing fails
+            return get_demo_ir()
+
     def generate(
         self,
         prompt: str,
-        diagram_format: str = "mermaid",
+        diagram_format: str = "html",
         archetype: str = "architecture",
         codebase_context: Optional[str] = None
     ) -> str:
         """
-        Generates a diagram using Gemini or returns a structured demo response.
+        Generates an architecture output (HTML explainer, Mermaid, D2, or ASCII).
         """
         diagram_format = diagram_format.lower()
         archetype = archetype.lower()
 
-        # Select prompt and sanitizer based on format
+        # Flagship: Interactive HTML Explainer
+        if diagram_format in ("html", "interactive", "explainer"):
+            ir = self.generate_ir(prompt=prompt, codebase_context=codebase_context)
+            return compile_to_html(ir)
+
+        # Legacy formats
         if diagram_format == "d2":
             system_prompt = D2_SYSTEM_PROMPT
             sanitizer = sanitize_d2
@@ -71,7 +110,6 @@ class VizArcEngine:
         user_content += f"USER SPECIFICATION / REQUIREMENTS:\n{prompt}\n"
 
         if not self._client_initialized:
-            # Fallback mock template if no API key is configured yet
             return self._generate_fallback(diagram_format, prompt)
 
         full_prompt = f"{system_prompt}\n\n---\n{user_content}"
@@ -139,4 +177,3 @@ class VizArcEngine:
                 '    AuthSvc --> Cache\n'
                 '    AppSvc --> DB'
             )
-

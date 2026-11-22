@@ -1,0 +1,954 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>E-Commerce Microservices Platform — VizArc</title>
+  <style>
+    :root {
+      --bg: #0B0F19;
+      --surface: #111827;
+      --surface-border: #1F2937;
+      --text-main: #F3F4F6;
+      --text-muted: #9CA3AF;
+      --accent: #3B82F6;
+      --accent-glow: rgba(59, 130, 246, 0.4);
+      --node-bg: #1F2937;
+      --node-border: #374151;
+      --edge-stroke: #4B5563;
+      --edge-active: #60A5FA;
+      --badge-bg: #374151;
+    }
+
+    [data-theme="light"] {
+      --bg: #F8FAFC;
+      --surface: #FFFFFF;
+      --surface-border: #E2E8F0;
+      --text-main: #0F172A;
+      --text-muted: #64748B;
+      --accent: #2563EB;
+      --accent-glow: rgba(37, 99, 235, 0.2);
+      --node-bg: #FFFFFF;
+      --node-border: #CBD5E1;
+      --edge-stroke: #94A3B8;
+      --edge-active: #2563EB;
+      --badge-bg: #E2E8F0;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text-main);
+      overflow: hidden;
+      height: 100vh;
+      width: 100vw;
+      user-select: none;
+    }
+
+    /* Top Bar */
+    header {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 60px;
+      background: var(--surface);
+      border-bottom: 1px solid var(--surface-border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 24px;
+      z-index: 20;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .brand-logo {
+      font-size: 1.3rem;
+      font-weight: 800;
+      color: var(--accent);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .doc-title {
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: var(--text-main);
+    }
+    .doc-summary {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      max-width: 450px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .controls {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .search-box {
+      background: var(--bg);
+      border: 1px solid var(--surface-border);
+      border-radius: 8px;
+      padding: 6px 12px;
+      color: var(--text-main);
+      font-size: 0.85rem;
+      outline: none;
+      width: 220px;
+      transition: all 0.2s;
+    }
+    .search-box:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 2px var(--accent-glow);
+    }
+
+    .btn {
+      background: var(--surface);
+      border: 1px solid var(--surface-border);
+      color: var(--text-main);
+      padding: 6px 12px;
+      border-radius: 6px;
+      font-size: 0.82rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s;
+    }
+    .btn:hover {
+      background: var(--badge-bg);
+      border-color: var(--text-muted);
+    }
+
+    /* Main Viewport */
+    #viewport {
+      position: absolute;
+      top: 60px;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      cursor: grab;
+      overflow: hidden;
+    }
+    #viewport:active { cursor: grabbing; }
+
+    svg#diagram-canvas {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+
+    /* Graph Elements */
+    .tier-box {
+      fill: none;
+      stroke-dasharray: 4 4;
+      stroke-width: 1.5;
+      rx: 12;
+    }
+    .tier-label {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .node-group {
+      cursor: pointer;
+      transition: transform 0.15s ease, opacity 0.25s ease;
+    }
+    .node-rect {
+      fill: var(--node-bg);
+      stroke: var(--node-border);
+      stroke-width: 1.5;
+      rx: 10;
+      transition: all 0.2s ease;
+      filter: drop-shadow(0 4px 6px rgba(0,0,0,0.15));
+    }
+    .node-group:hover .node-rect {
+      stroke: var(--accent);
+      filter: drop-shadow(0 0 12px var(--accent-glow));
+    }
+    .node-title {
+      font-size: 13px;
+      font-weight: 600;
+      fill: var(--text-main);
+    }
+    .node-tech {
+      font-size: 10px;
+      fill: var(--text-muted);
+    }
+
+    /* Path Tracing Highlights */
+    .node-group.is-selected .node-rect {
+      stroke: var(--accent);
+      stroke-width: 2.5;
+      filter: drop-shadow(0 0 16px var(--accent-glow));
+    }
+    .node-group.is-upstream .node-rect {
+      stroke: #10B981;
+      stroke-width: 2;
+      filter: drop-shadow(0 0 10px rgba(16, 185, 129, 0.4));
+    }
+    .node-group.is-downstream .node-rect {
+      stroke: #F59E0B;
+      stroke-width: 2;
+      filter: drop-shadow(0 0 10px rgba(245, 158, 11, 0.4));
+    }
+    .node-group.is-dimmed {
+      opacity: 0.15;
+    }
+
+    /* Edges */
+    .edge-path {
+      fill: none;
+      stroke: var(--edge-stroke);
+      stroke-width: 1.5;
+      transition: all 0.25s ease;
+    }
+    .edge-path.is-active {
+      stroke: var(--edge-active);
+      stroke-width: 2.5;
+      filter: drop-shadow(0 0 8px var(--accent-glow));
+    }
+    .edge-path.is-dimmed {
+      opacity: 0.1;
+    }
+
+    .edge-label {
+      font-size: 10px;
+      fill: var(--text-muted);
+      text-anchor: middle;
+      background: var(--bg);
+      pointer-events: none;
+    }
+    .edge-label-bg {
+      fill: var(--surface);
+      rx: 4;
+    }
+
+    /* Side Detail Drawer */
+    #drawer {
+      position: absolute;
+      top: 60px;
+      right: -380px;
+      width: 360px;
+      bottom: 0;
+      background: var(--surface);
+      border-left: 1px solid var(--surface-border);
+      padding: 24px;
+      box-shadow: -8px 0 24px rgba(0,0,0,0.3);
+      transition: right 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      z-index: 30;
+      overflow-y: auto;
+    }
+    #drawer.open {
+      right: 0;
+    }
+    .drawer-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 16px;
+    }
+    .drawer-title {
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: var(--text-main);
+    }
+    .drawer-close {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      font-size: 1.2rem;
+      cursor: pointer;
+      padding: 4px;
+    }
+    .drawer-badge {
+      display: inline-block;
+      padding: 3px 8px;
+      border-radius: 4px;
+      font-size: 0.72rem;
+      font-weight: 700;
+      margin-bottom: 12px;
+      text-transform: uppercase;
+    }
+    .drawer-section {
+      margin-top: 18px;
+    }
+    .drawer-label {
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-muted);
+      margin-bottom: 6px;
+    }
+    .drawer-text {
+      font-size: 0.9rem;
+      line-height: 1.5;
+      color: var(--text-main);
+    }
+    .file-tag {
+      display: inline-block;
+      font-family: monospace;
+      font-size: 0.75rem;
+      background: var(--badge-bg);
+      color: var(--accent);
+      padding: 3px 6px;
+      border-radius: 4px;
+      margin: 2px 4px 2px 0;
+    }
+    .connection-pill {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 6px 10px;
+      background: var(--bg);
+      border: 1px solid var(--surface-border);
+      border-radius: 6px;
+      font-size: 0.8rem;
+      margin-bottom: 6px;
+      cursor: pointer;
+    }
+    .connection-pill:hover {
+      border-color: var(--accent);
+    }
+  </style>
+</head>
+<body data-theme="dark">
+
+  <header>
+    <div class="brand">
+      <div class="brand-logo">📐 VizArc</div>
+      <div>
+        <div class="doc-title">E-Commerce Microservices Platform</div>
+        <div class="doc-summary">Distributed event-driven architecture with dedicated services, caching, and async queues.</div>
+      </div>
+    </div>
+    <div class="controls">
+      <input type="text" id="search-input" class="search-box" placeholder="🔍 Search components..." />
+      <button class="btn" id="theme-btn">🌓 Theme</button>
+      <button class="btn" id="reset-btn">🎯 Center</button>
+      <button class="btn" id="export-svg-btn">📥 SVG</button>
+    </div>
+  </header>
+
+  <div id="viewport">
+    <svg id="diagram-canvas">
+      <defs>
+        <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+          <path d="M 0 1.5 L 8 5 L 0 8.5 z" fill="var(--edge-stroke)" />
+        </marker>
+        <marker id="arrow-active" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+          <path d="M 0 1.5 L 8 5 L 0 8.5 z" fill="var(--edge-active)" />
+        </marker>
+      </defs>
+      <g id="scene-root">
+        <g id="tiers-layer"></g>
+        <g id="edges-layer"></g>
+        <g id="nodes-layer"></g>
+      </g>
+    </svg>
+  </div>
+
+  <div id="drawer">
+    <div class="drawer-header">
+      <div>
+        <span class="drawer-badge" id="d-badge">Service</span>
+        <div class="drawer-title" id="d-title">Node Title</div>
+      </div>
+      <button class="drawer-close" id="d-close">&times;</button>
+    </div>
+    
+    <div class="drawer-section">
+      <div class="drawer-label">Tech Stack</div>
+      <div class="drawer-text" id="d-tech">Node Tech</div>
+    </div>
+
+    <div class="drawer-section">
+      <div class="drawer-label">Description</div>
+      <div class="drawer-text" id="d-desc">Description text...</div>
+    </div>
+
+    <div class="drawer-section" id="d-files-sec">
+      <div class="drawer-label">Key Source Files</div>
+      <div id="d-files"></div>
+    </div>
+
+    <div class="drawer-section">
+      <div class="drawer-label">Incoming Traffic (Upstream)</div>
+      <div id="d-upstream"></div>
+    </div>
+
+    <div class="drawer-section">
+      <div class="drawer-label">Outgoing Calls (Downstream)</div>
+      <div id="d-downstream"></div>
+    </div>
+  </div>
+
+  <script>
+    const IR = {
+  "title": "E-Commerce Microservices Platform",
+  "summary": "Distributed event-driven architecture with dedicated services, caching, and async queues.",
+  "tiers": [
+    {
+      "id": "client",
+      "label": "Client Layer",
+      "color": "#3B82F6"
+    },
+    {
+      "id": "gateway",
+      "label": "API & Ingress",
+      "color": "#8B5CF6"
+    },
+    {
+      "id": "services",
+      "label": "Microservices",
+      "color": "#10B981"
+    },
+    {
+      "id": "data",
+      "label": "Data & Caching",
+      "color": "#F59E0B"
+    }
+  ],
+  "nodes": [
+    {
+      "id": "web_app",
+      "label": "Next.js Web Store",
+      "tier": "client",
+      "tech": "Next.js / React / TypeScript",
+      "description": "User-facing e-commerce storefront with server-side rendering.",
+      "files": [
+        "src/app/*",
+        "src/components/*"
+      ]
+    },
+    {
+      "id": "mobile_app",
+      "label": "Mobile App",
+      "tier": "client",
+      "tech": "React Native / Expo",
+      "description": "iOS and Android client application.",
+      "files": [
+        "mobile/src/*"
+      ]
+    },
+    {
+      "id": "api_gw",
+      "label": "API Gateway",
+      "tier": "gateway",
+      "tech": "Envoy / Traefik",
+      "description": "Handles TLS termination, rate limiting, and reverse proxy routing.",
+      "files": [
+        "infra/gateway/envoy.yaml"
+      ]
+    },
+    {
+      "id": "auth_svc",
+      "label": "Auth Service",
+      "tier": "services",
+      "tech": "Go / OAuth2 / JWT",
+      "description": "Issues tokens, manages sessions, and verifies user authorization.",
+      "files": [
+        "services/auth/main.go"
+      ]
+    },
+    {
+      "id": "order_svc",
+      "label": "Order Service",
+      "tier": "services",
+      "tech": "FastAPI / Python 3.12",
+      "description": "Processes purchases, updates inventory, and orchestrates fulfillment.",
+      "files": [
+        "services/orders/app.py"
+      ]
+    },
+    {
+      "id": "payment_svc",
+      "label": "Payment Service",
+      "tier": "services",
+      "tech": "Node.js / Express",
+      "description": "Integrates with Stripe API and processes transaction webhooks.",
+      "files": [
+        "services/payments/index.js"
+      ]
+    },
+    {
+      "id": "redis_cache",
+      "label": "Redis Session Cache",
+      "tier": "data",
+      "tech": "Redis 7.2",
+      "description": "High-throughput in-memory cache for user sessions and rate limits.",
+      "files": []
+    },
+    {
+      "id": "orders_db",
+      "label": "Orders Database",
+      "tier": "data",
+      "tech": "PostgreSQL 16",
+      "description": "ACID transactional database storing customer orders and line items.",
+      "files": [
+        "db/migrations/orders.sql"
+      ]
+    },
+    {
+      "id": "event_broker",
+      "label": "Kafka Event Bus",
+      "tier": "data",
+      "tech": "Apache Kafka",
+      "description": "Asynchronous event streaming bus for order updates and shipping notices.",
+      "files": [
+        "events/topics.json"
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "from": "web_app",
+      "to": "api_gw",
+      "label": "HTTPS / GraphQL",
+      "protocol": "HTTPS"
+    },
+    {
+      "from": "mobile_app",
+      "to": "api_gw",
+      "label": "HTTPS / REST",
+      "protocol": "HTTPS"
+    },
+    {
+      "from": "api_gw",
+      "to": "auth_svc",
+      "label": "gRPC Token Check",
+      "protocol": "gRPC"
+    },
+    {
+      "from": "api_gw",
+      "to": "order_svc",
+      "label": "Dispatch Order",
+      "protocol": "REST"
+    },
+    {
+      "from": "auth_svc",
+      "to": "redis_cache",
+      "label": "Read Session",
+      "protocol": "TCP"
+    },
+    {
+      "from": "order_svc",
+      "to": "payment_svc",
+      "label": "Trigger Charge",
+      "protocol": "HTTPS"
+    },
+    {
+      "from": "order_svc",
+      "to": "orders_db",
+      "label": "Insert Order",
+      "protocol": "SQL"
+    },
+    {
+      "from": "order_svc",
+      "to": "event_broker",
+      "label": "Publish 'OrderPlaced'",
+      "protocol": "Kafka"
+    }
+  ]
+};
+
+    // Layout configuration
+    const NODE_WIDTH = 200;
+    const NODE_HEIGHT = 70;
+    const TIER_SPACING_Y = 170;
+    const NODE_SPACING_X = 250;
+    const PADDING_TOP = 80;
+    const PADDING_LEFT = 100;
+
+    const nodePositions = {};
+    const nodesMap = {};
+    IR.nodes.forEach(n => nodesMap[n.id] = n);
+
+    // Group nodes by tier
+    const tiersOrder = IR.tiers.map(t => t.id);
+    const nodesByTier = {};
+    tiersOrder.forEach(t => nodesByTier[t] = []);
+
+    IR.nodes.forEach(n => {
+      const t = nodesByTier[n.tier] ? n.tier : tiersOrder[0];
+      nodesByTier[t].push(n);
+    });
+
+    // Calculate node coordinates
+    let maxRowWidth = 0;
+    tiersOrder.forEach((tId, tIdx) => {
+      const tierNodes = nodesByTier[tId];
+      const rowWidth = tierNodes.length * NODE_SPACING_X;
+      if (rowWidth > maxRowWidth) maxRowWidth = rowWidth;
+
+      tierNodes.forEach((node, nIdx) => {
+        const x = PADDING_LEFT + nIdx * NODE_SPACING_X;
+        const y = PADDING_TOP + tIdx * TIER_SPACING_Y;
+        nodePositions[node.id] = { x, y, width: NODE_WIDTH, height: NODE_HEIGHT };
+      });
+    });
+
+    const scene = document.getElementById("scene-root");
+    const tiersLayer = document.getElementById("tiers-layer");
+    const edgesLayer = document.getElementById("edges-layer");
+    const nodesLayer = document.getElementById("nodes-layer");
+
+    // 1. Render Tier Group Boxes
+    tiersOrder.forEach((tId, tIdx) => {
+      const tierObj = IR.tiers.find(t => t.id === tId);
+      const tierNodes = nodesByTier[tId];
+      if (!tierNodes.length) return;
+
+      const y = PADDING_TOP + tIdx * TIER_SPACING_Y - 30;
+      const height = NODE_HEIGHT + 60;
+      const width = Math.max(tierNodes.length * NODE_SPACING_X + 60, maxRowWidth + 60);
+
+      const rect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+      rect.setAttribute("class", "tier-box");
+      rect.setAttribute("x", PADDING_LEFT - 30);
+      rect.setAttribute("y", y);
+      rect.setAttribute("width", width);
+      rect.setAttribute("height", height);
+      rect.setAttribute("stroke", tierObj ? tierObj.color : "#4B5563");
+      rect.setAttribute("stroke-opacity", "0.35");
+      tiersLayer.appendChild(rect);
+
+      const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
+      text.setAttribute("class", "tier-label");
+      text.setAttribute("x", PADDING_LEFT - 15);
+      text.setAttribute("y", y + 20);
+      text.setAttribute("fill", tierObj ? tierObj.color : "#9CA3AF");
+      text.textContent = tierObj ? tierObj.label : tId;
+      tiersLayer.appendChild(text);
+    });
+
+    // 2. Render Edges (Smooth Bezier Curves)
+    IR.edges.forEach((edge, idx) => {
+      const source = nodePositions[edge.from];
+      const target = nodePositions[edge.to];
+      if (!source || !target) return;
+
+      const x1 = source.x + source.width / 2;
+      const y1 = source.y + source.height;
+      const x2 = target.x + target.width / 2;
+      const y2 = target.y;
+
+      const deltaY = y2 - y1;
+      const cp1y = y1 + deltaY * 0.5;
+      const cp2y = y2 - deltaY * 0.5;
+
+      const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+      path.setAttribute("id", `edge-${edge.from}-${edge.to}`);
+      path.setAttribute("class", "edge-path");
+      path.setAttribute("d", `M ${x1} ${y1} C ${x1} ${cp1y}, ${x2} ${cp2y}, ${x2} ${y2}`);
+      path.setAttribute("marker-end", "url(#arrow)");
+      path.dataset.from = edge.from;
+      path.dataset.to = edge.to;
+      edgesLayer.appendChild(path);
+
+      // Edge label badge
+      if (edge.label) {
+        const midX = (x1 + x2) / 2;
+        const midY = (y1 + y2) / 2;
+
+        const g = document.createElementNS("http://www.w3.org/2000/svg", "g");
+        const bg = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+        const lbl = document.createElementNS("http://www.w3.org/2000/svg", "text");
+        
+        lbl.setAttribute("class", "edge-label");
+        lbl.setAttribute("x", midX);
+        lbl.setAttribute("y", midY + 3);
+        lbl.textContent = edge.label;
+
+        const estWidth = edge.label.length * 6 + 12;
+        bg.setAttribute("class", "edge-label-bg");
+        bg.setAttribute("x", midX - estWidth/2);
+        bg.setAttribute("y", midY - 9);
+        bg.setAttribute("width", estWidth);
+        bg.setAttribute("height", 16);
+
+        g.appendChild(bg);
+        g.appendChild(lbl);
+        edgesLayer.appendChild(g);
+      }
+    });
+
+    // 3. Render Nodes
+    IR.nodes.forEach(node => {
+      const pos = nodePositions[node.id];
+      if (!pos) return;
+
+      const tierObj = IR.tiers.find(t => t.id === node.tier);
+      const tierColor = tierObj ? tierObj.color : "#3B82F6";
+
+      const g = document.createElementNS("http://www.w3.org/2000/svg", "g");
+      g.setAttribute("class", "node-group");
+      g.setAttribute("id", `node-${node.id}`);
+      g.setAttribute("transform", `translate(${pos.x}, ${pos.y})`);
+      g.dataset.id = node.id;
+
+      // Card rectangle
+      const rect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+      rect.setAttribute("class", "node-rect");
+      rect.setAttribute("width", pos.width);
+      rect.setAttribute("height", pos.height);
+
+      // Tier colored accent tab
+      const accent = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+      accent.setAttribute("x", 0);
+      accent.setAttribute("y", 0);
+      accent.setAttribute("width", 5);
+      accent.setAttribute("height", pos.height);
+      accent.setAttribute("fill", tierColor);
+      accent.setAttribute("rx", 3);
+
+      // Node Label
+      const title = document.createElementNS("http://www.w3.org/2000/svg", "text");
+      title.setAttribute("class", "node-title");
+      title.setAttribute("x", 16);
+      title.setAttribute("y", 28);
+      title.textContent = node.label;
+
+      // Node Tech
+      const tech = document.createElementNS("http://www.w3.org/2000/svg", "text");
+      tech.setAttribute("class", "node-tech");
+      tech.setAttribute("x", 16);
+      tech.setAttribute("y", 48);
+      tech.textContent = node.tech || "Service";
+
+      g.appendChild(rect);
+      g.appendChild(accent);
+      g.appendChild(title);
+      g.appendChild(tech);
+
+      g.addEventListener("click", () => selectNode(node.id));
+      nodesLayer.appendChild(g);
+    });
+
+    // Pan & Zoom
+    let scale = 1;
+    let panX = 0;
+    let panY = 0;
+    let isDragging = false;
+    let startX = 0;
+    let startY = 0;
+
+    const viewport = document.getElementById("viewport");
+    function updateTransform() {
+      scene.setAttribute("transform", `translate(${panX}, ${panY}) scale(${scale})`);
+    }
+
+    viewport.addEventListener("mousedown", e => {
+      if (e.target.closest(".node-group")) return;
+      isDragging = true;
+      startX = e.clientX - panX;
+      startY = e.clientY - panY;
+    });
+
+    window.addEventListener("mousemove", e => {
+      if (!isDragging) return;
+      panX = e.clientX - startX;
+      panY = e.clientY - startY;
+      updateTransform();
+    });
+
+    window.addEventListener("mouseup", () => isDragging = false);
+
+    viewport.addEventListener("wheel", e => {
+      e.preventDefault();
+      const zoomFactor = e.deltaY < 0 ? 1.08 : 0.92;
+      const newScale = Math.min(Math.max(scale * zoomFactor, 0.3), 3.0);
+      
+      const mouseX = e.clientX;
+      const mouseY = e.clientY - 60;
+      panX = mouseX - (mouseX - panX) * (newScale / scale);
+      panY = mouseY - (mouseY - panY) * (newScale / scale);
+      scale = newScale;
+      updateTransform();
+    });
+
+    // Upstream & Downstream Link Tracing
+    function selectNode(selectedId) {
+      const allNodes = document.querySelectorAll(".node-group");
+      const allEdges = document.querySelectorAll(".edge-path");
+
+      // Find direct upstream and downstream
+      const upstreams = new Set();
+      const downstreams = new Set();
+      const activeEdgeIds = new Set();
+
+      IR.edges.forEach(e => {
+        if (e.to === selectedId) {
+          upstreams.add(e.from);
+          activeEdgeIds.add(`edge-${e.from}-${e.to}`);
+        }
+        if (e.from === selectedId) {
+          downstreams.add(e.to);
+          activeEdgeIds.add(`edge-${e.from}-${e.to}`);
+        }
+      });
+
+      allNodes.forEach(el => {
+        const id = el.dataset.id;
+        el.classList.remove("is-selected", "is-upstream", "is-downstream", "is-dimmed");
+        if (id === selectedId) {
+          el.classList.add("is-selected");
+        } else if (upstreams.has(id)) {
+          el.classList.add("is-upstream");
+        } else if (downstreams.has(id)) {
+          el.classList.add("is-downstream");
+        } else {
+          el.classList.add("is-dimmed");
+        }
+      });
+
+      allEdges.forEach(el => {
+        el.classList.remove("is-active", "is-dimmed");
+        if (activeEdgeIds.has(el.id)) {
+          el.classList.add("is-active");
+          el.setAttribute("marker-end", "url(#arrow-active)");
+        } else {
+          el.classList.add("is-dimmed");
+          el.setAttribute("marker-end", "url(#arrow)");
+        }
+      });
+
+      openDrawer(selectedId, upstreams, downstreams);
+    }
+
+    // Side Drawer Details
+    const drawer = document.getElementById("drawer");
+    function openDrawer(nodeId, upstreams, downstreams) {
+      const node = nodesMap[nodeId];
+      if (!node) return;
+
+      const tierObj = IR.tiers.find(t => t.id === node.tier);
+      const badge = document.getElementById("d-badge");
+      badge.textContent = tierObj ? tierObj.label : node.tier;
+      badge.style.background = tierObj ? tierObj.color + "22" : "#3B82F622";
+      badge.style.color = tierObj ? tierObj.color : "#3B82F6";
+
+      document.getElementById("d-title").textContent = node.label;
+      document.getElementById("d-tech").textContent = node.tech || "None specified";
+      document.getElementById("d-desc").textContent = node.description || "No detailed description provided.";
+
+      // Files list
+      const filesContainer = document.getElementById("d-files");
+      filesContainer.innerHTML = "";
+      if (node.files && node.files.length) {
+        node.files.forEach(f => {
+          const sp = document.createElement("span");
+          sp.className = "file-tag";
+          sp.textContent = f;
+          filesContainer.appendChild(sp);
+        });
+        document.getElementById("d-files-sec").style.display = "block";
+      } else {
+        document.getElementById("d-files-sec").style.display = "none";
+      }
+
+      // Upstream Pills
+      const upContainer = document.getElementById("d-upstream");
+      upContainer.innerHTML = "";
+      if (upstreams.size) {
+        upstreams.forEach(uId => {
+          const uNode = nodesMap[uId];
+          const div = document.createElement("div");
+          div.className = "connection-pill";
+          div.innerHTML = `<span>⬆️ ${uNode ? uNode.label : uId}</span> <span style="font-size:0.7rem; color:var(--text-muted)">Upstream</span>`;
+          div.onclick = () => selectNode(uId);
+          upContainer.appendChild(div);
+        });
+      } else {
+        upContainer.innerHTML = `<span style="font-size:0.8rem; color:var(--text-muted)">None (Ingress root)</span>`;
+      }
+
+      // Downstream Pills
+      const downContainer = document.getElementById("d-downstream");
+      downContainer.innerHTML = "";
+      if (downstreams.size) {
+        downstreams.forEach(dId => {
+          const dNode = nodesMap[dId];
+          const div = document.createElement("div");
+          div.className = "connection-pill";
+          div.innerHTML = `<span>⬇️ ${dNode ? dNode.label : dId}</span> <span style="font-size:0.7rem; color:var(--text-muted)">Downstream</span>`;
+          div.onclick = () => selectNode(dId);
+          downContainer.appendChild(div);
+        });
+      } else {
+        downContainer.innerHTML = `<span style="font-size:0.8rem; color:var(--text-muted)">None (Leaf node)</span>`;
+      }
+
+      drawer.classList.add("open");
+    }
+
+    document.getElementById("d-close").onclick = () => {
+      drawer.classList.remove("open");
+      document.querySelectorAll(".node-group").forEach(el => el.classList.remove("is-selected", "is-upstream", "is-downstream", "is-dimmed"));
+      document.querySelectorAll(".edge-path").forEach(el => {
+        el.classList.remove("is-active", "is-dimmed");
+        el.setAttribute("marker-end", "url(#arrow)");
+      });
+    };
+
+    // Search Filtering
+    document.getElementById("search-input").addEventListener("input", e => {
+      const query = e.target.value.toLowerCase().trim();
+      if (!query) {
+        document.querySelectorAll(".node-group").forEach(el => el.classList.remove("is-dimmed"));
+        return;
+      }
+      document.querySelectorAll(".node-group").forEach(el => {
+        const node = nodesMap[el.dataset.id];
+        const match = node && (node.label.toLowerCase().includes(query) || (node.tech && node.tech.toLowerCase().includes(query)));
+        el.classList.toggle("is-dimmed", !match);
+      });
+    });
+
+    // Controls
+    document.getElementById("theme-btn").onclick = () => {
+      const cur = document.body.getAttribute("data-theme");
+      document.body.setAttribute("data-theme", cur === "dark" ? "light" : "dark");
+    };
+
+    document.getElementById("reset-btn").onclick = () => {
+      scale = 0.95;
+      panX = 40;
+      panY = 20;
+      updateTransform();
+    };
+
+    document.getElementById("export-svg-btn").onclick = () => {
+      const svg = document.getElementById("diagram-canvas");
+      const serializer = new XMLSerializer();
+      const source = serializer.serializeToString(svg);
+      const blob = new Blob([source], { type: "image/svg+xml;charset=utf-8" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "e-commerce_microservices_platform.svg";
+      a.click();
+    };
+
+    // Initial positioning
+    window.addEventListener("DOMContentLoaded", () => {
+      scale = 0.95;
+      panX = 40;
+      panY = 20;
+      updateTransform();
+    });
+  </script>
+</body>
+</html>
