@@ -1,6 +1,8 @@
 """
-Core VizArc Engine: connects to Gemini Flash API and manages diagram synthesis.
-Supports Interactive HTML Explainers via Typed JSON IR, as well as Mermaid, D2, and ASCII.
+Core VizArc Engine: implements the Universal Architecture Compiler Pattern.
+Calls AI once to produce the Canonical Architecture Model (JSON IR),
+then deterministically compiles it into D2, Mermaid, Structurizr C4, PlantUML,
+Graphviz DOT, Excalidraw, ASCII, and Interactive HTML.
 """
 
 import os
@@ -10,20 +12,9 @@ from typing import Optional, Dict, Any
 from dotenv import load_dotenv
 
 from .ir import IR_SCHEMA_PROMPT, validate_ir, get_demo_ir
-from .compiler import compile_to_html
-from .formats.mermaid import MERMAID_SYSTEM_PROMPT, sanitize_mermaid
-from .formats.d2 import D2_SYSTEM_PROMPT, sanitize_d2
-from .formats.ascii import ASCII_SYSTEM_PROMPT, sanitize_ascii
-from .formats.excalidraw import EXCALIDRAW_SYSTEM_PROMPT, prepare_for_excalidraw
+from .adapters import render_ir, render_all_formats, ADAPTERS
 
 load_dotenv()
-
-ARCHETYPE_INSTRUCTIONS = {
-    "architecture": "Focus on high-level system architecture, client tiers, API gateways, microservices, caches, and database storage.",
-    "sequence": "Focus on the step-by-step sequence of requests, responses, authentication checks, and asynchronous events between actors.",
-    "flowchart": "Focus on business logic, decision trees, conditional branches, and user decision paths.",
-    "erd": "Focus on database tables, entities, fields, primary keys, and foreign key relationships.",
-}
 
 class VizArcEngine:
     def __init__(self, api_key: Optional[str] = None, model_name: str = "gemini-1.5-flash"):
@@ -43,7 +34,7 @@ class VizArcEngine:
 
     def generate_ir(self, prompt: str, codebase_context: Optional[str] = None) -> Dict[str, Any]:
         """
-        Generates a validated Architecture JSON Intermediate Representation (IR).
+        Generates a validated Canonical Architecture JSON Intermediate Representation (IR).
         """
         if not self._client_initialized:
             return get_demo_ir()
@@ -55,19 +46,17 @@ class VizArcEngine:
         if codebase_context:
             full_prompt += f"\nCODEBASE CONTEXT:\n{codebase_context}\n"
 
-        response = self.model.generate_content(
-            full_prompt,
-            generation_config={"temperature": 0.2, "response_mime_type": "application/json"}
-        )
-        
-        raw_text = response.text or "{}"
         try:
-            # Strip code fences if present
+            response = self.model.generate_content(
+                full_prompt,
+                generation_config={"temperature": 0.2, "response_mime_type": "application/json"}
+            )
+            raw_text = response.text or "{}"
             cleaned = re.sub(r"^```(?:json)?\s*|\s*```$", "", raw_text.strip(), flags=re.MULTILINE)
             parsed = json.loads(cleaned)
             return validate_ir(parsed)
         except Exception:
-            # Fallback to demo if JSON parsing fails
+            # Fallback to demo IR if parsing fails
             return get_demo_ir()
 
     def generate(
@@ -78,102 +67,21 @@ class VizArcEngine:
         codebase_context: Optional[str] = None
     ) -> str:
         """
-        Generates an architecture output (HTML explainer, Mermaid, D2, or ASCII).
+        1. Analyzes prompt/codebase to produce the Canonical IR (1 LLM call).
+        2. Compiles IR to the target format deterministically via adapters.
         """
-        diagram_format = diagram_format.lower()
-        archetype = archetype.lower()
+        ir = self.generate_ir(prompt=prompt, codebase_context=codebase_context)
+        return render_ir(ir, target_format=diagram_format)
 
-        # Flagship: Interactive HTML Explainer
-        if diagram_format in ("html", "interactive", "explainer"):
-            ir = self.generate_ir(prompt=prompt, codebase_context=codebase_context)
-            return compile_to_html(ir)
-
-        # Legacy formats
-        if diagram_format == "d2":
-            system_prompt = D2_SYSTEM_PROMPT
-            sanitizer = sanitize_d2
-        elif diagram_format == "ascii":
-            system_prompt = ASCII_SYSTEM_PROMPT
-            sanitizer = sanitize_ascii
-        elif diagram_format == "excalidraw":
-            system_prompt = EXCALIDRAW_SYSTEM_PROMPT
-            sanitizer = prepare_for_excalidraw
-        else: # default mermaid
-            system_prompt = MERMAID_SYSTEM_PROMPT
-            sanitizer = sanitize_mermaid
-
-        archetype_note = ARCHETYPE_INSTRUCTIONS.get(archetype, ARCHETYPE_INSTRUCTIONS["architecture"])
-
-        user_content = f"DIAGRAM TYPE: {archetype.upper()}\nGOAL: {archetype_note}\n\n"
-        if codebase_context:
-            user_content += f"CODEBASE ARCHITECTURE CONTEXT:\n{codebase_context}\n\n"
-        user_content += f"USER SPECIFICATION / REQUIREMENTS:\n{prompt}\n"
-
-        if not self._client_initialized:
-            return self._generate_fallback(diagram_format, prompt)
-
-        full_prompt = f"{system_prompt}\n\n---\n{user_content}"
-        
-        response = self.model.generate_content(
-            full_prompt,
-            generation_config={"temperature": 0.2}
-        )
-        
-        raw_text = response.text or ""
-        return sanitizer(raw_text)
-
-    def _generate_fallback(self, diagram_format: str, prompt: str) -> str:
-        """Demo response returned when GEMINI_API_KEY is not yet supplied."""
-        if diagram_format == "d2":
-            return (
-                "# (Demo Mode - Set GEMINI_API_KEY for live generation)\n"
-                "client: Web Application {\n"
-                "  shape: person\n"
-                "}\n"
-                "gateway: API Gateway\n"
-                "services: Backend Services {\n"
-                "  auth: Auth Service\n"
-                "  core: Core Engine\n"
-                "}\n"
-                "db: PostgreSQL Database {\n"
-                "  shape: cylinder\n"
-                "}\n"
-                "client -> gateway: HTTPS / API\n"
-                "gateway -> services.auth: Authenticate\n"
-                "services.auth -> db: Query Credentials\n"
-                "gateway -> services.core: Process Request\n"
-            )
-        elif diagram_format == "ascii":
-            return (
-                "┌────────────────┐       HTTPS        ┌─────────────┐\n"
-                "│  Web / Mobile  ├───────────────────►│ API Gateway │\n"
-                "└────────────────┘                    └──────┬──────┘\n"
-                "                                             │\n"
-                "                         ┌───────────────────┴───────────────────┐\n"
-                "                         ▼                                       ▼\n"
-                "               ┌───────────────────┐                   ┌───────────────────┐\n"
-                "               │   Auth Service    │                   │   Core Services   │\n"
-                "               └─────────┬─────────┘                   └─────────┬─────────┘\n"
-                "                         │                                       │\n"
-                "                         ▼                                       ▼\n"
-                "               ┌───────────────────┐                   ┌───────────────────┐\n"
-                "               │ Redis Session DB  │                   │ PostgreSQL (Data) │\n"
-                "               └───────────────────┘                   └───────────────────┘"
-            )
-        else: # mermaid
-            return (
-                "flowchart TD\n"
-                '    User["Client (Web / Mobile)"] -->|HTTPS| APIGW["API Gateway"]\n'
-                '    subgraph Core Services\n'
-                '        AuthSvc["Auth Service"]\n'
-                '        AppSvc["Core App Engine"]\n'
-                '    end\n'
-                '    subgraph Data Layer\n'
-                '        Cache[("Redis Cache")]\n'
-                '        DB[("PostgreSQL DB")]\n'
-                '    end\n'
-                '    APIGW --> AuthSvc\n'
-                '    APIGW --> AppSvc\n'
-                '    AuthSvc --> Cache\n'
-                '    AppSvc --> DB'
-            )
+    def generate_all(
+        self,
+        prompt: str,
+        codebase_context: Optional[str] = None
+    ) -> Dict[str, str]:
+        """
+        Produces the Canonical IR once and compiles into all 8 formats simultaneously.
+        """
+        ir = self.generate_ir(prompt=prompt, codebase_context=codebase_context)
+        results = render_all_formats(ir)
+        results["ir"] = json.dumps(ir, indent=2)
+        return results

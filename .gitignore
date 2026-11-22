@@ -12,5 +12,10 @@ ENV/
 # Environment Variables
 .env
 
+# Output directories
+vizarc_out/
+test_vizarc_out/
+architecture.html
+
 # Streamlit
 .streamlit/secrets.toml
