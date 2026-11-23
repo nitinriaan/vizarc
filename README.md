@@ -1,5 +1,9 @@
 <p align="center">
-  <img src="assets/logo.png" alt="VizArc - Architecture, Visualized" width="680"/>
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="assets/logo-dark.png">
+    <source media="(prefers-color-scheme: light)" srcset="assets/logo-light.png">
+    <img alt="VizArc - Architecture, Visualized" src="assets/logo-light.png" width="680">
+  </picture>
 </p>
 
 <p align="center">
