@@ -11,7 +11,7 @@ Features Dual-View Mode:
 import json
 from typing import Dict, Any
 from .services import infer_service_metadata, PROTOCOL_COLORS, PROVIDER_COLORS, VECTOR_ICONS
-from .logo_data import LOGO_LIGHT_URI, LOGO_DARK_URI
+from .logo_data import LOGO_LIGHT_URI, LOGO_DARK_URI, FAVICON_URI
 
 def compile_to_html(ir: Dict[str, Any]) -> str:
     """
@@ -34,6 +34,7 @@ def compile_to_html(ir: Dict[str, Any]) -> str:
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>{ir.get('title', 'Architecture Explainer')} — VizArc</title>
+  <link rel="icon" type="image/png" href="{FAVICON_URI}">
   <style>
     :root {{
       --bg: #090D16;
@@ -105,9 +106,9 @@ def compile_to_html(ir: Dict[str, Any]) -> str:
       text-decoration: none;
     }}
     .brand-logo-img {{
-      height: 30px;
+      height: 32px;
       width: auto;
-      max-width: 140px;
+      max-width: 160px;
       object-fit: contain;
       display: block;
     }}

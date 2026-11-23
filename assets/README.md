@@ -1,0 +1,1 @@
+# VizArc Brand Kit\n\nA ready-to-use logo and visual identity package for light and dark interfaces. See [`guidelines/BRAND-GUIDELINES.md`](guidelines/BRAND-GUIDELINES.md) for palette, typography, spacing, and aspect-ratio guidance.\n

@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 256 256">
+<defs>
+      <linearGradient id="arcBlue" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0" stop-color="#00D5F5"/><stop offset="0.48" stop-color="#087BFF"/><stop offset="1" stop-color="#1645E8"/>
+      </linearGradient>
+      <linearGradient id="arcNavy" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0" stop-color="#06145A"/><stop offset="1" stop-color="#123BEA"/>
+      </linearGradient>
+      <linearGradient id="arcCyan" x1="0" y1="0" x2="1" y2="0">
+        <stop offset="0" stop-color="#00C8F2"/><stop offset="1" stop-color="#087BFF"/>
+      </linearGradient>
+      <linearGradient id="bgLight" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0" stop-color="#FFFFFF"/><stop offset="0.72" stop-color="#F5F8FF"/><stop offset="1" stop-color="#DCE9FF"/>
+      </linearGradient>
+      <linearGradient id="bgDark" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0" stop-color="#06132F"/><stop offset="0.7" stop-color="#071F54"/><stop offset="1" stop-color="#123B9A"/>
+      </linearGradient>
+    </defs><rect width="100%" height="100%" fill="#06132F"/>
+    <g transform="translate(25,33) scale(0.6866666666666666,0.6909090909090909)">
+      <path d="M18 202 L119 38 Q150 -7 184 39 L294 202 L239 202 L164 91 Q150 71 135 92 L72 202 Z"
+            fill="url(#arcBlue)"/>
+      <path d="M18 202 L72 202 L135 111 Q151 91 169 113 L239 202 L205 202 L164 151 Q151 133 137 152 L104 202 Z"
+            fill="url(#arcNavy)"/>
+      <path d="M104 202 L137 152 Q151 133 164 151 L205 202 Q155 180 104 202Z"
+            fill="url(#arcCyan)"/>
+    </g></svg>

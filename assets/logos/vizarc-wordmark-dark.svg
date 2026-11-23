@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="520" height="175" viewBox="0 0 520 175">
+<defs>
+      <linearGradient id="arcBlue" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0" stop-color="#00D5F5"/><stop offset="0.48" stop-color="#087BFF"/><stop offset="1" stop-color="#1645E8"/>
+      </linearGradient>
+      <linearGradient id="arcNavy" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0" stop-color="#06145A"/><stop offset="1" stop-color="#123BEA"/>
+      </linearGradient>
+      <linearGradient id="arcCyan" x1="0" y1="0" x2="1" y2="0">
+        <stop offset="0" stop-color="#00C8F2"/><stop offset="1" stop-color="#087BFF"/>
+      </linearGradient>
+      <linearGradient id="bgLight" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0" stop-color="#FFFFFF"/><stop offset="0.72" stop-color="#F5F8FF"/><stop offset="1" stop-color="#DCE9FF"/>
+      </linearGradient>
+      <linearGradient id="bgDark" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0" stop-color="#06132F"/><stop offset="0.7" stop-color="#071F54"/><stop offset="1" stop-color="#123B9A"/>
+      </linearGradient>
+    </defs><text x="12" y="140" font-family="Plus Jakarta Sans, Inter, Arial, sans-serif" font-size="128" font-weight="750" letter-spacing="-5" fill="#FFFFFF">VizArc</text></svg>

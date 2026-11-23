@@ -26,9 +26,11 @@ from vizarc.logo_data import LOGO_LIGHT_URI, LOGO_DARK_URI
 
 load_dotenv()
 
+icon_path = Path(__file__).resolve().parent / "assets" / "icons" / "vizarc-blue-64.png"
+
 st.set_page_config(
     page_title="VizArc - Architecture Studio",
-    page_icon="📐",
+    page_icon=str(icon_path) if icon_path.exists() else "📐",
     layout="wide",
     initial_sidebar_state="collapsed"
 )
