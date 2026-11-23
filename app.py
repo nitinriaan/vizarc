@@ -68,47 +68,64 @@ if "current_ir" not in st.session_state:
     st.session_state.current_ir = initial_tpl["ir"]
     st.session_state.spec_text = initial_tpl["text"]
     st.session_state.preset_id = initial_tpl["id"]
+    st.session_state.orientation = "horizontal"
 
-# Two-Pane Split Layout (Like Mermaid Live Editor)
-col_editor, col_preview = st.columns([1, 2.7], gap="large")
+current_ir = st.session_state.get("current_ir")
+selected_orientation = st.session_state.get("orientation", "horizontal")
+
+html_code = compile_to_html(current_ir) if current_ir else ""
+svg_code = render_svg_diagram(current_ir, orientation=selected_orientation) if current_ir else ""
+
+# Two-Pane Split Layout (Compact left control pane ~19%, massive right canvas ~81%)
+col_editor, col_preview = st.columns([1, 4.2], gap="medium")
 
 # ==========================================
-# LEFT SIDE PANE: System Specification & ⚙️ Settings
+# LEFT SIDE PANE: System Specification, Actions & Downloads
 # ==========================================
 with col_editor:
-    st.markdown("#### 📝 System Specification")
+    st.markdown("#### 📝 Specification")
 
     spec_input = st.text_area(
         label="System Specification",
         value=st.session_state.get("spec_text", ""),
-        height=240,
+        height=230,
         placeholder="Describe your system architecture, components, and data flow...",
         label_visibility="collapsed"
     )
 
     col_btn_gen, col_btn_load = st.columns([3, 2], gap="small")
-    
     with col_btn_gen:
-        generate_clicked = st.button("🚀 Generate Canvas", type="primary", use_container_width=True)
+        generate_clicked = st.button("🚀 Generate", type="primary", use_container_width=True)
     with col_btn_load:
-        load_preset_clicked = st.button("⚡ Load Preset", use_container_width=True)
+        load_preset_clicked = st.button("⚡ Load", use_container_width=True)
 
-    # Settings Gear Expander (in the same left pane)
+    # Downloads in Left Pane
+    if current_ir:
+        st.markdown("<div style='margin-top: 6px;'></div>", unsafe_allow_html=True)
+        col_dl_svg, col_dl_html = st.columns(2, gap="small")
+        with col_dl_svg:
+            st.download_button(
+                label="📥 SVG",
+                data=svg_code,
+                file_name=f"{current_ir.get('title', 'architecture').lower().replace(' ', '_')}.svg",
+                mime="image/svg+xml",
+                use_container_width=True
+            )
+        with col_dl_html:
+            st.download_button(
+                label="📥 HTML",
+                data=html_code,
+                file_name=f"{current_ir.get('title', 'architecture').lower().replace(' ', '_')}.html",
+                mime="text/html",
+                use_container_width=True
+            )
+
+    # Settings Expander (Presets & Orientation only, NO API Key in UI)
     st.markdown("<div style='margin-top: 10px;'></div>", unsafe_allow_html=True)
-    with st.expander("⚙️ Settings & Configuration", expanded=False):
-        st.markdown("##### ⚙️ Configuration")
-        user_api_key = st.text_input(
-            "Google Gemini API Key",
-            value=os.getenv("GEMINI_API_KEY", ""),
-            type="password",
-            help="Your Gemini API key is loaded automatically from .env or .streamlit/secrets.toml."
-        )
-
-        st.markdown("---")
+    with st.expander("⚙️ Presets & Layout", expanded=False):
         st.markdown("##### 📐 13 Preset Architectures")
         preset_names = [f"{t['name']} ({t['id']})" for t in TEMPLATES]
         
-        # Calculate selected index
         current_id = st.session_state.get("preset_id", "ecommerce-platform")
         cur_idx = 0
         for i, t in enumerate(TEMPLATES):
@@ -124,14 +141,17 @@ with col_editor:
         selected_tpl_id = chosen_preset_name.split("(")[-1].replace(")", "").strip()
 
         st.markdown("---")
-        st.markdown("##### SVG / Diagram Layout:")
+        st.markdown("##### Layout Direction:")
         layout_choice = st.radio(
-            "SVG / Diagram Layout:",
+            "Layout Direction:",
             options=["Horizontal (LR)", "Vertical (TB)"],
-            index=0,
+            index=0 if selected_orientation == "horizontal" else 1,
             label_visibility="collapsed"
         )
-        selected_orientation = "horizontal" if "Horizontal" in layout_choice else "vertical"
+        new_orientation = "horizontal" if "Horizontal" in layout_choice else "vertical"
+        if new_orientation != selected_orientation:
+            st.session_state.orientation = new_orientation
+            st.rerun()
 
 # Action Logic
 if load_preset_clicked:
@@ -144,54 +164,19 @@ if load_preset_clicked:
 
 if generate_clicked:
     with st.spinner("Analyzing architecture and generating interactive canvas..."):
-        engine = VizArcEngine(api_key=user_api_key or None)
+        engine = VizArcEngine()
         ir = engine.generate_ir(prompt=spec_input)
         st.session_state.current_ir = ir
         st.session_state.spec_text = spec_input
+        st.rerun()
 
 # ==========================================
-# RIGHT SIDE PANE: Interactive Canvas (Majority of page)
+# RIGHT SIDE PANE: Pure Full-Bleed Canvas (No Header, Nothing)
 # ==========================================
 with col_preview:
-    current_ir = st.session_state.get("current_ir")
-    
     if current_ir:
-        # Default: compile interactive HTML & SVG only
-        html_code = compile_to_html(current_ir)
-        svg_code = render_svg_diagram(current_ir, orientation=selected_orientation)
-
-        # Top Bar: Diagram Title on left, Download SVG & HTML in top-right corner
-        col_title, col_svg_dl, col_html_dl = st.columns([4, 1.2, 1.2], gap="small")
-        
-        with col_title:
-            st.markdown(
-                f"<div style='font-size:1.15rem; font-weight:700; color:#0F172A; padding-top:4px;'>"
-                f"{current_ir.get('title', 'Architecture Diagram')} "
-                f"<span style='font-size:0.75rem; color:#64748B; font-weight:normal;'>({len(current_ir.get('nodes', []))} nodes, {len(current_ir.get('edges', []))} links)</span>"
-                f"</div>",
-                unsafe_allow_html=True
-            )
-
-        with col_svg_dl:
-            st.download_button(
-                label="📥 Download SVG",
-                data=svg_code,
-                file_name=f"{current_ir.get('title', 'architecture').lower().replace(' ', '_')}.svg",
-                mime="image/svg+xml",
-                use_container_width=True
-            )
-
-        with col_html_dl:
-            st.download_button(
-                label="📥 Download HTML",
-                data=html_code,
-                file_name=f"{current_ir.get('title', 'architecture').lower().replace(' ', '_')}.html",
-                mime="text/html",
-                use_container_width=True
-            )
-
-        # Primary Display: Interactive Canvas & One-Page Explainer (16:9 Viewport Fit)
-        components.html(html_code, height=780, scrolling=False)
+        # Pure Edge-to-Edge Interactive Canvas & Explainer (16:9 Viewport Fit)
+        components.html(html_code, height=820, scrolling=False)
 
         # On-Demand Styles Expander: Only generate other formats when user asks for them!
         st.markdown("<div style='margin-top: 14px;'></div>", unsafe_allow_html=True)

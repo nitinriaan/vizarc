@@ -382,6 +382,68 @@ def compile_to_html(ir: Dict[str, Any]) -> str:
       color: var(--accent);
     }}
 
+    /* Workflow Route Player Dock (Archify Agent Workflow Standard) */
+    .flow-player-dock {{
+      position: absolute;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--surface);
+      border: 1px solid var(--surface-border);
+      border-radius: 30px;
+      padding: 5px 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.45);
+      z-index: 30;
+      backdrop-filter: blur(12px);
+    }}
+    .player-btn {{
+      background: var(--bg);
+      border: 1px solid var(--surface-border);
+      color: var(--text-main);
+      border-radius: 16px;
+      padding: 4px 10px;
+      font-size: 0.74rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.15s;
+    }}
+    .player-btn:hover {{
+      border-color: var(--accent);
+      color: var(--accent);
+    }}
+    .player-btn.player-play {{
+      background: var(--accent);
+      color: #FFFFFF;
+      border-color: var(--accent);
+    }}
+    .player-info {{
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.78rem;
+    }}
+    .player-badge {{
+      font-size: 0.64rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      background: var(--badge-bg);
+      color: var(--accent);
+      padding: 2px 6px;
+      border-radius: 4px;
+      border: 1px solid var(--surface-border);
+    }}
+    .player-step-desc {{
+      color: var(--text-muted);
+      font-size: 0.75rem;
+      max-width: 260px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }}
+
     /* MiniMap */
     #minimap-card {{
       position: absolute;
@@ -917,6 +979,19 @@ def compile_to_html(ir: Dict[str, Any]) -> str:
         <g id="minimap-elements"></g>
         <rect id="minimap-viewport" class="minimap-viewport-rect" x="0" y="0" width="0" height="0"></rect>
       </svg>
+    </div>
+
+    <!-- Floating Workflow Route Player (Archify Workflow Standard) -->
+    <div id="flow-player-dock" class="flow-player-dock">
+      <button class="player-btn" id="player-prev-btn" title="Previous Phase (Left Arrow)">◀</button>
+      <div class="player-info" id="player-info-pill">
+        <span class="player-badge">WORKFLOW TRACE</span>
+        <span id="player-step-label">Step 1 / {len(ir.get('flow_steps', []))}</span>
+        <span id="player-step-desc" class="player-step-desc">Click ▶ to trace route</span>
+      </div>
+      <button class="player-btn" id="player-next-btn" title="Next Phase (Right Arrow)">▶</button>
+      <button class="player-btn player-play" id="player-play-btn" title="Auto-Play Route Animation">▶ Auto</button>
+      <button class="player-btn" id="player-reset-btn" title="Clear Trace">✕</button>
     </div>
 
     <!-- Side Inspector Drawer -->
@@ -1874,6 +1949,111 @@ def compile_to_html(ir: Dict[str, Any]) -> str:
       img.src = url;
     }};
 
+    // ==========================================
+    // WORKFLOW ROUTE TRACE CONTROLLER (Archify Standard)
+    // ==========================================
+    let currentStepIndex = -1;
+    let autoPlayTimer = null;
+    const flowSteps = IR.flow_steps || [];
+
+    function highlightFlowStep(index) {{
+      if (!flowSteps.length) return;
+      if (index < 0) index = 0;
+      if (index >= flowSteps.length) index = flowSteps.length - 1;
+      currentStepIndex = index;
+
+      const step = flowSteps[index];
+      const stepLabel = document.getElementById("player-step-label");
+      const stepDesc = document.getElementById("player-step-desc");
+      if (stepLabel) stepLabel.textContent = `Phase ${{step.step || (index + 1)}} / ${{flowSteps.length}}`;
+      if (stepDesc) {{
+        stepDesc.textContent = `${{step.title || (step.from + ' → ' + step.to)}} [${{step.protocol || 'HTTPS'}}]`;
+        stepDesc.title = step.description || "";
+      }}
+
+      // Highlight source node, target node, and the specific connecting edge
+      const allNodes = document.querySelectorAll(".node-group");
+      const allEdges = document.querySelectorAll(".edge-path");
+      const targetEdgeId = `edge-${{step.from}}-${{step.to}}`;
+
+      allNodes.forEach(el => {{
+        const id = el.dataset.id;
+        el.classList.remove("is-selected", "is-upstream", "is-downstream", "is-dimmed");
+        if (id === step.from) {{
+          el.classList.add("is-selected");
+        }} else if (id === step.to) {{
+          el.classList.add("is-downstream");
+        }} else {{
+          el.classList.add("is-dimmed");
+        }}
+      }});
+
+      allEdges.forEach(el => {{
+        el.classList.remove("is-active", "is-dimmed");
+        if (el.id === targetEdgeId) {{
+          el.classList.add("is-active");
+          el.setAttribute("marker-end", "url(#arrow-active)");
+        }} else {{
+          el.classList.add("is-dimmed");
+          el.setAttribute("marker-end", "url(#arrow-default)");
+        }}
+      }});
+    }}
+
+    function nextStep() {{
+      highlightFlowStep(currentStepIndex + 1);
+    }}
+
+    function prevStep() {{
+      highlightFlowStep(currentStepIndex - 1);
+    }}
+
+    function toggleAutoPlay() {{
+      const playBtn = document.getElementById("player-play-btn");
+      if (autoPlayTimer) {{
+        clearInterval(autoPlayTimer);
+        autoPlayTimer = null;
+        if (playBtn) {{
+          playBtn.textContent = "▶ Auto";
+          playBtn.classList.remove("player-play");
+        }}
+      }} else {{
+        if (playBtn) {{
+          playBtn.textContent = "⏸ Pause";
+          playBtn.classList.add("player-play");
+        }}
+        if (currentStepIndex >= flowSteps.length - 1) currentStepIndex = -1;
+        nextStep();
+        autoPlayTimer = setInterval(() => {{
+          if (currentStepIndex >= flowSteps.length - 1) {{
+            toggleAutoPlay();
+          }} else {{
+            nextStep();
+          }}
+        }}, 1800);
+      }}
+    }}
+
+    function resetTrace() {{
+      if (autoPlayTimer) toggleAutoPlay();
+      currentStepIndex = -1;
+      const stepLabel = document.getElementById("player-step-label");
+      const stepDesc = document.getElementById("player-step-desc");
+      if (stepLabel) stepLabel.textContent = `Step 1 / ${{flowSteps.length}}`;
+      if (stepDesc) stepDesc.textContent = "Click ▶ to trace route";
+      closeDrawer();
+    }}
+
+    const prevBtn = document.getElementById("player-prev-btn");
+    const nextBtn = document.getElementById("player-next-btn");
+    const playBtn = document.getElementById("player-play-btn");
+    const resetBtn = document.getElementById("player-reset-btn");
+
+    if (prevBtn) prevBtn.onclick = prevStep;
+    if (nextBtn) nextBtn.onclick = nextStep;
+    if (playBtn) playBtn.onclick = toggleAutoPlay;
+    if (resetBtn) resetBtn.onclick = resetTrace;
+
     // Keyboard Shortcuts
     window.addEventListener("keydown", (e) => {{
       if (e.target === searchInput && e.key !== "Escape") return;
@@ -1887,7 +2067,7 @@ def compile_to_html(ir: Dict[str, Any]) -> str:
       }} else if (e.key === "/") {{
         e.preventDefault();
         searchInput.focus();
-      }} else if (e.key.toLowerCase() === "d") {{
+      }} else if (e.key.toLowerCase() === "d" || e.key.toLowerCase() === "t") {{
         document.getElementById("theme-btn").click();
       }} else if (e.key.toLowerCase() === "m") {{
         toggleFlowMotion();
@@ -1897,6 +2077,13 @@ def compile_to_html(ir: Dict[str, Any]) -> str:
         document.getElementById("orient-btn").click();
       }} else if (e.key.toLowerCase() === "f") {{
         document.getElementById("fullscreen-btn").click();
+      }} else if (e.key === "ArrowRight") {{
+        nextStep();
+      }} else if (e.key === "ArrowLeft") {{
+        prevStep();
+      }} else if (e.key === " " && e.target !== searchInput) {{
+        e.preventDefault();
+        toggleAutoPlay();
       }}
     }});
 
