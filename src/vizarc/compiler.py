@@ -1,11 +1,12 @@
 """
-VizArc Standalone Interactive HTML Canvas & One-Page Explainer Compiler.
+VizArc Standalone Interactive Architecture Canvas Compiler.
 Compiles Canonical Architecture IR into a publication-grade, zero-dependency,
-double-clickable interactive architecture explainer (inspired by Archify & Mermaid Live).
+double-clickable interactive vector canvas (inspired by Archify & Mermaid Live).
 100% foolproof: embeds authentic vector SVG path glyphs directly with zero external network requests!
-Features Dual-View Mode:
-- 📐 Diagram Canvas: Interactive SVG canvas, pan/zoom, flow animation, path tracing, minimap.
-- 📄 One-Page Explainer: Executive summary, architecture decisions (ADRs), step-by-step transaction flow, component catalog.
+Features Dynamic Workflow Route Tracing with Live Node State Updates:
+- 📐 Pure Interactive Canvas: SVG canvas, pan/zoom, flow motion, dynamic node updates, minimap.
+- ⚡ Live Flow Route Player: Dynamically updates what each node is sending, receiving, and processing at each phase.
+- 🔍 Node Inspector Drawer: Upstream/downstream dependency breakdown & participating lifecycle steps.
 """
 
 import json
@@ -15,7 +16,7 @@ from .logo_data import LOGO_LIGHT_URI, LOGO_DARK_URI, FAVICON_URI
 
 def compile_to_html(ir: Dict[str, Any]) -> str:
     """
-    Takes an Architecture IR and produces a self-contained, publication-grade interactive HTML file.
+    Takes an Architecture IR and produces a self-contained, publication-grade interactive canvas HTML file.
     """
     enriched_ir = dict(ir)
     enriched_nodes = []
@@ -61,21 +62,27 @@ def compile_to_html(ir: Dict[str, Any]) -> str:
       --accent: #2563EB;
       --accent-glow: rgba(37, 99, 235, 0.25);
       --node-bg: #FFFFFF;
-      --node-border: #CBD5E1;
+      --node-border: #E2E8F0;
       --edge-stroke: #94A3B8;
       --edge-active: #2563EB;
-      --badge-bg: #F1F5F9;
-      --card-bg: #FFFFFF;
+      --badge-bg: #EFF6FF;
+      --card-bg: rgba(255, 255, 255, 0.95);
     }}
 
-    * {{ box-sizing: border-box; margin: 0; padding: 0; }}
-    body {{
+    * {{
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-      background: var(--bg);
-      color: var(--text-main);
-      overflow: hidden;
-      height: 100vh;
+      -webkit-font-smoothing: antialiased;
+    }}
+
+    html, body {{
       width: 100vw;
+      height: 100vh;
+      overflow: hidden;
+      background-color: var(--bg);
+      color: var(--text-main);
       user-select: none;
     }}
 
@@ -142,42 +149,10 @@ def compile_to_html(ir: Dict[str, Any]) -> str:
     .doc-summary {{
       font-size: 0.74rem;
       color: var(--text-muted);
-      max-width: 320px;
+      max-width: 420px;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
-    }}
-
-    /* Center Dual-View Switcher */
-    .view-switcher {{
-      display: flex;
-      background: var(--bg);
-      border: 1px solid var(--surface-border);
-      border-radius: 8px;
-      padding: 3px;
-      gap: 4px;
-    }}
-    .tab-btn {{
-      background: transparent;
-      border: none;
-      color: var(--text-muted);
-      padding: 5px 12px;
-      border-radius: 6px;
-      font-size: 0.8rem;
-      font-weight: 700;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      transition: all 0.15s ease;
-    }}
-    .tab-btn.active {{
-      background: var(--surface);
-      color: var(--text-main);
-      box-shadow: 0 2px 6px rgba(0,0,0,0.25);
-    }}
-    .tab-btn:hover:not(.active) {{
-      color: var(--text-main);
     }}
 
     /* Right Controls */
@@ -190,31 +165,31 @@ def compile_to_html(ir: Dict[str, Any]) -> str:
       background: var(--bg);
       border: 1px solid var(--surface-border);
       border-radius: 6px;
-      padding: 6px 10px;
-      color: var(--text-main);
+      padding: 6px 12px;
       font-size: 0.8rem;
+      color: var(--text-main);
+      width: 170px;
       outline: none;
-      width: 175px;
       transition: all 0.2s;
     }}
     .search-box:focus {{
       border-color: var(--accent);
+      width: 220px;
       box-shadow: 0 0 0 2px var(--accent-glow);
     }}
-
     .btn {{
       background: var(--surface);
       border: 1px solid var(--surface-border);
       color: var(--text-main);
-      padding: 6px 11px;
+      padding: 6px 12px;
       border-radius: 6px;
-      font-size: 0.78rem;
+      font-size: 0.8rem;
       font-weight: 600;
       cursor: pointer;
       display: flex;
       align-items: center;
       gap: 5px;
-      transition: all 0.15s;
+      transition: all 0.15s ease;
     }}
     .btn:hover {{
       background: var(--badge-bg);
@@ -226,61 +201,59 @@ def compile_to_html(ir: Dict[str, Any]) -> str:
       border-color: var(--accent);
     }}
 
-    /* Viewport & Panels */
-    .view-panel {{
+    /* Main Canvas Viewport */
+    #canvas-view {{
       position: absolute;
       top: 58px;
       bottom: 0;
       left: 0;
       right: 0;
-      display: none;
-    }}
-    .view-panel.active {{
-      display: block;
+      width: 100vw;
+      height: calc(100vh - 58px);
+      overflow: hidden;
+      background-color: var(--bg);
     }}
 
-    /* =========================================
-       CANVAS VIEW
-       ========================================= */
     #viewport {{
       width: 100%;
       height: 100%;
       cursor: grab;
       overflow: hidden;
       background-color: var(--bg);
-      background-image: radial-gradient(rgba(255, 255, 255, 0.08) 1px, transparent 1px);
+      background-image: 
+        radial-gradient(var(--surface-border) 1px, transparent 1px);
       background-size: 24px 24px;
     }}
-    [data-theme="light"] #viewport {{
-      background-image: radial-gradient(rgba(0, 0, 0, 0.08) 1px, transparent 1px);
+    #viewport.dragging {{
+      cursor: grabbing;
     }}
-    #viewport:active {{ cursor: grabbing; }}
-
-    svg#diagram-canvas {{
+    #diagram-canvas {{
       width: 100%;
       height: 100%;
       display: block;
     }}
 
-    /* Graph Tiers */
-    .tier-box {{
-      fill: var(--surface);
-      fill-opacity: 0.3;
-      stroke-dasharray: 5 5;
-      stroke-width: 1.5;
-      rx: 14;
+    /* Tiers / Swimlanes */
+    .tier-rect {{
+      fill: var(--card-bg);
+      stroke: var(--surface-border);
+      stroke-width: 1;
+      stroke-dasharray: 4 4;
+      rx: 12;
+      transition: all 0.2s ease;
     }}
     .tier-label {{
-      font-size: 10px;
-      font-weight: 800;
+      font-size: 11px;
+      font-weight: 700;
       text-transform: uppercase;
       letter-spacing: 0.08em;
+      fill: var(--text-muted);
     }}
 
     /* Node Cards */
     .node-group {{
       cursor: pointer;
-      transition: transform 0.15s ease, opacity 0.25s ease;
+      transition: transform 0.18s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.25s ease;
     }}
     .node-rect {{
       fill: var(--node-bg);
@@ -296,7 +269,7 @@ def compile_to_html(ir: Dict[str, Any]) -> str:
     }}
     .node-title {{
       font-size: 12.5px;
-      font-weight: 700;
+      font-weight: 750;
       fill: var(--text-main);
       letter-spacing: -0.01em;
     }}
@@ -304,30 +277,45 @@ def compile_to_html(ir: Dict[str, Any]) -> str:
       font-size: 9.5px;
       font-weight: 600;
       fill: #38BDF8;
+      transition: fill 0.2s ease;
     }}
     .node-desc {{
       font-size: 8.5px;
       fill: var(--text-muted);
+      transition: fill 0.2s ease;
     }}
 
-    /* Highlighting */
+    /* Dynamic Node States during Flow Tracing */
     .node-group.is-selected .node-rect {{
-      stroke: var(--accent) !important;
-      stroke-width: 2.5;
-      filter: drop-shadow(0 0 20px var(--accent-glow));
-    }}
-    .node-group.is-upstream .node-rect {{
-      stroke: #10B981 !important;
-      stroke-width: 2.2;
-      filter: drop-shadow(0 0 14px rgba(16, 185, 129, 0.45));
+      stroke: #00C8F2 !important;
+      stroke-width: 2.8;
+      filter: drop-shadow(0 0 22px rgba(0, 200, 242, 0.65));
+      animation: pulseGlowCyan 2s infinite;
     }}
     .node-group.is-downstream .node-rect {{
-      stroke: #F59E0B !important;
+      stroke: #10B981 !important;
+      stroke-width: 2.8;
+      filter: drop-shadow(0 0 22px rgba(16, 185, 129, 0.65));
+      animation: pulseGlowGreen 2s infinite;
+    }}
+    .node-group.is-upstream .node-rect {{
+      stroke: #60A5FA !important;
       stroke-width: 2.2;
-      filter: drop-shadow(0 0 14px rgba(245, 158, 11, 0.45));
+      filter: drop-shadow(0 0 14px rgba(96, 165, 250, 0.45));
     }}
     .node-group.is-dimmed {{
-      opacity: 0.12;
+      opacity: 0.14;
+    }}
+
+    @keyframes pulseGlowCyan {{
+      0% {{ filter: drop-shadow(0 0 14px rgba(0, 200, 242, 0.45)); }}
+      50% {{ filter: drop-shadow(0 0 26px rgba(0, 200, 242, 0.85)); }}
+      100% {{ filter: drop-shadow(0 0 14px rgba(0, 200, 242, 0.45)); }}
+    }}
+    @keyframes pulseGlowGreen {{
+      0% {{ filter: drop-shadow(0 0 14px rgba(16, 185, 129, 0.45)); }}
+      50% {{ filter: drop-shadow(0 0 26px rgba(16, 185, 129, 0.85)); }}
+      100% {{ filter: drop-shadow(0 0 14px rgba(16, 185, 129, 0.45)); }}
     }}
 
     /* Edges */
@@ -347,8 +335,8 @@ def compile_to_html(ir: Dict[str, Any]) -> str:
 
     .edge-path.is-active {{
       stroke: var(--edge-active) !important;
-      stroke-width: 3.2;
-      filter: drop-shadow(0 0 10px var(--accent-glow));
+      stroke-width: 3.5;
+      filter: drop-shadow(0 0 12px var(--accent-glow));
     }}
     .edge-path.is-dimmed {{
       opacity: 0.08;
@@ -399,7 +387,45 @@ def compile_to_html(ir: Dict[str, Any]) -> str:
       color: var(--accent);
     }}
 
-    /* Workflow Route Player Dock (Archify Agent Workflow Standard) */
+    /* MiniMap */
+    #minimap-card {{
+      position: absolute;
+      bottom: 24px;
+      right: 24px;
+      width: 190px;
+      height: 125px;
+      background: var(--surface);
+      border: 1px solid var(--surface-border);
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+      z-index: 25;
+      display: flex;
+      flex-direction: column;
+    }}
+    .minimap-header {{
+      padding: 4px 8px;
+      font-size: 0.65rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-muted);
+      border-bottom: 1px solid var(--surface-border);
+      display: flex;
+      justify-content: space-between;
+    }}
+    #minimap-canvas {{
+      flex: 1;
+      width: 100%;
+      height: 100%;
+    }}
+    .minimap-viewport-rect {{
+      fill: rgba(59, 130, 246, 0.15);
+      stroke: var(--accent);
+      stroke-width: 1.2;
+    }}
+
+    /* Floating Workflow Route Player (Archify Workflow Standard) */
     .flow-player-dock {{
       position: absolute;
       bottom: 24px;
@@ -408,114 +434,83 @@ def compile_to_html(ir: Dict[str, Any]) -> str:
       background: var(--surface);
       border: 1px solid var(--surface-border);
       border-radius: 30px;
-      padding: 5px 12px;
+      padding: 4px 8px;
       display: flex;
       align-items: center;
-      gap: 8px;
-      box-shadow: 0 8px 32px rgba(0,0,0,0.45);
+      gap: 6px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.45);
       z-index: 30;
-      backdrop-filter: blur(12px);
+      backdrop-filter: blur(10px);
     }}
     .player-btn {{
-      background: var(--bg);
-      border: 1px solid var(--surface-border);
+      background: transparent;
+      border: none;
       color: var(--text-main);
-      border-radius: 16px;
-      padding: 4px 10px;
-      font-size: 0.74rem;
+      padding: 6px 10px;
+      border-radius: 20px;
+      font-size: 0.8rem;
       font-weight: 700;
       cursor: pointer;
-      transition: all 0.15s;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      transition: all 0.15s ease;
     }}
     .player-btn:hover {{
-      border-color: var(--accent);
+      background: var(--badge-bg);
       color: var(--accent);
     }}
     .player-btn.player-play {{
       background: var(--accent);
       color: #FFFFFF;
-      border-color: var(--accent);
+      padding: 6px 14px;
+    }}
+    .player-btn.player-play:hover {{
+      filter: brightness(1.1);
     }}
     .player-info {{
       display: flex;
       align-items: center;
       gap: 8px;
-      font-size: 0.78rem;
+      padding: 0 8px;
+      font-size: 0.8rem;
+      border-left: 1px solid var(--surface-border);
+      border-right: 1px solid var(--surface-border);
     }}
     .player-badge {{
-      font-size: 0.64rem;
+      font-size: 0.65rem;
       font-weight: 800;
+      letter-spacing: 0.05em;
       text-transform: uppercase;
-      background: var(--badge-bg);
-      color: var(--accent);
       padding: 2px 6px;
       border-radius: 4px;
-      border: 1px solid var(--surface-border);
+      background: rgba(59, 130, 246, 0.2);
+      color: #38BDF8;
     }}
     .player-step-desc {{
       color: var(--text-muted);
-      font-size: 0.75rem;
-      max-width: 260px;
+      font-size: 0.76rem;
+      max-width: 320px;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
-    }}
-
-    /* MiniMap */
-    #minimap-card {{
-      position: absolute;
-      bottom: 24px;
-      right: 24px;
-      width: 170px;
-      height: 110px;
-      background: var(--surface);
-      border: 1px solid var(--surface-border);
-      border-radius: 8px;
-      box-shadow: 0 4px 16px rgba(0,0,0,0.3);
-      z-index: 25;
-      overflow: hidden;
-      display: flex;
-      flex-direction: column;
-    }}
-    .minimap-header {{
-      font-size: 8.5px;
-      font-weight: 700;
-      text-transform: uppercase;
-      color: var(--text-muted);
-      padding: 4px 8px;
-      background: var(--bg);
-      border-bottom: 1px solid var(--surface-border);
-      display: flex;
-      justify-content: space-between;
-    }}
-    #minimap-canvas {{
-      width: 100%;
-      height: 100%;
-    }}
-    .minimap-node {{
-      fill: var(--accent);
-      opacity: 0.7;
-      rx: 2;
-    }}
-    .minimap-viewport-rect {{
-      fill: rgba(59, 130, 246, 0.15);
-      stroke: var(--accent);
-      stroke-width: 1;
     }}
 
     /* Side Inspector Drawer */
     #drawer {{
       position: absolute;
       top: 58px;
-      right: -420px;
-      width: 390px;
+      right: -360px;
+      width: 360px;
       bottom: 0;
       background: var(--surface);
       border-left: 1px solid var(--surface-border);
-      padding: 24px;
-      box-shadow: -10px 0 30px rgba(0,0,0,0.5);
-      transition: right 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      box-shadow: -8px 0 28px rgba(0,0,0,0.45);
+      transition: right 0.25s cubic-bezier(0.16, 1, 0.3, 1);
       z-index: 40;
+      display: flex;
+      flex-direction: column;
+      padding: 20px;
       overflow-y: auto;
     }}
     #drawer.open {{
@@ -525,15 +520,24 @@ def compile_to_html(ir: Dict[str, Any]) -> str:
       display: flex;
       justify-content: space-between;
       align-items: flex-start;
-      margin-bottom: 16px;
+      margin-bottom: 18px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--surface-border);
     }}
     .drawer-title {{
-      font-size: 1.2rem;
-      font-weight: 700;
+      font-size: 1.15rem;
+      font-weight: 750;
       color: var(--text-main);
-      display: flex;
-      align-items: center;
-      gap: 8px;
+    }}
+    .drawer-badge {{
+      font-size: 0.7rem;
+      font-weight: 700;
+      color: var(--accent);
+      background: var(--badge-bg);
+      padding: 2px 6px;
+      border-radius: 4px;
+      display: inline-block;
+      margin-bottom: 6px;
     }}
     .drawer-close {{
       background: transparent;
@@ -541,22 +545,16 @@ def compile_to_html(ir: Dict[str, Any]) -> str:
       color: var(--text-muted);
       font-size: 1.3rem;
       cursor: pointer;
-      padding: 4px;
+      line-height: 1;
     }}
-    .drawer-badge {{
-      display: inline-block;
-      padding: 3px 8px;
-      border-radius: 4px;
-      font-size: 0.72rem;
-      font-weight: 700;
-      margin-bottom: 8px;
-      text-transform: uppercase;
+    .drawer-close:hover {{
+      color: var(--text-main);
     }}
     .drawer-section {{
-      margin-top: 18px;
+      margin-bottom: 16px;
     }}
     .drawer-label {{
-      font-size: 0.74rem;
+      font-size: 0.72rem;
       font-weight: 700;
       text-transform: uppercase;
       letter-spacing: 0.05em;
@@ -564,7 +562,7 @@ def compile_to_html(ir: Dict[str, Any]) -> str:
       margin-bottom: 6px;
     }}
     .drawer-text {{
-      font-size: 0.88rem;
+      font-size: 0.85rem;
       line-height: 1.5;
       color: var(--text-main);
     }}
@@ -579,348 +577,27 @@ def compile_to_html(ir: Dict[str, Any]) -> str:
       font-size: 0.8rem;
       margin-bottom: 6px;
       cursor: pointer;
+      transition: border-color 0.15s ease;
     }}
     .connection-pill:hover {{
       border-color: var(--accent);
     }}
-
-    /* =========================================
-       ONE-PAGE EXPLAINER VIEW (Archify Standard)
-       ========================================= */
-    #explainer-view {{
-      overflow-y: auto;
-      user-select: text;
-    }}
-    .explainer-container {{
-      max-width: 1040px;
-      margin: 0 auto;
-      padding: 36px 24px 80px;
-    }}
-
-    /* Executive Hero Card */
-    .hero-card {{
-      background: var(--card-bg);
-      border: 1px solid var(--surface-border);
-      border-radius: 12px;
-      padding: 28px;
-      margin-bottom: 28px;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.25);
-    }}
-    .hero-meta {{
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      margin-bottom: 12px;
-    }}
-    .hero-title {{
-      font-size: 1.7rem;
-      font-weight: 800;
-      color: var(--text-main);
-      letter-spacing: -0.02em;
-      margin-bottom: 10px;
-    }}
-    .hero-summary {{
-      font-size: 1.05rem;
-      line-height: 1.6;
-      color: var(--text-muted);
-      margin-bottom: 24px;
-    }}
-    .stats-grid {{
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-      gap: 16px;
-      border-top: 1px solid var(--surface-border);
-      padding-top: 20px;
-    }}
-    .stat-box {{
+    .flow-step-pill {{
       display: flex;
       flex-direction: column;
-    }}
-    .stat-val {{
-      font-size: 1.5rem;
-      font-weight: 800;
-      color: var(--accent);
-    }}
-    .stat-label {{
-      font-size: 0.74rem;
-      font-weight: 700;
-      text-transform: uppercase;
-      color: var(--text-muted);
-      letter-spacing: 0.05em;
-    }}
-
-    /* Section Styling */
-    .section-title {{
-      font-size: 1.25rem;
-      font-weight: 800;
-      color: var(--text-main);
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      margin-top: 36px;
-      margin-bottom: 18px;
-      letter-spacing: -0.01em;
-    }}
-    .section-desc {{
-      font-size: 0.9rem;
-      color: var(--text-muted);
-      margin-bottom: 20px;
-      line-height: 1.5;
-    }}
-
-    /* ADR Decisions Grid */
-    .decisions-grid {{
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(310px, 1fr));
-      gap: 18px;
-    }}
-    .adr-card {{
-      background: var(--surface);
-      border: 1px solid var(--surface-border);
-      border-radius: 10px;
-      padding: 20px;
-      display: flex;
-      flex-direction: column;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-    }}
-    .adr-header {{
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
-      margin-bottom: 12px;
-    }}
-    .adr-name {{
-      font-size: 1.05rem;
-      font-weight: 700;
-      color: var(--text-main);
-    }}
-    .status-badge {{
-      font-size: 0.68rem;
-      font-weight: 700;
-      text-transform: uppercase;
-      padding: 3px 8px;
-      border-radius: 9999px;
-      background: rgba(16, 185, 129, 0.15);
-      color: #10B981;
-      border: 1px solid rgba(16, 185, 129, 0.3);
-    }}
-    .adr-body {{
-      font-size: 0.88rem;
-      line-height: 1.55;
-      color: var(--text-muted);
-      margin-bottom: 14px;
-    }}
-    .tradeoff-box {{
-      margin-top: auto;
+      gap: 3px;
+      padding: 8px 10px;
       background: var(--bg);
-      border-left: 3px solid #F59E0B;
-      padding: 8px 12px;
-      border-radius: 0 6px 6px 0;
+      border: 1px solid var(--surface-border);
+      border-radius: 6px;
       font-size: 0.8rem;
-      line-height: 1.45;
-      color: var(--text-muted);
-    }}
-    .tradeoff-box strong {{
-      color: #F59E0B;
-    }}
-
-    /* Stepper Lifecycle Walkthrough */
-    .stepper {{
-      display: flex;
-      flex-direction: column;
-      gap: 16px;
-    }}
-    .step-card {{
-      background: var(--surface);
-      border: 1px solid var(--surface-border);
-      border-radius: 10px;
-      padding: 18px 20px;
-      display: flex;
-      align-items: flex-start;
-      gap: 18px;
-      transition: border-color 0.15s;
-    }}
-    .step-card:hover {{
-      border-color: var(--accent);
-    }}
-    .step-num {{
-      width: 36px;
-      height: 36px;
-      border-radius: 50%;
-      background: var(--accent);
-      color: #FFFFFF;
-      font-size: 1rem;
-      font-weight: 800;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-shrink: 0;
-      box-shadow: 0 0 12px var(--accent-glow);
-    }}
-    .step-content {{
-      flex: 1;
-    }}
-    .step-top {{
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
       margin-bottom: 6px;
-      flex-wrap: wrap;
-      gap: 8px;
-    }}
-    .step-title {{
-      font-size: 1.05rem;
-      font-weight: 700;
-      color: var(--text-main);
-    }}
-    .protocol-pill {{
-      font-size: 0.72rem;
-      font-weight: 700;
-      padding: 3px 8px;
-      border-radius: 4px;
-      background: var(--badge-bg);
-      border: 1px solid var(--surface-border);
-      color: var(--accent);
-      text-transform: uppercase;
-    }}
-    .step-desc {{
-      font-size: 0.88rem;
-      color: var(--text-muted);
-      line-height: 1.5;
-      margin-bottom: 10px;
-    }}
-    .step-action-btn {{
-      background: transparent;
-      border: 1px solid var(--surface-border);
-      color: var(--accent);
-      font-size: 0.75rem;
-      font-weight: 600;
-      padding: 4px 10px;
-      border-radius: 4px;
       cursor: pointer;
-      display: inline-flex;
-      align-items: center;
-      gap: 5px;
+      transition: all 0.15s ease;
     }}
-    .step-action-btn:hover {{
+    .flow-step-pill:hover {{
+      border-color: var(--accent);
       background: var(--badge-bg);
-    }}
-
-    /* Component Inventory Cards */
-    .inventory-grid {{
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(290px, 1fr));
-      gap: 16px;
-    }}
-    .inv-card {{
-      background: var(--surface);
-      border: 1px solid var(--surface-border);
-      border-radius: 10px;
-      padding: 16px;
-      display: flex;
-      flex-direction: column;
-    }}
-    .inv-top {{
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      margin-bottom: 10px;
-    }}
-    .inv-icon-box {{
-      width: 36px;
-      height: 36px;
-      border-radius: 8px;
-      background: var(--bg);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-shrink: 0;
-      border: 1px solid var(--surface-border);
-    }}
-    .inv-name {{
-      font-size: 0.98rem;
-      font-weight: 700;
-      color: var(--text-main);
-    }}
-    .inv-tech {{
-      font-size: 0.78rem;
-      font-weight: 600;
-      color: #38BDF8;
-    }}
-    .inv-desc {{
-      font-size: 0.84rem;
-      line-height: 1.5;
-      color: var(--text-muted);
-      margin-bottom: 12px;
-    }}
-    .inv-meta {{
-      margin-top: auto;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      border-top: 1px solid var(--surface-border);
-      padding-top: 10px;
-    }}
-
-    /* Matrix Table */
-    .table-container {{
-      background: var(--surface);
-      border: 1px solid var(--surface-border);
-      border-radius: 10px;
-      overflow-x: auto;
-    }}
-    table.data-table {{
-      width: 100%;
-      border-collapse: collapse;
-      font-size: 0.85rem;
-      text-align: left;
-    }}
-    table.data-table th {{
-      background: var(--bg);
-      color: var(--text-muted);
-      font-weight: 700;
-      text-transform: uppercase;
-      font-size: 0.72rem;
-      letter-spacing: 0.05em;
-      padding: 12px 16px;
-      border-bottom: 1px solid var(--surface-border);
-    }}
-    table.data-table td {{
-      padding: 12px 16px;
-      border-bottom: 1px solid var(--surface-border);
-      color: var(--text-main);
-    }}
-    table.data-table tr:last-child td {{
-      border-bottom: none;
-    }}
-
-    /* Print & Whitepaper Mode */
-    @media print {{
-      header, .floating-dock, #minimap-card, #drawer, .btn, .search-box, .view-switcher {{
-        display: none !important;
-      }}
-      #canvas-view {{ display: none !important; }}
-      #explainer-view {{
-        display: block !important;
-        position: static !important;
-        height: auto !important;
-        overflow: visible !important;
-        background: #FFFFFF !important;
-        color: #000000 !important;
-      }}
-      .hero-card, .adr-card, .step-card, .inv-card, .table-container {{
-        background: #FFFFFF !important;
-        border: 1px solid #CCCCCC !important;
-        color: #000000 !important;
-        box-shadow: none !important;
-        page-break-inside: avoid;
-      }}
-      .hero-title, .section-title, .adr-name, .step-title, .inv-name {{
-        color: #000000 !important;
-      }}
-      .hero-summary, .adr-body, .step-desc, .inv-desc {{
-        color: #333333 !important;
-      }}
     }}
   </style>
 </head>
@@ -933,17 +610,11 @@ def compile_to_html(ir: Dict[str, Any]) -> str:
         <img class="brand-logo-img logo-dark" src="{LOGO_DARK_URI}" alt="VizArc" />
         <img class="brand-logo-img logo-light" src="{LOGO_LIGHT_URI}" alt="VizArc" />
       </a>
-      <span class="version-tag">Archify Spec</span>
+      <span class="version-tag">Interactive Canvas</span>
       <div>
-        <div class="doc-title">{ir.get('title', 'Architecture Explainer')}</div>
+        <div class="doc-title">{ir.get('title', 'Architecture Canvas')}</div>
         <div class="doc-summary" title="{ir.get('summary', '')}">{ir.get('summary', '')}</div>
       </div>
-    </div>
-
-    <!-- Center Dual-View Switcher -->
-    <div class="view-switcher">
-      <button class="tab-btn active" id="tab-canvas-btn" onclick="switchView('canvas')" title="Interactive Diagram Canvas (Key: 1)">📐 Canvas View</button>
-      <button class="tab-btn" id="tab-explainer-btn" onclick="switchView('explainer')" title="One-Page Architectural Explainer (Key: 2)">📄 One-Page Explainer</button>
     </div>
 
     <!-- Right Controls -->
@@ -953,15 +624,14 @@ def compile_to_html(ir: Dict[str, Any]) -> str:
       <button class="btn" id="theme-btn" title="Toggle Dark/Light Theme (Key: D)">🌓 Theme</button>
       <button class="btn" id="export-svg-btn" title="Download standalone SVG">📥 SVG</button>
       <button class="btn" id="export-png-btn" title="Export High-Res PNG">🖼️ PNG</button>
-      <button class="btn" id="export-print-btn" title="Print / PDF Whitepaper (Ctrl+P)">📄 Print</button>
       <button class="btn" id="fullscreen-btn" title="Toggle Fullscreen (Key: F)">⛶</button>
     </div>
   </header>
 
   <!-- ==========================================
-       VIEW 1: DIAGRAM CANVAS
+       MAIN INTERACTIVE DIAGRAM CANVAS
        ========================================== -->
-  <div id="canvas-view" class="view-panel active">
+  <div id="canvas-view">
     <div id="viewport">
       <svg id="diagram-canvas">
         <defs>
@@ -1009,9 +679,9 @@ def compile_to_html(ir: Dict[str, Any]) -> str:
         <span id="player-step-label">Step 1 / {len(ir.get('flow_steps', []))}</span>
         <span id="player-step-desc" class="player-step-desc">Click ▶ to trace route</span>
       </div>
-      <button class="player-btn" id="player-next-btn" title="Next Phase (Right Arrow)">▶</button>
+      <button class="player-btn" id="player-next-btn" title="Next Phase (Right Arrow / Space)">▶</button>
       <button class="player-btn player-play" id="player-play-btn" title="Auto-Play Route Animation">▶ Auto</button>
-      <button class="player-btn" id="player-reset-btn" title="Clear Trace">✕</button>
+      <button class="player-btn" id="player-reset-btn" title="Clear Trace (Esc)">✕</button>
     </div>
 
     <!-- Side Inspector Drawer -->
@@ -1044,6 +714,11 @@ def compile_to_html(ir: Dict[str, Any]) -> str:
         <div class="drawer-text" id="d-desc">Description text...</div>
       </div>
 
+      <div class="drawer-section" id="d-flow-section" style="display: none;">
+        <div class="drawer-label">Participating Flow Steps</div>
+        <div id="d-flow-steps"></div>
+      </div>
+
       <div class="drawer-section">
         <div class="drawer-label">Incoming Traffic (Upstream)</div>
         <div id="d-upstream"></div>
@@ -1053,92 +728,6 @@ def compile_to_html(ir: Dict[str, Any]) -> str:
         <div class="drawer-label">Outgoing Calls (Downstream)</div>
         <div id="d-downstream"></div>
       </div>
-
-      <div class="drawer-section" style="margin-top: 24px;">
-        <button class="btn" style="width: 100%; justify-content: center;" id="d-jump-explainer-btn">📄 View in One-Page Explainer</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- ==========================================
-       VIEW 2: ONE-PAGE EXPLAINER (Archify Standard)
-       ========================================== -->
-  <div id="explainer-view" class="view-panel">
-    <div class="explainer-container">
-      
-      <!-- Executive Summary Card -->
-      <div class="hero-card">
-        <div class="hero-meta">
-          <span class="status-badge">ARCHITECTURAL BRIEF</span>
-          <span class="version-tag">{ir.get('archetype', 'architecture').upper()} ARCHETYPE</span>
-        </div>
-        <h1 class="hero-title">{ir.get('title', 'System Architecture')}</h1>
-        <p class="hero-summary">{ir.get('summary', 'Enterprise architecture specification and technical implementation details.')}</p>
-        
-        <div class="stats-grid">
-          <div class="stat-box">
-            <span class="stat-val">{len(ir.get('nodes', []))}</span>
-            <span class="stat-label">System Components</span>
-          </div>
-          <div class="stat-box">
-            <span class="stat-val">{len(ir.get('tiers', []))}</span>
-            <span class="stat-label">Architecture Tiers</span>
-          </div>
-          <div class="stat-box">
-            <span class="stat-val">{len(ir.get('edges', []))}</span>
-            <span class="stat-label">Network Connections</span>
-          </div>
-          <div class="stat-box">
-            <span class="stat-val">{len(ir.get('decisions', []))}</span>
-            <span class="stat-label">Design Decisions (ADR)</span>
-          </div>
-        </div>
-      </div>
-
-      <!-- Section 1: Architecture Decisions & Trade-Offs (ADRs) -->
-      <h2 class="section-title">⚖️ Key Architecture Decisions & Trade-offs</h2>
-      <p class="section-desc">Core architectural trade-offs, rationale, and operational consequences accepted across this system.</p>
-      
-      <div class="decisions-grid" id="explainer-decisions">
-        <!-- Rendered dynamically -->
-      </div>
-
-      <!-- Section 2: Step-by-Step Data Flow Narrative -->
-      <h2 class="section-title">🔄 End-to-End Transaction Flow</h2>
-      <p class="section-desc">Lifecycle walkthrough of how payloads and transactions traverse the system from ingress to storage.</p>
-      
-      <div class="stepper" id="explainer-stepper">
-        <!-- Rendered dynamically -->
-      </div>
-
-      <!-- Section 3: Component & Service Inventory -->
-      <h2 class="section-title">📦 Component & Service Inventory</h2>
-      <p class="section-desc">Detailed catalog of all microservices, databases, gateways, and edge workers with their roles.</p>
-      
-      <div class="inventory-grid" id="explainer-inventory">
-        <!-- Rendered dynamically -->
-      </div>
-
-      <!-- Section 4: Network Protocols & Communication Matrix -->
-      <h2 class="section-title">🌐 Communication & Protocols Matrix</h2>
-      <p class="section-desc">Upstream-to-downstream communication pathways, transport protocols, and operational goals.</p>
-      
-      <div class="table-container">
-        <table class="data-table">
-          <thead>
-            <tr>
-              <th>From (Caller)</th>
-              <th>To (Callee)</th>
-              <th>Protocol</th>
-              <th>Action / Purpose</th>
-            </tr>
-          </thead>
-          <tbody id="explainer-matrix-body">
-            <!-- Rendered dynamically -->
-          </tbody>
-        </table>
-      </div>
-
     </div>
   </div>
 
@@ -1147,13 +736,13 @@ def compile_to_html(ir: Dict[str, Any]) -> str:
 
     let currentOrientation = "horizontal";
     let isFlowMotionActive = true;
-    const NODE_WIDTH = 230;
-    const NODE_HEIGHT = 92;
+    const NODE_WIDTH = 240;
+    const NODE_HEIGHT = 98;
 
     const PROTOCOL_COLORS = {json.dumps(PROTOCOL_COLORS)};
     const nodePositions = {{}};
     const nodesMap = {{}};
-    IR.nodes.forEach(n => nodesMap[n.id] = n);
+    (IR.nodes || []).forEach(n => nodesMap[n.id] = n);
 
     const scene = document.getElementById("scene-root");
     const tiersLayer = document.getElementById("tiers-layer");
@@ -1164,57 +753,38 @@ def compile_to_html(ir: Dict[str, Any]) -> str:
     const nodesByTier = {{}};
     tiersOrder.forEach(t => nodesByTier[t] = []);
 
-    IR.nodes.forEach(n => {{
+    (IR.nodes || []).forEach(n => {{
       const t = nodesByTier[n.tier] ? n.tier : tiersOrder[0];
       if (nodesByTier[t]) nodesByTier[t].push(n);
     }});
 
     // ==========================================
-    // VIEW SWITCHING (Canvas vs Explainer)
+    // LAYOUT ENGINE (Horizontal LR & Vertical TB)
     // ==========================================
-    function switchView(target) {{
-      const canvasPanel = document.getElementById("canvas-view");
-      const explainerPanel = document.getElementById("explainer-view");
-      const canvasBtn = document.getElementById("tab-canvas-btn");
-      const explainerBtn = document.getElementById("tab-explainer-btn");
-
-      if (target === "canvas") {{
-        canvasPanel.classList.add("active");
-        explainerPanel.classList.remove("active");
-        canvasBtn.classList.add("active");
-        explainerBtn.classList.remove("active");
-        setTimeout(fitToView, 30);
-      }} else {{
-        explainerPanel.classList.add("active");
-        canvasPanel.classList.remove("active");
-        explainerBtn.classList.add("active");
-        canvasBtn.classList.remove("active");
-      }}
-    }}
-
-    // ==========================================
-    // LAYOUT ENGINE
-    // ==========================================
-    function computeLayout() {{
-      Object.keys(nodePositions).forEach(k => delete nodePositions[k]);
+    function calculateLayout() {{
+      const tierPositions = {{}};
+      const COL_GAP = 90;
+      const ROW_GAP = 32;
+      const PADDING = 28;
 
       if (currentOrientation === "horizontal") {{
-        const COL_GAP = 140;
-        const ROW_GAP = 28;
-        const PADDING_LEFT = 70;
-        const PADDING_TOP = 80;
-
+        let currX = 50;
         let maxRows = 1;
-        tiersOrder.forEach(tId => {{
-          maxRows = Math.max(maxRows, (nodesByTier[tId] || []).length);
+        tiersOrder.forEach(t => {{
+          const count = (nodesByTier[t] || []).length;
+          if (count > maxRows) maxRows = count;
         }});
+
         const totalHeight = maxRows * (NODE_HEIGHT + ROW_GAP);
 
-        let currX = PADDING_LEFT;
-        tiersOrder.forEach((tId) => {{
-          const tNodes = nodesByTier[tId] || [];
+        tiersOrder.forEach(tierId => {{
+          const tNodes = nodesByTier[tierId] || [];
+          if (!tNodes.length) return;
+
           const nH = tNodes.length * (NODE_HEIGHT + ROW_GAP) - (ROW_GAP ? ROW_GAP : 0);
-          const startY = PADDING_TOP + Math.max(0, (totalHeight - nH) / 2);
+          const startY = 60 + Math.max(0, (totalHeight - nH) / 2);
+
+          tierPositions[tierId] = {{ x: currX - PADDING, y: 30, width: NODE_WIDTH + PADDING*2, height: totalHeight + PADDING*2 + 40 }};
 
           tNodes.forEach((node, idx) => {{
             const x = currX;
@@ -1225,22 +795,23 @@ def compile_to_html(ir: Dict[str, Any]) -> str:
           currX += NODE_WIDTH + COL_GAP;
         }});
       }} else {{
-        const ROW_GAP = 120;
-        const COL_GAP = 28;
-        const PADDING_TOP = 80;
-        const PADDING_LEFT = 60;
-
+        let currY = 50;
         let maxCols = 1;
-        tiersOrder.forEach(tId => {{
-          maxCols = Math.max(maxCols, (nodesByTier[tId] || []).length);
+        tiersOrder.forEach(t => {{
+          const count = (nodesByTier[t] || []).length;
+          if (count > maxCols) maxCols = count;
         }});
+
         const totalWidth = maxCols * (NODE_WIDTH + COL_GAP);
 
-        let currY = PADDING_TOP;
-        tiersOrder.forEach((tId) => {{
-          const tNodes = nodesByTier[tId] || [];
+        tiersOrder.forEach(tierId => {{
+          const tNodes = nodesByTier[tierId] || [];
+          if (!tNodes.length) return;
+
           const nW = tNodes.length * (NODE_WIDTH + COL_GAP) - (COL_GAP ? COL_GAP : 0);
-          const startX = PADDING_LEFT + Math.max(0, (totalWidth - nW) / 2);
+          const startX = 60 + Math.max(0, (totalWidth - nW) / 2);
+
+          tierPositions[tierId] = {{ x: 30, y: currY - PADDING, width: totalWidth + PADDING*2 + 40, height: NODE_HEIGHT + PADDING*2 + 30 }};
 
           tNodes.forEach((node, idx) => {{
             const x = startX + idx * (NODE_WIDTH + COL_GAP);
@@ -1248,84 +819,83 @@ def compile_to_html(ir: Dict[str, Any]) -> str:
             nodePositions[node.id] = {{ x, y, width: NODE_WIDTH, height: NODE_HEIGHT }};
           }});
 
-          currY += NODE_HEIGHT + ROW_GAP;
+          currY += NODE_HEIGHT + ROW_GAP + 24;
         }});
       }}
+
+      return {{ tierPositions }};
     }}
 
+    // ==========================================
+    // RENDER SCENE WITH DYNAMIC NODE STATUS BARS
+    // ==========================================
     function renderScene() {{
-      computeLayout();
       tiersLayer.innerHTML = "";
       edgesLayer.innerHTML = "";
       nodesLayer.innerHTML = "";
 
+      const {{ tierPositions }} = calculateLayout();
+
       // 1. Tiers
-      tiersOrder.forEach((tId) => {{
-        const tierObj = (IR.tiers || []).find(t => t.id === tId);
-        const tierNodes = nodesByTier[tId] || [];
-        if (!tierNodes.length) return;
+      tiersOrder.forEach(tId => {{
+        const pos = tierPositions[tId];
+        if (!pos) return;
 
-        let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
-        tierNodes.forEach(n => {{
-          const p = nodePositions[n.id];
-          if (p) {{
-            minX = Math.min(minX, p.x);
-            minY = Math.min(minY, p.y);
-            maxX = Math.max(maxX, p.x + p.width);
-            maxY = Math.max(maxY, p.y + p.height);
-          }}
-        }});
+        const tierObj = (IR.tiers || []).find(t => t.id === tId) || {{ label: tId }};
+        const g = document.createElementNS("http://www.w3.org/2000/svg", "g");
 
-        const pad = 16;
         const rect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
-        rect.setAttribute("class", "tier-box");
-        rect.setAttribute("x", minX - pad);
-        rect.setAttribute("y", minY - pad - 16);
-        rect.setAttribute("width", (maxX - minX) + pad * 2);
-        rect.setAttribute("height", (maxY - minY) + pad * 2 + 20);
-        rect.setAttribute("stroke", tierObj ? tierObj.color : "#4B5563");
-        rect.setAttribute("stroke-opacity", "0.25");
-        tiersLayer.appendChild(rect);
+        rect.setAttribute("class", "tier-rect");
+        rect.setAttribute("x", pos.x);
+        rect.setAttribute("y", pos.y);
+        rect.setAttribute("width", pos.width);
+        rect.setAttribute("height", pos.height);
 
-        const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
-        text.setAttribute("class", "tier-label");
-        text.setAttribute("x", minX - pad + 10);
-        text.setAttribute("y", minY - pad);
-        text.setAttribute("fill", tierObj ? tierObj.color : "#94A3B8");
-        text.textContent = tierObj ? tierObj.label : tId;
-        tiersLayer.appendChild(text);
+        const lbl = document.createElementNS("http://www.w3.org/2000/svg", "text");
+        lbl.setAttribute("class", "tier-label");
+        lbl.setAttribute("x", pos.x + 16);
+        lbl.setAttribute("y", pos.y + 22);
+        lbl.textContent = tierObj.label;
+
+        g.appendChild(rect);
+        g.appendChild(lbl);
+        tiersLayer.appendChild(g);
       }});
 
       // 2. Edges
-      (IR.edges || []).forEach((edge) => {{
-        const source = nodePositions[edge.from];
-        const target = nodePositions[edge.to];
-        if (!source || !target) return;
+      (IR.edges || []).forEach(edge => {{
+        const p1 = nodePositions[edge.from];
+        const p2 = nodePositions[edge.to];
+        if (!p1 || !p2) return;
 
-        let x1, y1, x2, y2, pathD;
-        const proto = (edge.protocol || "https").toLowerCase();
-        const strokeColor = PROTOCOL_COLORS[proto] || "var(--edge-stroke)";
-
+        let x1, y1, x2, y2;
         if (currentOrientation === "horizontal") {{
-          x1 = source.x + source.width;
-          y1 = source.y + source.height / 2;
-          x2 = target.x;
-          y2 = target.y + target.height / 2;
-          const dx = Math.abs(x2 - x1) * 0.5;
-          pathD = `M ${{x1}} ${{y1}} C ${{x1 + dx}} ${{y1}}, ${{x2 - dx}} ${{y2}}, ${{x2}} ${{y2}}`;
+          x1 = p1.x + p1.width;
+          y1 = p1.y + p1.height / 2;
+          x2 = p2.x;
+          y2 = p2.y + p2.height / 2;
         }} else {{
-          x1 = source.x + source.width / 2;
-          y1 = source.y + source.height;
-          x2 = target.x + target.width / 2;
-          y2 = target.y;
-          const dy = Math.abs(y2 - y1) * 0.5;
-          pathD = `M ${{x1}} ${{y1}} C ${{x1}} ${{y1 + dy}}, ${{x2}} ${{y2 - dy}}, ${{x2}} ${{y2}}`;
+          x1 = p1.x + p1.width / 2;
+          y1 = p1.y + p1.height;
+          x2 = p2.x + p2.width / 2;
+          y2 = p2.y;
         }}
 
         const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+        const dx = Math.abs(x2 - x1) * 0.45;
+        const dy = Math.abs(y2 - y1) * 0.45;
+        
+        let d = "";
+        if (currentOrientation === "horizontal") {{
+          d = `M ${{x1}} ${{y1}} C ${{x1 + dx}} ${{y1}}, ${{x2 - dx}} ${{y2}}, ${{x2}} ${{y2}}`;
+        }} else {{
+          d = `M ${{x1}} ${{y1}} C ${{x1}} ${{y1 + dy}}, ${{x2}} ${{y2 - dy}}, ${{x2}} ${{y2}}`;
+        }}
+
+        const strokeColor = PROTOCOL_COLORS[(edge.protocol || "").toUpperCase()] || "var(--edge-stroke)";
+        path.setAttribute("d", d);
+        path.setAttribute("class", "edge-path" + (isFlowMotionActive ? " flow-active" : ""));
         path.setAttribute("id", `edge-${{edge.from}}-${{edge.to}}`);
-        path.setAttribute("class", isFlowMotionActive ? "edge-path flow-active" : "edge-path");
-        path.setAttribute("d", pathD);
         path.setAttribute("stroke", strokeColor);
         path.setAttribute("marker-end", "url(#arrow-default)");
         path.dataset.from = edge.from;
@@ -1360,7 +930,7 @@ def compile_to_html(ir: Dict[str, Any]) -> str:
         }}
       }});
 
-      // 3. Nodes (Foolproof Vector SVG Glyphs)
+      // 3. Nodes with Embedded Authentic Vector Icons & Dynamic Status Bar
       (IR.nodes || []).forEach(node => {{
         const pos = nodePositions[node.id];
         if (!pos) return;
@@ -1368,20 +938,25 @@ def compile_to_html(ir: Dict[str, Any]) -> str:
         const meta = node._meta || {{ provider: "generic", brand_color: "#3B82F6", icon: "", service_name: "Service" }};
         const brandColor = meta.brand_color || "#3B82F6";
         const providerName = (meta.provider || "generic").toUpperCase();
+        const tier = (IR.tiers || []).find(t => t.id === node.tier);
+        const tierName = tier ? tier.label : (node.tier || "Service Component");
 
         const g = document.createElementNS("http://www.w3.org/2000/svg", "g");
         g.setAttribute("class", "node-group");
         g.setAttribute("id", `node-${{node.id}}`);
         g.setAttribute("transform", `translate(${{pos.x}}, ${{pos.y}})`);
         g.dataset.id = node.id;
+        g.dataset.width = pos.width;
+        g.dataset.height = pos.height;
 
         // Card Base
         const rect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
         rect.setAttribute("class", "node-rect");
+        rect.setAttribute("id", `node-rect-${{node.id}}`);
         rect.setAttribute("width", pos.width);
         rect.setAttribute("height", pos.height);
 
-        // Top Stripe
+        // Top Brand Stripe
         const stripe = document.createElementNS("http://www.w3.org/2000/svg", "path");
         stripe.setAttribute("d", `M 0 10 Q 0 0 10 0 L ${{pos.width - 10}} 0 Q ${{pos.width}} 0 ${{pos.width}} 10 L ${{pos.width}} 4 L 0 4 Z`);
         stripe.setAttribute("fill", brandColor);
@@ -1389,18 +964,18 @@ def compile_to_html(ir: Dict[str, Any]) -> str:
         // Icon Box
         const iconBox = document.createElementNS("http://www.w3.org/2000/svg", "rect");
         iconBox.setAttribute("x", 12);
-        iconBox.setAttribute("y", 14);
-        iconBox.setAttribute("width", 34);
-        iconBox.setAttribute("height", 34);
-        iconBox.setAttribute("rx", 8);
+        iconBox.setAttribute("y", 12);
+        iconBox.setAttribute("width", 32);
+        iconBox.setAttribute("height", 32);
+        iconBox.setAttribute("rx", 7);
         iconBox.setAttribute("fill", "var(--surface)");
         iconBox.setAttribute("stroke", brandColor);
-        iconBox.setAttribute("stroke-opacity", "0.35");
+        iconBox.setAttribute("stroke-opacity", "0.4");
 
         // Embedded Vector SVG (100% Offline-proof)
         const iconSvg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-        iconSvg.setAttribute("x", 17);
-        iconSvg.setAttribute("y", 19);
+        iconSvg.setAttribute("x", 16);
+        iconSvg.setAttribute("y", 16);
         iconSvg.setAttribute("width", 24);
         iconSvg.setAttribute("height", 24);
         iconSvg.setAttribute("viewBox", "0 0 24 24");
@@ -1412,20 +987,22 @@ def compile_to_html(ir: Dict[str, Any]) -> str:
 
         // Provider Badge Pill
         const provBg = document.createElementNS("http://www.w3.org/2000/svg", "rect");
-        provBg.setAttribute("x", pos.width - 60);
-        provBg.setAttribute("y", 14);
-        provBg.setAttribute("width", 48);
-        provBg.setAttribute("height", 17);
-        provBg.setAttribute("rx", 8.5);
+        provBg.setAttribute("id", `node-prov-bg-${{node.id}}`);
+        provBg.setAttribute("x", pos.width - 62);
+        provBg.setAttribute("y", 12);
+        provBg.setAttribute("width", 50);
+        provBg.setAttribute("height", 16);
+        provBg.setAttribute("rx", 8);
         provBg.setAttribute("fill", "var(--bg)");
         provBg.setAttribute("stroke", brandColor);
         provBg.setAttribute("stroke-opacity", "0.5");
 
         const provTxt = document.createElementNS("http://www.w3.org/2000/svg", "text");
-        provTxt.setAttribute("x", pos.width - 36);
-        provTxt.setAttribute("y", 25.5);
+        provTxt.setAttribute("id", `node-prov-txt-${{node.id}}`);
+        provTxt.setAttribute("x", pos.width - 37);
+        provTxt.setAttribute("y", 23);
         provTxt.setAttribute("fill", brandColor);
-        provTxt.setAttribute("font-size", "8px");
+        provTxt.setAttribute("font-size", "7.5px");
         provTxt.setAttribute("font-weight", "700");
         provTxt.setAttribute("text-anchor", "middle");
         provTxt.textContent = providerName;
@@ -1433,25 +1010,49 @@ def compile_to_html(ir: Dict[str, Any]) -> str:
         // Title
         const title = document.createElementNS("http://www.w3.org/2000/svg", "text");
         title.setAttribute("class", "node-title");
-        title.setAttribute("x", 54);
-        title.setAttribute("y", 32);
-        title.textContent = node.label.length > 18 ? node.label.slice(0, 17) + '..' : node.label;
+        title.setAttribute("id", `node-title-${{node.id}}`);
+        title.setAttribute("x", 52);
+        title.setAttribute("y", 28);
+        title.textContent = node.label.length > 20 ? node.label.slice(0, 19) + '..' : node.label;
 
         // Tech Subtitle
         const tech = document.createElementNS("http://www.w3.org/2000/svg", "text");
         tech.setAttribute("class", "node-tech");
-        tech.setAttribute("x", 14);
-        tech.setAttribute("y", 62);
-        const techStr = node.tech || "Service";
-        tech.textContent = techStr.length > 28 ? techStr.slice(0, 27) + '..' : techStr;
+        tech.setAttribute("id", `node-tech-${{node.id}}`);
+        tech.setAttribute("x", 52);
+        tech.setAttribute("y", 43);
+        const techStr = node.tech || meta.service_name || "Service";
+        tech.textContent = techStr.length > 25 ? techStr.slice(0, 24) + '..' : techStr;
 
         // Role Description
         const desc = document.createElementNS("http://www.w3.org/2000/svg", "text");
         desc.setAttribute("class", "node-desc");
-        desc.setAttribute("x", 14);
-        desc.setAttribute("y", 78);
+        desc.setAttribute("id", `node-desc-${{node.id}}`);
+        desc.setAttribute("x", 12);
+        desc.setAttribute("y", 64);
         const descStr = node.description || meta.service_name || "";
-        desc.textContent = descStr.length > 34 ? descStr.slice(0, 33) + '..' : descStr;
+        desc.textContent = descStr.length > 38 ? descStr.slice(0, 37) + '..' : descStr;
+
+        // Bottom Dynamic Status Bar
+        const statusBg = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+        statusBg.setAttribute("id", `node-status-bg-${{node.id}}`);
+        statusBg.setAttribute("x", 1);
+        statusBg.setAttribute("y", pos.height - 21);
+        statusBg.setAttribute("width", pos.width - 2);
+        statusBg.setAttribute("height", 20);
+        statusBg.setAttribute("rx", 9);
+        statusBg.setAttribute("fill", "rgba(255, 255, 255, 0.03)");
+        statusBg.setAttribute("stroke", "var(--surface-border)");
+        statusBg.setAttribute("stroke-width", "0.5");
+
+        const statusTxt = document.createElementNS("http://www.w3.org/2000/svg", "text");
+        statusTxt.setAttribute("id", `node-status-txt-${{node.id}}`);
+        statusTxt.setAttribute("x", 12);
+        statusTxt.setAttribute("y", pos.height - 7.5);
+        statusTxt.setAttribute("fill", "var(--text-muted)");
+        statusTxt.setAttribute("font-size", "8.2px");
+        statusTxt.setAttribute("font-weight", "650");
+        statusTxt.textContent = `📍 ${{tierName}}`;
 
         g.appendChild(rect);
         g.appendChild(stripe);
@@ -1462,6 +1063,8 @@ def compile_to_html(ir: Dict[str, Any]) -> str:
         g.appendChild(title);
         g.appendChild(tech);
         g.appendChild(desc);
+        g.appendChild(statusBg);
+        g.appendChild(statusTxt);
 
         g.addEventListener("click", () => selectNode(node.id));
         nodesLayer.appendChild(g);
@@ -1471,7 +1074,7 @@ def compile_to_html(ir: Dict[str, Any]) -> str:
     }}
 
     // ==========================================
-    // PAN & ZOOM
+    // PAN & ZOOM CONTROLLER
     // ==========================================
     let scale = 0.95;
     let panX = 40;
@@ -1483,7 +1086,7 @@ def compile_to_html(ir: Dict[str, Any]) -> str:
     const viewport = document.getElementById("viewport");
     function updateTransform() {{
       scene.setAttribute("transform", `translate(${{panX}}, ${{panY}}) scale(${{scale}})`);
-      updateMiniMapViewport();
+      updateMiniMap();
     }}
 
     viewport.addEventListener("mousedown", e => {{
@@ -1491,6 +1094,7 @@ def compile_to_html(ir: Dict[str, Any]) -> str:
       isDragging = true;
       startX = e.clientX - panX;
       startY = e.clientY - panY;
+      viewport.classList.add("dragging");
     }});
 
     window.addEventListener("mousemove", e => {{
@@ -1500,115 +1104,380 @@ def compile_to_html(ir: Dict[str, Any]) -> str:
       updateTransform();
     }});
 
-    window.addEventListener("mouseup", () => isDragging = false);
+    window.addEventListener("mouseup", () => {{
+      isDragging = false;
+      viewport.classList.remove("dragging");
+    }});
 
     viewport.addEventListener("wheel", e => {{
       e.preventDefault();
-      const zoomFactor = e.deltaY < 0 ? 1.08 : 0.92;
-      const newScale = Math.min(Math.max(scale * zoomFactor, 0.25), 3.0);
-      
-      const mouseX = e.clientX;
-      const mouseY = e.clientY - 58;
+      const zoomFactor = 1.1;
+      const mouseX = e.clientX - viewport.getBoundingClientRect().left;
+      const mouseY = e.clientY - viewport.getBoundingClientRect().top;
+
+      let newScale = e.deltaY < 0 ? scale * zoomFactor : scale / zoomFactor;
+      newScale = Math.min(Math.max(0.3, newScale), 3.0);
+
       panX = mouseX - (mouseX - panX) * (newScale / scale);
       panY = mouseY - (mouseY - panY) * (newScale / scale);
       scale = newScale;
       updateTransform();
-    }});
+    }}, {{ passive: false }});
+
+    function fitToView() {{
+      const b = scene.getBBox();
+      if (!b || b.width === 0 || b.height === 0) return;
+      const vw = viewport.clientWidth;
+      const vh = viewport.clientHeight;
+      const padding = 80;
+
+      const scaleX = (vw - padding * 2) / b.width;
+      const scaleY = (vh - padding * 2) / b.height;
+      scale = Math.min(Math.max(Math.min(scaleX, scaleY), 0.4), 1.6);
+
+      panX = (vw - b.width * scale) / 2 - b.x * scale;
+      panY = (vh - b.height * scale) / 2 - b.y * scale;
+      updateTransform();
+    }}
+
+    document.getElementById("zoom-in-btn").onclick = () => {{ scale = Math.min(scale * 1.2, 3.0); updateTransform(); }};
+    document.getElementById("zoom-out-btn").onclick = () => {{ scale = Math.max(scale / 1.2, 0.3); updateTransform(); }};
+    document.getElementById("reset-btn").onclick = fitToView;
+    document.getElementById("orient-btn").onclick = () => {{
+      currentOrientation = currentOrientation === "horizontal" ? "vertical" : "horizontal";
+      renderScene();
+      fitToView();
+    }};
 
     // ==========================================
-    // MINIMAP
+    // MINIMAP ENGINE
     // ==========================================
     function updateMiniMap() {{
-      const miniEl = document.getElementById("minimap-elements");
-      miniEl.innerHTML = "";
+      const b = scene.getBBox();
+      if (!b || b.width === 0 || b.height === 0) return;
 
-      let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
-      Object.values(nodePositions).forEach(p => {{
-        minX = Math.min(minX, p.x);
-        minY = Math.min(minY, p.y);
-        maxX = Math.max(maxX, p.x + p.width);
-        maxY = Math.max(maxY, p.y + p.height);
+      const mmW = 190;
+      const mmH = 95;
+      const s = Math.min(mmW / (b.width + 120), mmH / (b.height + 120));
+      const offX = (mmW - b.width * s) / 2 - b.x * s;
+      const offY = (mmH - b.height * s) / 2 - b.y * s;
+
+      const mmElements = document.getElementById("minimap-elements");
+      mmElements.innerHTML = "";
+
+      // Mini Nodes
+      (IR.nodes || []).forEach(n => {{
+        const pos = nodePositions[n.id];
+        if (!pos) return;
+        const rect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+        rect.setAttribute("x", pos.x * s + offX);
+        rect.setAttribute("y", pos.y * s + offY);
+        rect.setAttribute("width", Math.max(pos.width * s, 6));
+        rect.setAttribute("height", Math.max(pos.height * s, 3));
+        rect.setAttribute("rx", 2);
+        rect.setAttribute("fill", "var(--accent)");
+        rect.setAttribute("opacity", "0.6");
+        mmElements.appendChild(rect);
       }});
 
-      const sceneW = (maxX - minX) || 800;
-      const sceneH = (maxY - minY) || 500;
-      const mmW = 170;
-      const mmH = 90;
-      const scaleX = (mmW - 20) / sceneW;
-      const scaleY = (mmH - 20) / sceneH;
-      const mmScale = Math.min(scaleX, scaleY);
+      // Viewport Rectangle
+      const vw = viewport.clientWidth;
+      const vh = viewport.clientHeight;
+      const vx = (-panX) / scale;
+      const vy = (-panY) / scale;
+      const vwS = vw / scale;
+      const vhS = vh / scale;
 
-      Object.values(nodePositions).forEach(p => {{
-        const r = document.createElementNS("http://www.w3.org/2000/svg", "rect");
-        r.setAttribute("class", "minimap-node");
-        r.setAttribute("x", 10 + (p.x - minX) * mmScale);
-        r.setAttribute("y", 10 + (p.y - minY) * mmScale);
-        r.setAttribute("width", Math.max(4, p.width * mmScale));
-        r.setAttribute("height", Math.max(3, p.height * mmScale));
-        miniEl.appendChild(r);
-      }});
-
-      window._miniMeta = {{ minX, minY, mmScale }};
-      updateMiniMapViewport();
-    }}
-
-    function updateMiniMapViewport() {{
-      if (!window._miniMeta) return;
-      const {{ minX, minY, mmScale }} = window._miniMeta;
       const vpRect = document.getElementById("minimap-viewport");
-      
-      const vpW = window.innerWidth;
-      const vpH = window.innerHeight - 58;
-      const visibleW = vpW / scale;
-      const visibleH = vpH / scale;
-      const visibleX = -panX / scale;
-      const visibleY = -panY / scale;
-
-      vpRect.setAttribute("x", 10 + (visibleX - minX) * mmScale);
-      vpRect.setAttribute("y", 10 + (visibleY - minY) * mmScale);
-      vpRect.setAttribute("width", Math.max(10, visibleW * mmScale));
-      vpRect.setAttribute("height", Math.max(8, visibleH * mmScale));
+      vpRect.setAttribute("x", vx * s + offX);
+      vpRect.setAttribute("y", vy * s + offY);
+      vpRect.setAttribute("width", Math.max(vwS * s, 10));
+      vpRect.setAttribute("height", Math.max(vhS * s, 8));
     }}
 
     // ==========================================
-    // NODE SELECTION & PATH TRACING
+    // NODE INSPECTOR DRAWER WITH FLOW STEPS
     // ==========================================
+    const drawer = document.getElementById("drawer");
+    const dClose = document.getElementById("d-close");
+    dClose.onclick = closeDrawer;
+
     function selectNode(selectedId) {{
-      const allNodes = document.querySelectorAll(".node-group");
-      const allEdges = document.querySelectorAll(".edge-path");
+      const node = nodesMap[selectedId];
+      if (!node) return;
 
-      const upstreams = new Set();
-      const downstreams = new Set();
-      const activeEdgeIds = new Set();
+      const meta = node._meta || {{}};
+      const brandColor = meta.brand_color || "#3B82F6";
 
-      (IR.edges || []).forEach(e => {{
-        if (e.to === selectedId) {{
-          upstreams.add(e.from);
-          activeEdgeIds.add(`edge-${{e.from}}-${{e.to}}`);
-        }}
-        if (e.from === selectedId) {{
-          downstreams.add(e.to);
-          activeEdgeIds.add(`edge-${{e.from}}-${{e.to}}`);
-        }}
-      }});
+      // Find incoming & outgoing edges
+      const inEdges = (IR.edges || []).filter(e => e.to === selectedId);
+      const outEdges = (IR.edges || []).filter(e => e.from === selectedId);
+      const upIds = new Set(inEdges.map(e => e.from));
+      const downIds = new Set(outEdges.map(e => e.to));
 
-      allNodes.forEach(el => {{
-        const id = el.dataset.id;
+      // Update Node Text & Highlights
+      (IR.nodes || []).forEach(n => {{
+        const el = document.getElementById(`node-${{n.id}}`);
+        if (!el) return;
+
+        const provTxt = document.getElementById(`node-prov-txt-${{n.id}}`);
+        const statusTxt = document.getElementById(`node-status-txt-${{n.id}}`);
+        const statusBg = document.getElementById(`node-status-bg-${{n.id}}`);
+
         el.classList.remove("is-selected", "is-upstream", "is-downstream", "is-dimmed");
-        if (id === selectedId) {{
+
+        if (n.id === selectedId) {{
           el.classList.add("is-selected");
-        }} else if (upstreams.has(id)) {{
+          if (provTxt) provTxt.textContent = "SELECTED";
+          if (statusTxt) {{
+            statusTxt.textContent = `🎯 ACTIVE (${{inEdges.length}} In, ${{outEdges.length}} Out)`;
+            statusTxt.setAttribute("fill", "#00C8F2");
+          }}
+          if (statusBg) statusBg.setAttribute("fill", "rgba(0, 200, 242, 0.18)");
+        }} else if (upIds.has(n.id)) {{
           el.classList.add("is-upstream");
-        }} else if (downstreams.has(id)) {{
+          if (provTxt) provTxt.textContent = "UPSTREAM";
+          if (statusTxt) {{
+            statusTxt.textContent = `⬅️ SENDS TO ${{node.label.slice(0, 16)}}`;
+            statusTxt.setAttribute("fill", "#60A5FA");
+          }}
+          if (statusBg) statusBg.setAttribute("fill", "rgba(96, 165, 250, 0.15)");
+        }} else if (downIds.has(n.id)) {{
           el.classList.add("is-downstream");
+          if (provTxt) provTxt.textContent = "DOWNSTREAM";
+          if (statusTxt) {{
+            statusTxt.textContent = `➡️ RECEIVES FROM ${{node.label.slice(0, 16)}}`;
+            statusTxt.setAttribute("fill", "#10B981");
+          }}
+          if (statusBg) statusBg.setAttribute("fill", "rgba(16, 185, 129, 0.15)");
         }} else {{
           el.classList.add("is-dimmed");
         }}
       }});
 
-      allEdges.forEach(el => {{
+      // Edges highlighting
+      document.querySelectorAll(".edge-path").forEach(el => {{
+        const isConn = (el.dataset.to === selectedId || el.dataset.from === selectedId);
+        el.classList.toggle("is-active", isConn);
+        el.classList.toggle("is-dimmed", !isConn);
+        el.setAttribute("marker-end", isConn ? "url(#arrow-active)" : "url(#arrow-default)");
+      }});
+
+      // Populate Drawer
+      document.getElementById("d-badge").textContent = (meta.provider || "Service").toUpperCase();
+      document.getElementById("d-title").textContent = node.label;
+      document.getElementById("d-service").textContent = `${{meta.service_name || node.label}} (${{meta.provider || 'cloud'}})`;
+      document.getElementById("d-structurizr").textContent = `🏷️ ${{meta.structurizr_tag || 'Element'}}`;
+      document.getElementById("d-tech").textContent = node.tech || "Service Tech Stack";
+      document.getElementById("d-desc").textContent = node.description || "Component responsibility in system design.";
+
+      // Participating Flow Steps in Drawer
+      const flowStepsContainer = document.getElementById("d-flow-steps");
+      const flowSection = document.getElementById("d-flow-section");
+      const participatingSteps = (IR.flow_steps || []).map((s, idx) => ({{ step: s, index: idx }}))
+        .filter(item => item.step.from === selectedId || item.step.to === selectedId);
+
+      if (participatingSteps.length > 0) {{
+        flowSection.style.display = "block";
+        flowStepsContainer.innerHTML = "";
+        participatingSteps.forEach(item => {{
+          const isSender = item.step.from === selectedId;
+          const pill = document.createElement("div");
+          pill.className = "flow-step-pill";
+          pill.innerHTML = `
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+              <span style="font-weight:700; color:${{isSender ? '#00C8F2' : '#10B981'}};">
+                ${{isSender ? '📤 Send Step' : '📥 Receive Step'}} ${{item.step.step || (item.index + 1)}}
+              </span>
+              <span style="font-size:0.7rem; color:var(--accent);">[${{item.step.protocol || 'API'}}]</span>
+            </div>
+            <div style="font-size:0.78rem; color:var(--text-main); font-weight:600;">${{item.step.title || ''}}</div>
+            <div style="font-size:0.72rem; color:var(--text-muted);">${{item.step.description || ''}}</div>
+          `;
+          pill.onclick = () => highlightFlowStep(item.index);
+          flowStepsContainer.appendChild(pill);
+        }});
+      }} else {{
+        flowSection.style.display = "none";
+      }}
+
+      // Upstream list
+      const upContainer = document.getElementById("d-upstream");
+      upContainer.innerHTML = inEdges.length ? "" : "<span style='color:var(--text-muted); font-size:0.8rem;'>No incoming calls (Ingress node)</span>";
+      inEdges.forEach(e => {{
+        const src = nodesMap[e.from] || {{ label: e.from }};
+        const p = document.createElement("div");
+        p.className = "connection-pill";
+        p.innerHTML = `<span><strong>${{src.label}}</strong></span><span style="color:var(--accent); font-size:0.75rem;">[${{e.protocol || 'API'}}] ${{e.label || ''}}</span>`;
+        p.onclick = () => selectNode(e.from);
+        upContainer.appendChild(p);
+      }});
+
+      // Downstream list
+      const downContainer = document.getElementById("d-downstream");
+      downContainer.innerHTML = outEdges.length ? "" : "<span style='color:var(--text-muted); font-size:0.8rem;'>No outgoing calls (Terminal storage/sink)</span>";
+      outEdges.forEach(e => {{
+        const tgt = nodesMap[e.to] || {{ label: e.to }};
+        const p = document.createElement("div");
+        p.className = "connection-pill";
+        p.innerHTML = `<span><strong>${{tgt.label}}</strong></span><span style="color:var(--accent); font-size:0.75rem;">[${{e.protocol || 'API'}}] ${{e.label || ''}}</span>`;
+        p.onclick = () => selectNode(e.to);
+        downContainer.appendChild(p);
+      }});
+
+      drawer.classList.add("open");
+    }}
+
+    function closeDrawer() {{
+      drawer.classList.remove("open");
+      resetRouteTrace();
+    }}
+
+    // ==========================================
+    // DYNAMIC WORKFLOW ROUTE TRACE CONTROLLER
+    // Updates what each node shows as flow changes!
+    // ==========================================
+    let currentStepIndex = -1;
+    let autoPlayTimer = null;
+    const flowSteps = IR.flow_steps || [];
+
+    function highlightFlowStep(index) {{
+      if (!flowSteps.length) return;
+      if (index < 0) index = 0;
+      if (index >= flowSteps.length) index = flowSteps.length - 1;
+      currentStepIndex = index;
+
+      const step = flowSteps[index];
+      const stepLabel = document.getElementById("player-step-label");
+      const stepDesc = document.getElementById("player-step-desc");
+      if (stepLabel) stepLabel.textContent = `Phase ${{step.step || (index + 1)}} / ${{flowSteps.length}}`;
+      if (stepDesc) {{
+        stepDesc.textContent = `${{step.title || (step.from + ' → ' + step.to)}} [${{step.protocol || 'HTTPS'}}]`;
+        stepDesc.title = step.description || "";
+      }}
+
+      const targetEdgeId = `edge-${{step.from}}-${{step.to}}`;
+      const reverseEdgeId = `edge-${{step.to}}-${{step.from}}`;
+
+      // Dynamically update EVERY node's visible text and status
+      (IR.nodes || []).forEach(node => {{
+        const el = document.getElementById(`node-${{node.id}}`);
+        if (!el) return;
+
+        const provTxt = document.getElementById(`node-prov-txt-${{node.id}}`);
+        const provBg = document.getElementById(`node-prov-bg-${{node.id}}`);
+        const techTxt = document.getElementById(`node-tech-${{node.id}}`);
+        const descTxt = document.getElementById(`node-desc-${{node.id}}`);
+        const statusBg = document.getElementById(`node-status-bg-${{node.id}}`);
+        const statusTxt = document.getElementById(`node-status-txt-${{node.id}}`);
+
+        const meta = node._meta || {{}};
+        const brandColor = meta.brand_color || "#3B82F6";
+        const defaultProv = (meta.provider || "generic").toUpperCase();
+        const tier = (IR.tiers || []).find(t => t.id === node.tier);
+        const tierName = tier ? tier.label : (node.tier || "Service");
+
+        el.classList.remove("is-selected", "is-upstream", "is-downstream", "is-dimmed");
+
+        if (node.id === step.from) {{
+          // ⚡ SENDER NODE: Dynamically display what it is sending!
+          el.classList.add("is-selected");
+          if (provTxt) {{
+            provTxt.textContent = `⚡ SENDER`;
+            provTxt.setAttribute("fill", "#00C8F2");
+          }}
+          if (provBg) {{
+            provBg.setAttribute("width", "54");
+            provBg.setAttribute("x", el.dataset.width - 66);
+            provBg.setAttribute("stroke", "#00C8F2");
+            provBg.setAttribute("fill", "rgba(0, 200, 242, 0.18)");
+          }}
+          if (techTxt) {{
+            techTxt.textContent = `📤 Sending [${{step.protocol || 'API'}}]: ${{(step.title || 'Payload').slice(0, 22)}}`;
+            techTxt.setAttribute("fill", "#00C8F2");
+            techTxt.setAttribute("font-weight", "750");
+          }}
+          if (descTxt) {{
+            descTxt.textContent = (step.description || node.description || "").slice(0, 36) + '..';
+            descTxt.setAttribute("fill", "var(--text-main)");
+          }}
+          if (statusTxt) {{
+            const tgtNode = nodesMap[step.to] || {{ label: step.to }};
+            statusTxt.textContent = `▶ OUTBOUND ➔ ${{tgtNode.label.slice(0, 18)}}`;
+            statusTxt.setAttribute("fill", "#00C8F2");
+          }}
+          if (statusBg) {{
+            statusBg.setAttribute("fill", "rgba(0, 200, 242, 0.2)");
+            statusBg.setAttribute("stroke", "#00C8F2");
+          }}
+        }} else if (node.id === step.to) {{
+          // 📥 RECEIVER NODE: Dynamically display what it is receiving and processing!
+          el.classList.add("is-downstream");
+          if (provTxt) {{
+            provTxt.textContent = `📥 RECEIVER`;
+            provTxt.setAttribute("fill", "#10B981");
+          }}
+          if (provBg) {{
+            provBg.setAttribute("width", "60");
+            provBg.setAttribute("x", el.dataset.width - 72);
+            provBg.setAttribute("stroke", "#10B981");
+            provBg.setAttribute("fill", "rgba(16, 185, 129, 0.18)");
+          }}
+          if (techTxt) {{
+            techTxt.textContent = `📥 Ingesting [${{step.protocol || 'API'}}]: ${{(step.title || 'Processing').slice(0, 20)}}`;
+            techTxt.setAttribute("fill", "#10B981");
+            techTxt.setAttribute("font-weight", "750");
+          }}
+          if (descTxt) {{
+            descTxt.textContent = (step.description || node.description || "").slice(0, 36) + '..';
+            descTxt.setAttribute("fill", "var(--text-main)");
+          }}
+          if (statusTxt) {{
+            const srcNode = nodesMap[step.from] || {{ label: step.from }};
+            statusTxt.textContent = `◀ RECEIVED FROM: ${{srcNode.label.slice(0, 18)}}`;
+            statusTxt.setAttribute("fill", "#10B981");
+          }}
+          if (statusBg) {{
+            statusBg.setAttribute("fill", "rgba(16, 185, 129, 0.2)");
+            statusBg.setAttribute("stroke", "#10B981");
+          }}
+        }} else {{
+          // 💤 IDLE NODE IN THIS PHASE
+          el.classList.add("is-dimmed");
+          if (provTxt) {{
+            provTxt.textContent = defaultProv;
+            provTxt.setAttribute("fill", brandColor);
+          }}
+          if (provBg) {{
+            provBg.setAttribute("width", "50");
+            provBg.setAttribute("x", el.dataset.width - 62);
+            provBg.setAttribute("stroke", brandColor);
+            provBg.setAttribute("fill", "var(--bg)");
+          }}
+          if (techTxt) {{
+            techTxt.textContent = (node.tech || "Service").slice(0, 25);
+            techTxt.setAttribute("fill", "#38BDF8");
+            techTxt.setAttribute("font-weight", "600");
+          }}
+          if (descTxt) {{
+            descTxt.textContent = (node.description || meta.service_name || "").slice(0, 36);
+            descTxt.setAttribute("fill", "var(--text-muted)");
+          }}
+          if (statusTxt) {{
+            statusTxt.textContent = `📍 ${{tierName}} (Idle)`;
+            statusTxt.setAttribute("fill", "var(--text-muted)");
+          }}
+          if (statusBg) {{
+            statusBg.setAttribute("fill", "rgba(255, 255, 255, 0.03)");
+            statusBg.setAttribute("stroke", "var(--surface-border)");
+          }}
+        }}
+      }});
+
+      // Edge highlighting
+      document.querySelectorAll(".edge-path").forEach(el => {{
         el.classList.remove("is-active", "is-dimmed");
-        if (activeEdgeIds.has(el.id)) {{
+        if (el.id === targetEdgeId || el.id === reverseEdgeId) {{
           el.classList.add("is-active");
           el.setAttribute("marker-end", "url(#arrow-active)");
         }} else {{
@@ -1616,199 +1485,116 @@ def compile_to_html(ir: Dict[str, Any]) -> str:
           el.setAttribute("marker-end", "url(#arrow-default)");
         }}
       }});
-
-      openDrawer(selectedId, upstreams, downstreams);
     }}
 
-    // ==========================================
-    // SIDE INSPECTOR DRAWER
-    // ==========================================
-    const drawer = document.getElementById("drawer");
-    let currentDrawerNodeId = null;
-
-    function openDrawer(nodeId, upstreams, downstreams) {{
-      currentDrawerNodeId = nodeId;
-      const node = nodesMap[nodeId];
-      if (!node) return;
-
-      const meta = node._meta || {{}};
-      const tierObj = (IR.tiers || []).find(t => t.id === node.tier);
-      const badge = document.getElementById("d-badge");
-      badge.textContent = tierObj ? tierObj.label : node.tier;
-      badge.style.background = tierObj ? tierObj.color + "22" : "#3B82F622";
-      badge.style.color = tierObj ? tierObj.color : "#3B82F6";
-
-      document.getElementById("d-title").textContent = node.label;
-      document.getElementById("d-service").textContent = `${{(meta.provider || "GENERIC").toUpperCase()}} • ${{meta.service_name || node.label}}`;
-      document.getElementById("d-structurizr").textContent = `🏷️ ${{meta.structurizr_tag || "Microservice"}}`;
-      document.getElementById("d-tech").textContent = node.tech || "None specified";
-      document.getElementById("d-desc").textContent = node.description || "No detailed description provided.";
-
-      const upContainer = document.getElementById("d-upstream");
-      upContainer.innerHTML = "";
-      if (upstreams.size) {{
-        upstreams.forEach(uId => {{
-          const uNode = nodesMap[uId];
-          const div = document.createElement("div");
-          div.className = "connection-pill";
-          div.innerHTML = `<span>⬆️ ${{uNode ? uNode.label : uId}}</span> <span style="font-size:0.7rem; color:var(--text-muted)">Upstream</span>`;
-          div.onclick = () => selectNode(uId);
-          upContainer.appendChild(div);
-        }});
-      }} else {{
-        upContainer.innerHTML = `<span style="font-size:0.8rem; color:var(--text-muted)">None (Ingress root)</span>`;
+    function resetRouteTrace() {{
+      currentStepIndex = -1;
+      if (autoPlayTimer) {{
+        clearInterval(autoPlayTimer);
+        autoPlayTimer = null;
+        const playBtn = document.getElementById("player-play-btn");
+        if (playBtn) {{
+          playBtn.textContent = "▶ Auto";
+          playBtn.classList.remove("player-play");
+        }}
       }}
 
-      const downContainer = document.getElementById("d-downstream");
-      downContainer.innerHTML = "";
-      if (downstreams.size) {{
-        downstreams.forEach(dId => {{
-          const dNode = nodesMap[dId];
-          const div = document.createElement("div");
-          div.className = "connection-pill";
-          div.innerHTML = `<span>⬇️ ${{dNode ? dNode.label : dId}}</span> <span style="font-size:0.7rem; color:var(--text-muted)">Downstream</span>`;
-          div.onclick = () => selectNode(dId);
-          downContainer.appendChild(div);
-        }});
-      }} else {{
-        downContainer.innerHTML = `<span style="font-size:0.8rem; color:var(--text-muted)">None (Leaf node)</span>`;
-      }}
+      const stepLabel = document.getElementById("player-step-label");
+      const stepDesc = document.getElementById("player-step-desc");
+      if (stepLabel) stepLabel.textContent = `Flow Steps: ${{flowSteps.length}}`;
+      if (stepDesc) stepDesc.textContent = "Click ▶ or ▶ Auto to animate transaction flow";
 
-      drawer.classList.add("open");
-    }}
+      // Restore all nodes to default state
+      (IR.nodes || []).forEach(node => {{
+        const el = document.getElementById(`node-${{node.id}}`);
+        if (!el) return;
+        el.classList.remove("is-selected", "is-upstream", "is-downstream", "is-dimmed");
 
-    function closeDrawer() {{
-      drawer.classList.remove("open");
-      currentDrawerNodeId = null;
-      document.querySelectorAll(".node-group").forEach(el => el.classList.remove("is-selected", "is-upstream", "is-downstream", "is-dimmed"));
+        const provTxt = document.getElementById(`node-prov-txt-${{node.id}}`);
+        const provBg = document.getElementById(`node-prov-bg-${{node.id}}`);
+        const techTxt = document.getElementById(`node-tech-${{node.id}}`);
+        const descTxt = document.getElementById(`node-desc-${{node.id}}`);
+        const statusTxt = document.getElementById(`node-status-txt-${{node.id}}`);
+        const statusBg = document.getElementById(`node-status-bg-${{node.id}}`);
+
+        const meta = node._meta || {{}};
+        const brandColor = meta.brand_color || "#3B82F6";
+        const tier = (IR.tiers || []).find(t => t.id === node.tier);
+        const tierName = tier ? tier.label : (node.tier || "Service Layer");
+
+        if (provTxt) {{
+          provTxt.textContent = (meta.provider || "generic").toUpperCase();
+          provTxt.setAttribute("fill", brandColor);
+        }}
+        if (provBg) {{
+          provBg.setAttribute("width", "50");
+          provBg.setAttribute("x", el.dataset.width - 62);
+          provBg.setAttribute("stroke", brandColor);
+          provBg.setAttribute("fill", "var(--bg)");
+        }}
+        if (techTxt) {{
+          techTxt.textContent = (node.tech || meta.service_name || "Service").slice(0, 25);
+          techTxt.setAttribute("fill", "#38BDF8");
+          techTxt.setAttribute("font-weight", "600");
+        }}
+        if (descTxt) {{
+          descTxt.textContent = (node.description || meta.service_name || "").slice(0, 37);
+          descTxt.setAttribute("fill", "var(--text-muted)");
+        }}
+        if (statusTxt) {{
+          statusTxt.textContent = `📍 ${{tierName}}`;
+          statusTxt.setAttribute("fill", "var(--text-muted)");
+        }}
+        if (statusBg) {{
+          statusBg.setAttribute("fill", "rgba(255, 255, 255, 0.03)");
+          statusBg.setAttribute("stroke", "var(--surface-border)");
+        }}
+      }});
+
       document.querySelectorAll(".edge-path").forEach(el => {{
         el.classList.remove("is-active", "is-dimmed");
         el.setAttribute("marker-end", "url(#arrow-default)");
       }});
     }}
 
-    document.getElementById("d-close").onclick = closeDrawer;
+    function nextStep() {{
+      highlightFlowStep(currentStepIndex + 1);
+    }}
 
-    document.getElementById("d-jump-explainer-btn").onclick = () => {{
-      if (currentDrawerNodeId) {{
-        switchView("explainer");
-        const el = document.getElementById(`inv-card-${{currentDrawerNodeId}}`);
-        if (el) {{
-          el.scrollIntoView({{ behavior: "smooth", block: "center" }});
-          el.style.borderColor = "var(--accent)";
-          setTimeout(() => el.style.borderColor = "var(--surface-border)", 2000);
+    function prevStep() {{
+      highlightFlowStep(currentStepIndex - 1);
+    }}
+
+    function toggleAutoPlay() {{
+      const playBtn = document.getElementById("player-play-btn");
+      if (autoPlayTimer) {{
+        clearInterval(autoPlayTimer);
+        autoPlayTimer = null;
+        if (playBtn) {{
+          playBtn.textContent = "▶ Auto";
+          playBtn.classList.remove("player-play");
         }}
+      }} else {{
+        if (playBtn) {{
+          playBtn.textContent = "⏸ Pause";
+          playBtn.classList.add("player-play");
+        }}
+        if (currentStepIndex >= flowSteps.length - 1) currentStepIndex = -1;
+        nextStep();
+        autoPlayTimer = setInterval(() => {{
+          if (currentStepIndex >= flowSteps.length - 1) {{
+            toggleAutoPlay();
+          }} else {{
+            nextStep();
+          }}
+        }}, 2200);
       }}
-    }};
-
-    // ==========================================
-    // RENDER ONE-PAGE EXPLAINER (Archify Standard)
-    // ==========================================
-    function renderExplainer() {{
-      // 1. Decisions
-      const decContainer = document.getElementById("explainer-decisions");
-      decContainer.innerHTML = "";
-      (IR.decisions || []).forEach(d => {{
-        const card = document.createElement("div");
-        card.className = "adr-card";
-        card.innerHTML = `
-          <div class="adr-header">
-            <div class="adr-name">📌 ${{d.decision}}</div>
-            <span class="status-badge">${{d.status || 'ACCEPTED'}}</span>
-          </div>
-          <div class="adr-body">${{d.rationale}}</div>
-          <div class="tradeoff-box">
-            <strong>⚠️ Trade-off:</strong> ${{d.tradeoff || 'Operational overhead accepted.'}}
-          </div>
-        `;
-        decContainer.appendChild(card);
-      }});
-
-      // 2. Stepper Lifecycle
-      const stepContainer = document.getElementById("explainer-stepper");
-      stepContainer.innerHTML = "";
-      (IR.flow_steps || []).forEach(s => {{
-        const srcNode = nodesMap[s.from] || {{ label: s.from }};
-        const tgtNode = nodesMap[s.to] || {{ label: s.to }};
-        const item = document.createElement("div");
-        item.className = "step-card";
-        item.innerHTML = `
-          <div class="step-num">${{s.step}}</div>
-          <div class="step-content">
-            <div class="step-top">
-              <span class="step-title">${{s.title || (srcNode.label + ' → ' + tgtNode.label)}}</span>
-              <span class="protocol-pill">${{s.protocol || 'HTTPS'}}</span>
-            </div>
-            <p class="step-desc">${{s.description}}</p>
-            <button class="step-action-btn" onclick="highlightStepOnCanvas('${{s.from}}', '${{s.to}}')">
-              🔍 Inspect on Canvas
-            </button>
-          </div>
-        `;
-        stepContainer.appendChild(item);
-      }});
-
-      // 3. Component Inventory
-      const invContainer = document.getElementById("explainer-inventory");
-      invContainer.innerHTML = "";
-      (IR.nodes || []).forEach(node => {{
-        const meta = node._meta || {{}};
-        const brandColor = meta.brand_color || "#3B82F6";
-        const tierObj = (IR.tiers || []).find(t => t.id === node.tier);
-        const card = document.createElement("div");
-        card.className = "inv-card";
-        card.id = `inv-card-${{node.id}}`;
-        card.innerHTML = `
-          <div class="inv-top">
-            <div class="inv-icon-box" style="border-color: ${{brandColor}}55;">
-              <svg width="22" height="22" viewBox="0 0 24 24">
-                <path fill="${{brandColor}}" d="${{meta.icon || 'M12 2L2 7v10l10 5 10-5V7L12 2z'}}" />
-              </svg>
-            </div>
-            <div>
-              <div class="inv-name">${{node.label}}</div>
-              <div class="inv-tech">${{node.tech || 'Service'}}</div>
-            </div>
-          </div>
-          <p class="inv-desc">${{node.description || meta.service_name || 'Component responsibility.'}}</p>
-          <div class="inv-meta">
-            <span class="protocol-pill" style="color: ${{tierObj ? tierObj.color : 'var(--accent)'}};">
-              ${{tierObj ? tierObj.label : node.tier}}
-            </span>
-            <button class="step-action-btn" onclick="focusNodeOnCanvas('${{node.id}}')">
-              ⛶ Focus Node
-            </button>
-          </div>
-        `;
-        invContainer.appendChild(card);
-      }});
-
-      // 4. Matrix Table
-      const matrixBody = document.getElementById("explainer-matrix-body");
-      matrixBody.innerHTML = "";
-      (IR.edges || []).forEach(e => {{
-        const srcNode = nodesMap[e.from] || {{ label: e.from }};
-        const tgtNode = nodesMap[e.to] || {{ label: e.to }};
-        const tr = document.createElement("tr");
-        tr.innerHTML = `
-          <td><strong>${{srcNode.label}}</strong></td>
-          <td><strong>${{tgtNode.label}}</strong></td>
-          <td><span class="protocol-pill">${{e.protocol || 'HTTPS'}}</span></td>
-          <td style="color:var(--text-muted);">${{e.label || 'Direct call / data transfer'}}</td>
-        `;
-        matrixBody.appendChild(tr);
-      }});
     }}
 
-    function highlightStepOnCanvas(fromId, toId) {{
-      switchView("canvas");
-      selectNode(fromId);
-    }}
-
-    function focusNodeOnCanvas(nodeId) {{
-      switchView("canvas");
-      selectNode(nodeId);
-    }}
+    document.getElementById("player-next-btn").onclick = nextStep;
+    document.getElementById("player-prev-btn").onclick = prevStep;
+    document.getElementById("player-play-btn").onclick = toggleAutoPlay;
+    document.getElementById("player-reset-btn").onclick = resetRouteTrace;
 
     // ==========================================
     // SEARCH & CONTROLS
@@ -1844,66 +1630,10 @@ def compile_to_html(ir: Dict[str, Any]) -> str:
     document.getElementById("motion-btn").onclick = toggleFlowMotion;
     document.getElementById("dock-motion-btn").onclick = toggleFlowMotion;
 
-    // Theme Toggle
+    // Dark/Light Theme Toggle
     document.getElementById("theme-btn").onclick = () => {{
       const cur = document.body.getAttribute("data-theme");
       document.body.setAttribute("data-theme", cur === "dark" ? "light" : "dark");
-    }};
-
-    // Fit View (Auto-fit to 16:9 or current window aspect ratio)
-    function fitToView() {{
-      const nodeKeys = Object.keys(nodePositions);
-      if (!nodeKeys.length) return;
-
-      let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
-      nodeKeys.forEach(k => {{
-        const p = nodePositions[k];
-        minX = Math.min(minX, p.x);
-        minY = Math.min(minY, p.y);
-        maxX = Math.max(maxX, p.x + p.width);
-        maxY = Math.max(maxY, p.y + p.height);
-      }});
-
-      // Account for tier containers, labels, and margins
-      minX -= 32;
-      minY -= 42;
-      maxX += 32;
-      maxY += 32;
-
-      const diagramW = Math.max(maxX - minX, 300);
-      const diagramH = Math.max(maxY - minY, 200);
-
-      const vpW = viewport.clientWidth || window.innerWidth || 1280;
-      const vpH = viewport.clientHeight || (window.innerHeight - 58) || 720;
-
-      // Fit diagram within viewport with safe padding
-      const scaleX = (vpW * 0.92) / diagramW;
-      const scaleY = (vpH * 0.92) / diagramH;
-      scale = Math.min(Math.min(scaleX, scaleY), 1.35);
-
-      // Center horizontally and vertically
-      panX = (vpW - (maxX - minX) * scale) / 2 - minX * scale;
-      panY = (vpH - (maxY - minY) * scale) / 2 - minY * scale;
-
-      updateTransform();
-    }}
-
-    document.getElementById("reset-btn").onclick = fitToView;
-
-    document.getElementById("orient-btn").onclick = () => {{
-      currentOrientation = currentOrientation === "horizontal" ? "vertical" : "horizontal";
-      renderScene();
-      fitToView();
-    }};
-
-    document.getElementById("zoom-in-btn").onclick = () => {{
-      scale = Math.min(scale * 1.2, 3.0);
-      updateTransform();
-    }};
-
-    document.getElementById("zoom-out-btn").onclick = () => {{
-      scale = Math.max(scale * 0.8, 0.25);
-      updateTransform();
     }};
 
     // Fullscreen Toggle
@@ -1911,214 +1641,85 @@ def compile_to_html(ir: Dict[str, Any]) -> str:
       if (!document.fullscreenElement) {{
         document.documentElement.requestFullscreen().catch(() => {{}});
       }} else {{
-        document.exitFullscreen().catch(() => {{}});
+        document.exitFullscreen();
       }}
     }};
 
-    // Print
-    document.getElementById("export-print-btn").onclick = () => {{
-      switchView("explainer");
-      setTimeout(() => window.print(), 200);
-    }};
-
-    // Standalone SVG Export
+    // SVG Export
     document.getElementById("export-svg-btn").onclick = () => {{
-      const svg = document.getElementById("diagram-canvas");
-      const serializer = new XMLSerializer();
-      let source = serializer.serializeToString(svg);
-      const blob = new Blob([source], {{ type: "image/svg+xml;charset=utf-8" }});
+      const b = scene.getBBox();
+      const pad = 40;
+      const svgW = b.width + pad * 2;
+      const svgH = b.height + pad * 2;
+      
+      const clone = document.getElementById("diagram-canvas").cloneNode(true);
+      clone.setAttribute("viewBox", `${{b.x - pad}} ${{b.y - pad}} ${{svgW}} ${{svgH}}`);
+      clone.setAttribute("width", svgW);
+      clone.setAttribute("height", svgH);
+
+      const blob = new Blob([clone.outerHTML], {{ type: "image/svg+xml;charset=utf-8" }});
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
-      a.download = "{ir.get('title', 'architecture').lower().replace(' ', '_')}.svg";
+      a.download = `${{(IR.title || 'architecture').toLowerCase().replace(/\s+/g, '_')}}.svg`;
       a.click();
+      URL.revokeObjectURL(url);
     }};
 
-    // High-Resolution PNG Export via Canvas
+    // High-Res PNG Export
     document.getElementById("export-png-btn").onclick = () => {{
-      const svg = document.getElementById("diagram-canvas");
-      const serializer = new XMLSerializer();
-      let source = serializer.serializeToString(svg);
+      const b = scene.getBBox();
+      const pad = 40;
+      const svgW = b.width + pad * 2;
+      const svgH = b.height + pad * 2;
+      
+      const clone = document.getElementById("diagram-canvas").cloneNode(true);
+      clone.setAttribute("viewBox", `${{b.x - pad}} ${{b.y - pad}} ${{svgW}} ${{svgH}}`);
+      clone.setAttribute("width", svgW);
+      clone.setAttribute("height", svgH);
 
-      if (!source.match(/^<svg[^>]+xmlns="http\\:\\/\\/www\\.w3\\.org\\/2000\\/svg"/)) {{
-        source = source.replace(/^<svg/, '<svg xmlns="http://www.w3.org/2000/svg"');
-      }}
+      const svgData = new XMLSerializer().serializeToString(clone);
+      const canvas = document.createElement("canvas");
+      const dpr = 2;
+      canvas.width = svgW * dpr;
+      canvas.height = svgH * dpr;
+      const ctx = canvas.getContext("2d");
+      ctx.scale(dpr, dpr);
+      ctx.fillStyle = document.body.getAttribute("data-theme") === "light" ? "#F8FAFC" : "#090D16";
+      ctx.fillRect(0, 0, svgW, svgH);
 
       const img = new Image();
-      const svgBlob = new Blob([source], {{ type: "image/svg+xml;charset=utf-8" }});
-      const url = URL.createObjectURL(svgBlob);
-
-      img.onload = function() {{
-        const canvas = document.createElement("canvas");
-        const scaleFactor = 2;
-        canvas.width = (viewport.clientWidth || 1200) * scaleFactor;
-        canvas.height = (viewport.clientHeight || 800) * scaleFactor;
-        const ctx = canvas.getContext("2d");
-        ctx.scale(scaleFactor, scaleFactor);
-        ctx.fillStyle = document.body.getAttribute("data-theme") === "light" ? "#F8FAFC" : "#090D16";
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
-        ctx.drawImage(img, 0, 0, viewport.clientWidth || 1200, viewport.clientHeight || 800);
-        URL.revokeObjectURL(url);
-
-        const pngUrl = canvas.toDataURL("image/png");
+      img.onload = () => {{
+        ctx.drawImage(img, 0, 0);
         const a = document.createElement("a");
-        a.download = "{ir.get('title', 'architecture').lower().replace(' ', '_')}.png";
-        a.href = pngUrl;
+        a.download = `${{(IR.title || 'architecture').toLowerCase().replace(/\s+/g, '_')}}.png`;
+        a.href = canvas.toDataURL("image/png");
         a.click();
       }};
-      img.src = url;
+      img.src = "data:image/svg+xml;base64," + btoa(unescape(encodeURIComponent(svgData)));
     }};
 
     // ==========================================
-    // WORKFLOW ROUTE TRACE CONTROLLER (Archify Standard)
+    // KEYBOARD SHORTCUTS
     // ==========================================
-    let currentStepIndex = -1;
-    let autoPlayTimer = null;
-    const flowSteps = IR.flow_steps || [];
-
-    function highlightFlowStep(index) {{
-      if (!flowSteps.length) return;
-      if (index < 0) index = 0;
-      if (index >= flowSteps.length) index = flowSteps.length - 1;
-      currentStepIndex = index;
-
-      const step = flowSteps[index];
-      const stepLabel = document.getElementById("player-step-label");
-      const stepDesc = document.getElementById("player-step-desc");
-      if (stepLabel) stepLabel.textContent = `Phase ${{step.step || (index + 1)}} / ${{flowSteps.length}}`;
-      if (stepDesc) {{
-        stepDesc.textContent = `${{step.title || (step.from + ' → ' + step.to)}} [${{step.protocol || 'HTTPS'}}]`;
-        stepDesc.title = step.description || "";
-      }}
-
-      // Highlight source node, target node, and the specific connecting edge
-      const allNodes = document.querySelectorAll(".node-group");
-      const allEdges = document.querySelectorAll(".edge-path");
-      const targetEdgeId = `edge-${{step.from}}-${{step.to}}`;
-
-      allNodes.forEach(el => {{
-        const id = el.dataset.id;
-        el.classList.remove("is-selected", "is-upstream", "is-downstream", "is-dimmed");
-        if (id === step.from) {{
-          el.classList.add("is-selected");
-        }} else if (id === step.to) {{
-          el.classList.add("is-downstream");
-        }} else {{
-          el.classList.add("is-dimmed");
-        }}
-      }});
-
-      allEdges.forEach(el => {{
-        el.classList.remove("is-active", "is-dimmed");
-        if (el.id === targetEdgeId) {{
-          el.classList.add("is-active");
-          el.setAttribute("marker-end", "url(#arrow-active)");
-        }} else {{
-          el.classList.add("is-dimmed");
-          el.setAttribute("marker-end", "url(#arrow-default)");
-        }}
-      }});
-    }}
-
-    function nextStep() {{
-      highlightFlowStep(currentStepIndex + 1);
-    }}
-
-    function prevStep() {{
-      highlightFlowStep(currentStepIndex - 1);
-    }}
-
-    function toggleAutoPlay() {{
-      const playBtn = document.getElementById("player-play-btn");
-      if (autoPlayTimer) {{
-        clearInterval(autoPlayTimer);
-        autoPlayTimer = null;
-        if (playBtn) {{
-          playBtn.textContent = "▶ Auto";
-          playBtn.classList.remove("player-play");
-        }}
-      }} else {{
-        if (playBtn) {{
-          playBtn.textContent = "⏸ Pause";
-          playBtn.classList.add("player-play");
-        }}
-        if (currentStepIndex >= flowSteps.length - 1) currentStepIndex = -1;
-        nextStep();
-        autoPlayTimer = setInterval(() => {{
-          if (currentStepIndex >= flowSteps.length - 1) {{
-            toggleAutoPlay();
-          }} else {{
-            nextStep();
-          }}
-        }}, 1800);
-      }}
-    }}
-
-    function resetTrace() {{
-      if (autoPlayTimer) toggleAutoPlay();
-      currentStepIndex = -1;
-      const stepLabel = document.getElementById("player-step-label");
-      const stepDesc = document.getElementById("player-step-desc");
-      if (stepLabel) stepLabel.textContent = `Step 1 / ${{flowSteps.length}}`;
-      if (stepDesc) stepDesc.textContent = "Click ▶ to trace route";
-      closeDrawer();
-    }}
-
-    const prevBtn = document.getElementById("player-prev-btn");
-    const nextBtn = document.getElementById("player-next-btn");
-    const playBtn = document.getElementById("player-play-btn");
-    const resetBtn = document.getElementById("player-reset-btn");
-
-    if (prevBtn) prevBtn.onclick = prevStep;
-    if (nextBtn) nextBtn.onclick = nextStep;
-    if (playBtn) playBtn.onclick = toggleAutoPlay;
-    if (resetBtn) resetBtn.onclick = resetTrace;
-
-    // Keyboard Shortcuts
-    window.addEventListener("keydown", (e) => {{
-      if (e.target === searchInput && e.key !== "Escape") return;
-      if (e.key === "Escape") {{
-        closeDrawer();
-        searchInput.blur();
-      }} else if (e.key === "1") {{
-        switchView("canvas");
-      }} else if (e.key === "2") {{
-        switchView("explainer");
-      }} else if (e.key === "/") {{
-        e.preventDefault();
-        searchInput.focus();
-      }} else if (e.key.toLowerCase() === "d" || e.key.toLowerCase() === "t") {{
-        document.getElementById("theme-btn").click();
-      }} else if (e.key.toLowerCase() === "m") {{
-        toggleFlowMotion();
-      }} else if (e.key.toLowerCase() === "r") {{
-        document.getElementById("reset-btn").click();
-      }} else if (e.key.toLowerCase() === "o") {{
-        document.getElementById("orient-btn").click();
-      }} else if (e.key.toLowerCase() === "f") {{
-        document.getElementById("fullscreen-btn").click();
-      }} else if (e.key === "ArrowRight") {{
-        nextStep();
-      }} else if (e.key === "ArrowLeft") {{
-        prevStep();
-      }} else if (e.key === " " && e.target !== searchInput) {{
-        e.preventDefault();
-        toggleAutoPlay();
-      }}
+    window.addEventListener("keydown", e => {{
+      if (e.target.tagName === "INPUT" || e.target.tagName === "TEXTAREA") return;
+      const k = e.key.toLowerCase();
+      if (k === "r") fitToView();
+      if (k === "m") toggleFlowMotion();
+      if (k === "d") document.getElementById("theme-btn").click();
+      if (k === "f") document.getElementById("fullscreen-btn").click();
+      if (k === "o") document.getElementById("orient-btn").click();
+      if (e.key === "ArrowRight" || e.key === " ") {{ e.preventDefault(); nextStep(); }}
+      if (e.key === "ArrowLeft") {{ e.preventDefault(); prevStep(); }}
+      if (k === "escape") {{ closeDrawer(); resetRouteTrace(); }}
+      if (k === "/") {{ e.preventDefault(); searchInput.focus(); }}
     }});
 
-    // Initialize
-    window.addEventListener("DOMContentLoaded", () => {{
-      renderScene();
-      renderExplainer();
-      setTimeout(fitToView, 50);
-    }});
-
-    window.addEventListener("resize", () => {{
-      if (document.getElementById("canvas-view").classList.contains("active")) {{
-        fitToView();
-      }}
-    }});
+    // Initial Launch
+    renderScene();
+    setTimeout(fitToView, 60);
   </script>
 </body>
-</html>"""
+</html>
+"""
