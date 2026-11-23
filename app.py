@@ -199,9 +199,13 @@ if generate_clicked:
                 pass
         engine = VizArcEngine(api_key=api_key)
         ir = engine.generate_ir(prompt=spec_input)
-        st.session_state.current_ir = ir
-        st.session_state.spec_text = spec_input
-        st.rerun()
+        if engine.last_error:
+            st.error(f"⚠️ Generation issue: {engine.last_error}")
+        else:
+            st.session_state.current_ir = ir
+            st.session_state.spec_text = spec_input
+            st.session_state.preset_id = None
+            st.rerun()
 
 # ==========================================
 # RIGHT SIDE PANE: Pure Full-Bleed Canvas (No Header, Nothing)

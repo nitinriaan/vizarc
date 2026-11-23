@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>High-Volume E-Commerce Platform — VizArc</title>
+  <title>GCP CX AI Agent PHI Redaction & Analytics Architecture — VizArc</title>
   <link rel="icon" type="image/png" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAIAAAD8GO2jAAAABmJLR0QA/wD/AP+gvaeTAAACaElEQVRIie2WzWsUQRTEq17P7mwSQ4z58AM1CDGgoKCi6EGP3vTqwT/Rk/+AB/Eg4kHBiJggiKKbGMFEs7vTPf3Kw0ZF2U32oBdJM8d69aNe9QzD+bsR//LYP3XfB4xyitGlCohHAaDZBuu/DfAGvl1iboE1q3kdWIZVGmVw1BV1zzA3yUgkOG37FDXa6EiqNM84RSYgEZGMdFo1O9Ls3iIFdBbQd2cCE5HAxDgecot/AdA7SRn77vjhjgRmdaeJvRB7lJwnUM0aEliDkWMfHEJv2iAgC0I8wObX3dreFUB0TxgTUBM1Wmve2MyClyjiJOFiVmoiNBTS0CC7AaoZ5pJIRI3QQ/Hxc2f5vqTW0s2wcNwLMQuuVCrUBg1mDO3AC1Tz9nPprfW6Wn2guoazWnnUXPvCWv0QklLDh/kMBfSOmLRzbcK2a+Wpd77SWrQSsLT6pLGVmNV/HNltMGMwII8zjRsjkcis8u1aar+ilbp8CTeu01qKSW9ehoh+CGTVSsCAtgd1QHTnjDWRQVdjM6aVx2CJi2d7t5fYtbI5Fh4+962t8KHNw3OU95UZKVhz7wTxoLkZajG7JbflZ0gJk1O9W0s7gnMzWjpNK319rdjsIIvZmV0pKv/5FfwToIBqMvxcbvGunTfew8r6zhWf+HVP4tWTmJ2lld7esOh0oV9GrydpN0D3UICELLqsU+n1C1hLFxar8+PFFhrrLNtobIIZ6dqiygmowKdtuOhiFuuMTndoBwqwpBAdAgW2v2DqGGh+dGHmXtM6v2lzSS0c40aXNKYCBQDRtPOSh5243P+r2AfsA/4DwHeFqVerpmE/mgAAAABJRU5ErkJggg==">
   <style>
     :root {
@@ -905,8 +905,8 @@
       </a>
       <span class="version-tag">Archify Spec</span>
       <div>
-        <div class="doc-title">High-Volume E-Commerce Platform</div>
-        <div class="doc-summary" title="Scalable retail architecture with decoupled cart, checkout, payment, and inventory services designed for global flash sales.">Scalable retail architecture with decoupled cart, checkout, payment, and inventory services designed for global flash sales.</div>
+        <div class="doc-title">GCP CX AI Agent PHI Redaction & Analytics Architecture</div>
+        <div class="doc-summary" title="Enterprise cloud architecture leveraging GCP CX Agent Studio for conversational AI, Cloud Run for microservice orchestration, Cloud DLP (Sensitive Data Protection) for PHI redaction, and BigQuery for compliant data warehousing.">Enterprise cloud architecture leveraging GCP CX Agent Studio for conversational AI, Cloud Run for microservice orchestration, Cloud DLP (Sensitive Data Protection) for PHI redaction, and BigQuery for compliant data warehousing.</div>
       </div>
     </div>
 
@@ -963,7 +963,7 @@
     <div id="minimap-card">
       <div class="minimap-header">
         <span>Overview</span>
-        <span id="minimap-stats">7 Nodes</span>
+        <span id="minimap-stats">5 Nodes</span>
       </div>
       <svg id="minimap-canvas">
         <g id="minimap-elements"></g>
@@ -976,7 +976,7 @@
       <button class="player-btn" id="player-prev-btn" title="Previous Phase (Left Arrow)">◀</button>
       <div class="player-info" id="player-info-pill">
         <span class="player-badge">WORKFLOW TRACE</span>
-        <span id="player-step-label">Step 1 / 6</span>
+        <span id="player-step-label">Step 1 / 4</span>
         <span id="player-step-desc" class="player-step-desc">Click ▶ to trace route</span>
       </div>
       <button class="player-btn" id="player-next-btn" title="Next Phase (Right Arrow)">▶</button>
@@ -1042,12 +1042,12 @@
           <span class="status-badge">ARCHITECTURAL BRIEF</span>
           <span class="version-tag">ARCHITECTURE ARCHETYPE</span>
         </div>
-        <h1 class="hero-title">High-Volume E-Commerce Platform</h1>
-        <p class="hero-summary">Scalable retail architecture with decoupled cart, checkout, payment, and inventory services designed for global flash sales.</p>
+        <h1 class="hero-title">GCP CX AI Agent PHI Redaction & Analytics Architecture</h1>
+        <p class="hero-summary">Enterprise cloud architecture leveraging GCP CX Agent Studio for conversational AI, Cloud Run for microservice orchestration, Cloud DLP (Sensitive Data Protection) for PHI redaction, and BigQuery for compliant data warehousing.</p>
         
         <div class="stats-grid">
           <div class="stat-box">
-            <span class="stat-val">7</span>
+            <span class="stat-val">5</span>
             <span class="stat-label">System Components</span>
           </div>
           <div class="stat-box">
@@ -1055,11 +1055,11 @@
             <span class="stat-label">Architecture Tiers</span>
           </div>
           <div class="stat-box">
-            <span class="stat-val">6</span>
+            <span class="stat-val">5</span>
             <span class="stat-label">Network Connections</span>
           </div>
           <div class="stat-box">
-            <span class="stat-val">3</span>
+            <span class="stat-val">2</span>
             <span class="stat-label">Design Decisions (ADR)</span>
           </div>
         </div>
@@ -1114,176 +1114,129 @@
 
   <script>
     const IR = {
-  "title": "High-Volume E-Commerce Platform",
-  "summary": "Scalable retail architecture with decoupled cart, checkout, payment, and inventory services designed for global flash sales.",
+  "title": "GCP CX AI Agent PHI Redaction & Analytics Architecture",
+  "summary": "Enterprise cloud architecture leveraging GCP CX Agent Studio for conversational AI, Cloud Run for microservice orchestration, Cloud DLP (Sensitive Data Protection) for PHI redaction, and BigQuery for compliant data warehousing.",
   "archetype": "architecture",
   "decisions": [
     {
-      "decision": "Decoupled Microservice Domain Boundaries",
-      "rationale": "Separates high-frequency read catalog operations from write-heavy shopping cart and payment checkout flows, ensuring isolated autoscaling.",
-      "tradeoff": "Requires distributed tracing and eventual consistency handling across services.",
+      "decision": "Synchronous Middleware-Based DLP Sanitization",
+      "rationale": "Intercepts raw conversational transcripts in Cloud Run before persistent storage, ensuring zero unredacted PHI is committed to the analytical data warehouse.",
+      "tradeoff": "Introduces minor latency overhead on transcript ingestion lifecycle.",
       "status": "Accepted"
     },
     {
-      "decision": "In-Memory Session Caching with Redis",
-      "rationale": "Buffers active shopping carts and user sessions with sub-millisecond read/write latency, reducing database query overhead by 90%.",
-      "tradeoff": "Requires cart serialization and scheduled persistent backup to avoid session loss.",
-      "status": "Accepted"
-    },
-    {
-      "decision": "PCI-DSS Compliant Stripe Offloading",
-      "rationale": "Delegates card tokenization and sensitive fraud detection directly to Stripe, reducing regulatory compliance surface area.",
-      "tradeoff": "Introduces third-party dependency on Stripe API availability and webhook delivery.",
+      "decision": "BigQuery for Sanitized Analytical Storage",
+      "rationale": "Provides scalable, low-cost analytical query capabilities for conversational insights without exposing raw PHI.",
+      "tradeoff": "Requires strict IAM policies and column-level access control to enforce compliance bounds.",
       "status": "Accepted"
     }
   ],
   "flow_steps": [
     {
       "step": 1,
-      "title": "Storefront Ingress & TLS Termination",
-      "from": "storefront",
-      "to": "cloudfront",
+      "title": "Conversational Interaction",
+      "from": "user_client",
+      "to": "cx_agent_studio",
       "protocol": "HTTPS",
-      "description": "User requests route to the nearest CloudFront Edge PoP for SSL handshake termination and static asset caching."
+      "description": "User interacts with the conversational AI agent via Web SDK or mobile client."
     },
     {
       "step": 2,
-      "title": "Catalog Discovery & Search",
-      "from": "cloudfront",
-      "to": "product_svc",
-      "protocol": "HTTPS",
-      "description": "Catalog queries dispatched to Go Product Catalog Service with sub-10ms Elasticsearch faceted filtering."
+      "title": "Transcript Webhook Trigger",
+      "from": "cx_agent_studio",
+      "to": "cloud_run_service",
+      "protocol": "REST",
+      "description": "CX Agent Studio sends conversation turns and metadata to Cloud Run orchestration microservice."
     },
     {
       "step": 3,
-      "title": "In-Memory Cart Mutation",
-      "from": "cloudfront",
-      "to": "cart_svc",
-      "protocol": "HTTPS",
-      "description": "Item additions and quantities updated immediately in low-latency Redis-backed session store."
+      "title": "PHI Inspection & Redaction",
+      "from": "cloud_run_service",
+      "to": "cloud_dlp_api",
+      "protocol": "gRPC",
+      "description": "Cloud Run submits transcript text to Sensitive Data Protection (DLP) API using predefined PHI infoTypes for masking."
     },
     {
       "step": 4,
-      "title": "Checkout Submission & Validation",
-      "from": "cloudfront",
-      "to": "order_svc",
-      "protocol": "HTTPS",
-      "description": "Cart finalized; checkout request routed to Order Service to reserve stock and validate inventory."
-    },
-    {
-      "step": 5,
-      "title": "Payment Token Authorization",
-      "from": "order_svc",
-      "to": "stripe",
-      "protocol": "HTTPS",
-      "description": "Secure API exchange authorizes customer payment method via Stripe REST API."
-    },
-    {
-      "step": 6,
-      "title": "Transactional ACID Commit",
-      "from": "order_svc",
-      "to": "postgres",
-      "protocol": "SQL",
-      "description": "Order records, line items, and invoice state atomically persisted in Aurora PostgreSQL cluster."
+      "title": "Sanitized Transcript Storage",
+      "from": "cloud_run_service",
+      "to": "bigquery_ds",
+      "protocol": "gRPC",
+      "description": "Cloud Run streams the sanitized, redacted chat record into BigQuery for compliance reporting and analytics."
     }
   ],
   "tiers": [
     {
       "id": "client",
-      "label": "Storefront",
-      "color": "#0EA5E9"
+      "label": "Client & Touchpoints",
+      "color": "#3B82F6"
     },
     {
       "id": "gateway",
-      "label": "Routing & CDN",
-      "color": "#8C4FFF"
+      "label": "Conversational AI Gateway",
+      "color": "#8B5CF6"
     },
     {
       "id": "services",
-      "label": "Retail Services",
-      "color": "#FF9900"
+      "label": "Security & Compute Services",
+      "color": "#10B981"
     },
     {
       "id": "data",
-      "label": "Persistence & External",
-      "color": "#10B981"
+      "label": "Data & Analytics Storage",
+      "color": "#F59E0B"
     }
   ],
   "nodes": [
     {
-      "id": "storefront",
-      "label": "Web & Mobile Store",
+      "id": "user_client",
+      "label": "User Chat Widget",
       "tier": "client",
-      "tech": "Next.js / React",
-      "description": "Customer catalog browsing and checkout.",
+      "tech": "React / Web SDK",
+      "description": "End-user frontend interface communicating with the conversational agent.",
+      "files": [
+        "src/components/ChatWidget.tsx"
+      ],
       "_meta": {
         "provider": "generic",
         "type": "frontend",
-        "icon": "M18.66 21.98C16.76 23.3 14.45 24 12 24 5.37 24 0 18.63 0 12S5.37 0 12 0c2.49 0 4.83.75 6.81 2.12l-9.06 11.67h-2.1v-9.57H5.4v13.5h2.46l9.3-11.97h2.1v9.87h2.4v-13.5c1.47 1.95 2.34 4.38 2.34 7.02 0 6.63-5.37 12-12 12zm1.14-7.86v9.75h2.4v-9.75h-2.4z",
-        "icon_name": "nextjs",
-        "brand_color": "#000000",
-        "service_name": "Next.js Web Client",
+        "icon": "M12 21.64c-4.44 0-8.32-1.28-10.46-3.53-1.43-1.5-2-3.41-1.54-5.38.47-2 1.83-3.79 3.83-5.03.28-.18.59-.34.9-.49-.32-.92-.47-1.92-.42-2.92.09-2.11 1.26-3.9 3.09-4.64 1.78-.7 3.87-.48 5.48.6 1.58 1.06 2.6 2.77 2.77 4.68.08.86-.04 1.7-.33 2.5.43.18.85.4 1.25.63 2 1.24 3.36 3.03 3.83 5.03.46 1.97-.12 3.88-1.54 5.38-2.14 2.25-6.01 3.53-10.46 3.53zM12 4c-3.15 0-5.84 1.03-7.24 2.51-.94.99-1.33 2.26-1.03 3.55.32 1.34 1.22 2.54 2.55 3.38.62.39 1.35.72 2.15.95-.04-.3-.07-.6-.08-.9-.12-2.59 1.04-5.04 3.16-6.53 1.16-.8 2.54-1.21 3.92-1.16-1.13-1.01-2.59-1.63-4.33-1.8z",
+        "icon_name": "react",
+        "brand_color": "#0EA5E9",
+        "service_name": "React SPA",
         "structurizr_tag": "Web Browser",
         "structurizr_theme": "https://static.structurizr.com/themes/amazon-web-services-2023.01.31/theme.json"
       }
     },
     {
-      "id": "cloudfront",
-      "label": "CloudFront & WAF",
+      "id": "cx_agent_studio",
+      "label": "GCP CX Agent Studio",
       "tier": "gateway",
-      "tech": "AWS Edge Security",
-      "description": "DDoS protection and static caching.",
+      "tech": "Vertex AI / Dialogflow CX",
+      "description": "Conversational AI engine managing intent matching, dynamic turns, and dialog state.",
+      "files": [
+        "config/agent_flow.json"
+      ],
       "_meta": {
         "provider": "aws",
-        "type": "cdn",
-        "icon": "M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zm0 2c1.78 0 3.39 1.48 4.2 3.75H7.8C8.61 5.48 10.22 4 12 4zm-6.2 5.75h12.4c.18.7.28 1.46.28 2.25s-.1 1.55-.28 2.25H5.8c-.18-.7-.28-1.46-.28-2.25s.1-1.55.28-2.25zM12 20c-1.78 0-3.39-1.48-4.2-3.75h8.4c-.81 2.27-2.42 3.75-4.2 3.75z",
-        "icon_name": "cloudfront",
-        "brand_color": "#8C4FFF",
-        "service_name": "CloudFront CDN",
-        "structurizr_tag": "Amazon Web Services - Amazon CloudFront",
+        "type": "ai",
+        "icon": "M12 2a3 3 0 0 1 3 3v1h1a3 3 0 0 1 3 3v2h1a3 3 0 0 1 3 3v2a3 3 0 0 1-3 3h-1v2a3 3 0 0 1-3 3h-1v1a3 3 0 0 1-6 0v-1H8a3 3 0 0 1-3-3v-2H4a3 3 0 0 1-3-3v-2a3 3 0 0 1 3-3h1V8a3 3 0 0 1 3-3h1V5a3 3 0 0 1 3-3zm1 4h-2v2h2V6zm4 4h-2v2h2v-2zm-8 0H7v2h2v-2zm10 4h-2v2h2v-2zm-12 0H5v2h2v-2zm10 4h-2v2h2v-2zm-8 0H7v2h2v-2zm4 2h-2v2h2v-2z",
+        "icon_name": "sagemaker",
+        "brand_color": "#A855F7",
+        "service_name": "Amazon SageMaker / AI",
+        "structurizr_tag": "Amazon Web Services - Amazon SageMaker",
         "structurizr_theme": "https://static.structurizr.com/themes/amazon-web-services-2023.01.31/theme.json"
       }
     },
     {
-      "id": "product_svc",
-      "label": "Product Catalog Service",
+      "id": "cloud_run_service",
+      "label": "Transcript Orchestrator",
       "tier": "services",
-      "tech": "Go / Elasticsearch",
-      "description": "High-speed faceted product search.",
-      "_meta": {
-        "provider": "generic",
-        "type": "compute",
-        "icon": "M4 3h16a2 2 0 0 1 2 2v4a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2zm0 10h16a2 2 0 0 1 2 2v4a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2v-4a2 2 0 0 1 2-2z",
-        "icon_name": "server",
-        "brand_color": "#3B82F6",
-        "service_name": "Service Container",
-        "structurizr_tag": "Microservice",
-        "structurizr_theme": ""
-      }
-    },
-    {
-      "id": "cart_svc",
-      "label": "Shopping Cart Service",
-      "tier": "services",
-      "tech": "Node.js / Redis",
-      "description": "In-memory shopping cart sessions.",
-      "_meta": {
-        "provider": "generic",
-        "type": "cache",
-        "icon": "M0 5.68v2.66l12 4 12-4V5.68L12 9.68 0 5.68zm0 6v2.67l12 4 12-4v-2.67l-12 4-12-4zm0 6V20.35l12 4 12-4v-2.67l-12 4-12-4zM12 0L0 4l12 4 12-4L12 0z",
-        "icon_name": "redis",
-        "brand_color": "#DC382D",
-        "service_name": "Redis Cache",
-        "structurizr_tag": "Amazon Web Services - Amazon ElastiCache",
-        "structurizr_theme": "https://static.structurizr.com/themes/amazon-web-services-2023.01.31/theme.json"
-      }
-    },
-    {
-      "id": "order_svc",
-      "label": "Order & Checkout Service",
-      "tier": "services",
-      "tech": "FastAPI / Python",
-      "description": "Manages payments and order creation.",
+      "tech": "Cloud Run (Python / Go)",
+      "description": "Serverless container handling transcript webhooks, coordinating DLP calls, and pushing to BigQuery.",
+      "files": [
+        "services/redactor/main.py"
+      ],
       "_meta": {
         "provider": "generic",
         "type": "compute",
@@ -1296,76 +1249,76 @@
       }
     },
     {
-      "id": "postgres",
-      "label": "PostgreSQL Cluster",
-      "tier": "data",
-      "tech": "Aurora PostgreSQL",
-      "description": "Transactional order records.",
+      "id": "cloud_dlp_api",
+      "label": "Sensitive Data Protection API",
+      "tier": "services",
+      "tech": "GCP Cloud DLP",
+      "description": "Scans and redacts PHI infoTypes (e.g., PERSON_NAME, US_HEALTHCARE_NPI, MEDICAL_RECORD_NUMBER).",
+      "files": [
+        "config/dlp_deidentify_template.json"
+      ],
       "_meta": {
-        "provider": "aws",
-        "type": "database",
-        "icon": "M12 0c-6.63 0-12 2.69-12 6 0 1.83 1.35 3.49 3.6 4.71C2.26 12.01 1.5 13.15 1.5 14.5c0 1.93 4.76 3.5 10.5 3.5s10.5-1.57 10.5-3.5c0-1.35-.76-2.49-2.1-3.79C22.65 9.49 24 7.83 24 6c0-3.31-5.37-6-12-6zm0 1.5c5.39 0 9.75 2.02 9.75 4.5S17.39 10.5 12 10.5 2.25 8.49 2.25 6 6.62 1.5 12 1.5zm-8.14 10.26C5.23 12.56 8.36 13.25 12 13.25s6.77-.69 8.14-1.49C21.43 12.58 22.5 13.48 22.5 14.5c0 1.35-4.16 2.75-10.5 2.75S1.5 15.85 1.5 14.5c0-1.02 1.07-1.92 2.36-2.74z",
-        "icon_name": "postgresql",
-        "brand_color": "#527FFF",
-        "service_name": "Amazon RDS / PostgreSQL",
-        "structurizr_tag": "Amazon Web Services - Amazon Relational Database Service",
-        "structurizr_theme": "https://static.structurizr.com/themes/amazon-web-services-2023.01.31/theme.json"
+        "provider": "generic",
+        "type": "compute",
+        "icon": "M4 3h16a2 2 0 0 1 2 2v4a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2zm0 10h16a2 2 0 0 1 2 2v4a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2v-4a2 2 0 0 1 2-2z",
+        "icon_name": "server",
+        "brand_color": "#3B82F6",
+        "service_name": "Service Container",
+        "structurizr_tag": "Microservice",
+        "structurizr_theme": ""
       }
     },
     {
-      "id": "stripe",
-      "label": "Stripe Payments API",
+      "id": "bigquery_ds",
+      "label": "BigQuery Warehouse",
       "tier": "data",
-      "tech": "Stripe REST API",
-      "description": "Credit card processing and fraud detection.",
+      "tech": "Google BigQuery",
+      "description": "Analytical datastore housing scrubbed chat transcripts and conversational analytics.",
+      "files": [
+        "schemas/sanitized_transcripts.sql"
+      ],
       "_meta": {
-        "provider": "generic",
-        "type": "external",
-        "icon": "M13.98 9.3c0-.85-.68-1.18-1.8-1.18-1.6 0-3.64.6-5.06 1.48L6 6.32C7.72 5.24 10.16 4.6 12.38 4.6c3.78 0 6.22 1.94 6.22 5.04 0 4.92-6.74 4.14-6.74 6.26 0 .98.84 1.3 2.02 1.3 1.84 0 4.16-.8 5.76-1.82l1.1 3.28c-1.86 1.2-4.52 1.84-6.98 1.84-3.98 0-6.6-1.98-6.6-5.18 0-5.26 6.82-4.32 6.82-6.02z",
-        "icon_name": "stripe",
-        "brand_color": "#635BFF",
-        "service_name": "Stripe Payment Gateway",
-        "structurizr_tag": "External System",
-        "structurizr_theme": "https://static.structurizr.com/themes/amazon-web-services-2023.01.31/theme.json"
+        "provider": "gcp",
+        "type": "database",
+        "icon": "M19 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z",
+        "icon_name": "bigquery",
+        "brand_color": "#4285F4",
+        "service_name": "Google BigQuery",
+        "structurizr_tag": "Google Cloud Platform - BigQuery",
+        "structurizr_theme": "https://static.structurizr.com/themes/google-cloud-platform-v1.5/theme.json"
       }
     }
   ],
   "edges": [
     {
-      "from": "storefront",
-      "to": "cloudfront",
-      "label": "HTTPS",
-      "protocol": "https"
+      "from": "user_client",
+      "to": "cx_agent_studio",
+      "label": "Chat Messages",
+      "protocol": "HTTPS"
     },
     {
-      "from": "cloudfront",
-      "to": "product_svc",
-      "label": "GET /products",
-      "protocol": "https"
+      "from": "cx_agent_studio",
+      "to": "cloud_run_service",
+      "label": "Webhook Session Payload",
+      "protocol": "REST"
     },
     {
-      "from": "cloudfront",
-      "to": "cart_svc",
-      "label": "PUT /cart",
-      "protocol": "https"
+      "from": "cloud_run_service",
+      "to": "cloud_dlp_api",
+      "label": "Inspect & Redact PHI",
+      "protocol": "gRPC"
     },
     {
-      "from": "cloudfront",
-      "to": "order_svc",
-      "label": "POST /checkout",
-      "protocol": "https"
+      "from": "cloud_dlp_api",
+      "to": "cloud_run_service",
+      "label": "De-identified Payload",
+      "protocol": "gRPC"
     },
     {
-      "from": "order_svc",
-      "to": "postgres",
-      "label": "Insert Order",
-      "protocol": "sql"
-    },
-    {
-      "from": "order_svc",
-      "to": "stripe",
-      "label": "Charge Card",
-      "protocol": "https"
+      "from": "cloud_run_service",
+      "to": "bigquery_ds",
+      "label": "Stream Redacted Transcript",
+      "protocol": "gRPC"
     }
   ]
 };
@@ -2155,7 +2108,7 @@
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
-      a.download = "high-volume_e-commerce_platform.svg";
+      a.download = "gcp_cx_ai_agent_phi_redaction_&_analytics_architecture.svg";
       a.click();
     };
 
@@ -2187,7 +2140,7 @@
 
         const pngUrl = canvas.toDataURL("image/png");
         const a = document.createElement("a");
-        a.download = "high-volume_e-commerce_platform.png";
+        a.download = "gcp_cx_ai_agent_phi_redaction_&_analytics_architecture.png";
         a.href = pngUrl;
         a.click();
       };
