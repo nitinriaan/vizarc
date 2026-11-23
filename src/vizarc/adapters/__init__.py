@@ -12,9 +12,11 @@ from .graphviz_adapter import GraphvizAdapter
 from .excalidraw_adapter import ExcalidrawAdapter
 from .ascii_adapter import ASCIIAdapter
 from .html_adapter import HTMLAdapter
+from .svg_adapter import SVGAdapter
 
 ADAPTERS = {
     "html": HTMLAdapter(),
+    "svg": SVGAdapter(),
     "d2": D2Adapter(),
     "mermaid": MermaidAdapter(),
     "structurizr": StructurizrAdapter(),
