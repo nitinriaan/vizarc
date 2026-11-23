@@ -33,8 +33,14 @@ def compile_to_html(ir: Dict[str, Any]) -> str:
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>{ir.get('title', 'Architecture Explainer')} — VizArc</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400;1,600&display=swap" rel="stylesheet">
   <style>
+    @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400;1,600&display=swap');
+
     :root {{
+      --font-mono: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', Menlo, Monaco, Consolas, "Liberation Mono", monospace;
       --bg: #090D16;
       --surface: #0F172A;
       --surface-border: #1E293B;
@@ -66,15 +72,24 @@ def compile_to_html(ir: Dict[str, Any]) -> str:
       --card-bg: #FFFFFF;
     }}
 
-    * {{ box-sizing: border-box; margin: 0; padding: 0; }}
+    * {{
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: var(--font-mono);
+    }}
     body {{
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      font-family: var(--font-mono);
       background: var(--bg);
       color: var(--text-main);
       overflow: hidden;
       height: 100vh;
       width: 100vw;
       user-select: none;
+    }}
+
+    svg text, .node-title, .node-tech, .node-desc, .tier-label, .edge-label {{
+      font-family: var(--font-mono) !important;
     }}
 
     /* Top Navigation Bar */
@@ -1088,7 +1103,7 @@ def compile_to_html(ir: Dict[str, Any]) -> str:
         explainerPanel.classList.remove("active");
         canvasBtn.classList.add("active");
         explainerBtn.classList.remove("active");
-        updateMiniMap();
+        setTimeout(fitToView, 30);
       }} else {{
         explainerPanel.classList.add("active");
         canvasPanel.classList.remove("active");
@@ -1755,19 +1770,50 @@ def compile_to_html(ir: Dict[str, Any]) -> str:
       document.body.setAttribute("data-theme", cur === "dark" ? "light" : "dark");
     }};
 
-    // Flip Orientation
+    // Fit View (Auto-fit to 16:9 or current window aspect ratio)
+    function fitToView() {{
+      const nodeKeys = Object.keys(nodePositions);
+      if (!nodeKeys.length) return;
+
+      let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+      nodeKeys.forEach(k => {{
+        const p = nodePositions[k];
+        minX = Math.min(minX, p.x);
+        minY = Math.min(minY, p.y);
+        maxX = Math.max(maxX, p.x + p.width);
+        maxY = Math.max(maxY, p.y + p.height);
+      }});
+
+      // Account for tier containers, labels, and margins
+      minX -= 32;
+      minY -= 42;
+      maxX += 32;
+      maxY += 32;
+
+      const diagramW = Math.max(maxX - minX, 300);
+      const diagramH = Math.max(maxY - minY, 200);
+
+      const vpW = viewport.clientWidth || window.innerWidth || 1280;
+      const vpH = viewport.clientHeight || (window.innerHeight - 58) || 720;
+
+      // Fit diagram within viewport with safe padding
+      const scaleX = (vpW * 0.92) / diagramW;
+      const scaleY = (vpH * 0.92) / diagramH;
+      scale = Math.min(Math.min(scaleX, scaleY), 1.35);
+
+      // Center horizontally and vertically
+      panX = (vpW - (maxX - minX) * scale) / 2 - minX * scale;
+      panY = (vpH - (maxY - minY) * scale) / 2 - minY * scale;
+
+      updateTransform();
+    }}
+
+    document.getElementById("reset-btn").onclick = fitToView;
+
     document.getElementById("orient-btn").onclick = () => {{
       currentOrientation = currentOrientation === "horizontal" ? "vertical" : "horizontal";
       renderScene();
-      updateTransform();
-    }};
-
-    // Fit View
-    document.getElementById("reset-btn").onclick = () => {{
-      scale = 0.95;
-      panX = 40;
-      panY = 30;
-      updateTransform();
+      fitToView();
     }};
 
     document.getElementById("zoom-in-btn").onclick = () => {{
@@ -1873,7 +1919,13 @@ def compile_to_html(ir: Dict[str, Any]) -> str:
     window.addEventListener("DOMContentLoaded", () => {{
       renderScene();
       renderExplainer();
-      updateTransform();
+      setTimeout(fitToView, 50);
+    }});
+
+    window.addEventListener("resize", () => {{
+      if (document.getElementById("canvas-view").classList.contains("active")) {{
+        fitToView();
+      }}
     }});
   </script>
 </body>

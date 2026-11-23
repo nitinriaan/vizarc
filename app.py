@@ -32,72 +32,33 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-# Custom Styling (Mermaid Live Editor aesthetic)
+# Custom Styling (Mermaid Live Editor aesthetic & JetBrains Mono)
 st.markdown("""
 <style>
-    /* Remove unnecessary default Streamlit top margins */
+    @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400;1,600&display=swap');
+
+    /* Ultra-clean zero-margin container fitting 16:9 screen */
     .block-container {
-        padding-top: 1.2rem;
-        padding-bottom: 2rem;
-        padding-left: 2rem;
-        padding-right: 2rem;
-        max-width: 100%;
+        padding-top: 0.6rem !important;
+        padding-bottom: 0.8rem !important;
+        padding-left: 1.2rem !important;
+        padding-right: 1.2rem !important;
+        max-width: 100% !important;
     }
     header[data-testid="stHeader"] {
         display: none;
     }
-    .studio-header {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        padding-bottom: 12px;
-        margin-bottom: 14px;
-        border-bottom: 1px solid #E2E8F0;
-    }
-    .brand-title {
-        font-size: 1.45rem;
-        font-weight: 800;
-        color: #0F172A;
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        letter-spacing: -0.02em;
-    }
-    .badge-pill {
-        font-size: 0.72rem;
-        font-weight: 700;
-        color: #2563EB;
-        background: #EFF6FF;
-        border: 1px solid #DBEAFE;
-        padding: 3px 8px;
-        border-radius: 9999px;
-        text-transform: uppercase;
-        letter-spacing: 0.05em;
-    }
-    .sub-brand {
-        font-size: 0.85rem;
-        color: #64748B;
+    html, body, [class*="css"], textarea, input, select, button, .stMarkdown {
+        font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace !important;
     }
     /* Buttons */
     button[kind="primary"] {
         background-color: #2563EB !important;
         border-color: #2563EB !important;
-        font-weight: 600 !important;
+        font-weight: 700 !important;
+        font-family: 'JetBrains Mono', monospace !important;
     }
 </style>
-""", unsafe_allow_html=True)
-
-# Top Navbar
-st.markdown("""
-<div class="studio-header">
-  <div class="brand-title">
-    <span>📐 VizArc</span>
-    <span class="badge-pill">Live Architecture Studio</span>
-  </div>
-  <div class="sub-brand">
-    Interactive Canvas • Structurizr Themes • Standalone SVG Vector
-  </div>
-</div>
 """, unsafe_allow_html=True)
 
 # Find default template (E-Commerce Platform)
@@ -235,8 +196,8 @@ with col_preview:
                 use_container_width=True
             )
 
-        # Primary Display: Interactive Canvas & One-Page Explainer (Archify Spec)
-        components.html(html_code, height=680, scrolling=False)
+        # Primary Display: Interactive Canvas & One-Page Explainer (16:9 Viewport Fit)
+        components.html(html_code, height=780, scrolling=False)
 
         # On-Demand Styles Expander: Only generate other formats when user asks for them!
         st.markdown("<div style='margin-top: 14px;'></div>", unsafe_allow_html=True)
