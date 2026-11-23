@@ -1,13 +1,19 @@
-# 📐 VizArc: Universal Software Architecture Compiler & Explainer
+<p align="center">
+  <img src="assets/logo.png" alt="VizArc - Architecture, Visualized" width="680"/>
+</p>
 
-[![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Streamlit](https://img.shields.io/badge/Streamlit-FF4B4B?logo=Streamlit&logoColor=white)](https://streamlit.io)
-[![Built for AI Agents](https://img.shields.io/badge/Agent%20Skill-Claude%20%7C%20Antigravity%20%7C%20Cursor%20%7C%20Copilot-purple.svg)](#-agent-skill-integration)
-[![GitHub Action](https://img.shields.io/badge/GitHub%20Action-PR%20Diagrams-black?logo=github)](.github/workflows/vizarc-diagram.yml)
+<p align="center">
+  <a href="https://www.python.org/downloads/"><img src="https://img.shields.io/badge/python-3.10+-blue.svg" alt="Python 3.10+"/></a>
+  <a href="https://opensource.org/licenses/MIT"><img src="https://img.shields.io/badge/License-MIT-yellow.svg" alt="License: MIT"/></a>
+  <a href="https://streamlit.io"><img src="https://img.shields.io/badge/Streamlit-FF4B4B?logo=Streamlit&logoColor=white" alt="Streamlit"/></a>
+  <a href="#-agent-skill-integration"><img src="https://img.shields.io/badge/Agent%20Skill-Claude%20%7C%20Antigravity%20%7C%20Cursor%20%7C%20Copilot-purple.svg" alt="Built for AI Agents"/></a>
+  <a href=".github/workflows/vizarc-diagram.yml"><img src="https://img.shields.io/badge/GitHub%20Action-PR%20Diagrams-black?logo=github" alt="GitHub Action"/></a>
+</p>
 
-> **The "Pandoc & Archify of Software Architecture"**  
-> Turn any prompt, plan, or codebase into a **Canonical Architecture Model (JSON IR)**, and deterministically compile it into a **Dual-View Interactive Canvas & One-Page Explainer (HTML)**, **Publication-Grade Vector SVG**, **D2 Lang**, **Structurizr C4**, **Mermaid**, **PlantUML**, **Graphviz (DOT)**, **Excalidraw**, and **ASCII** in one single pass.
+<p align="center">
+  <strong>The "Pandoc & Archify of Software Architecture"</strong><br/>
+  Turn any prompt, plan, or codebase into a <strong>Canonical Architecture Model (JSON IR)</strong>, and deterministically compile it into a <strong>Dual-View Interactive Canvas & One-Page Explainer (HTML)</strong>, <strong>Publication-Grade Vector SVG</strong>, <strong>D2 Lang</strong>, <strong>Structurizr C4</strong>, <strong>Mermaid</strong>, <strong>PlantUML</strong>, <strong>Graphviz (DOT)</strong>, <strong>Excalidraw</strong>, and <strong>ASCII</strong> in one single pass.
+</p>
 
 ---
 
