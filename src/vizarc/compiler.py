@@ -1,19 +1,18 @@
 """
-VizArc Standalone Interactive HTML Compiler.
-Compiles Canonical Architecture IR into a single, zero-dependency,
-double-clickable interactive architecture explainer with cloud icon glyphs,
-orientation toggles, minimap, and keyboard shortcuts (inspired by vizarch & archify).
+VizArc Standalone Interactive HTML Canvas Compiler.
+Compiles Canonical Architecture IR into a publication-grade, zero-dependency,
+double-clickable interactive architecture explainer (inspired by Archify & Mermaid Live).
+100% foolproof: embeds authentic vector SVG path glyphs directly with zero external network requests!
 """
 
 import json
 from typing import Dict, Any
-from .services import infer_service_metadata, PROTOCOL_COLORS, PROVIDER_COLORS, ICON_PATHS
+from .services import infer_service_metadata, PROTOCOL_COLORS, PROVIDER_COLORS, VECTOR_ICONS
 
 def compile_to_html(ir: Dict[str, Any]) -> str:
     """
     Takes an Architecture IR and produces a self-contained, interactive HTML file.
     """
-    # Enrich nodes with cloud service metadata
     enriched_ir = dict(ir)
     enriched_nodes = []
     for n in ir.get("nodes", []):
@@ -33,18 +32,18 @@ def compile_to_html(ir: Dict[str, Any]) -> str:
   <title>{ir.get('title', 'Architecture Explainer')} — VizArc</title>
   <style>
     :root {{
-      --bg: #0B0F19;
-      --surface: #111827;
-      --surface-border: #1F2937;
-      --text-main: #F3F4F6;
-      --text-muted: #9CA3AF;
+      --bg: #090D16;
+      --surface: #0F172A;
+      --surface-border: #1E293B;
+      --text-main: #F8FAFC;
+      --text-muted: #94A3B8;
       --accent: #3B82F6;
-      --accent-glow: rgba(59, 130, 246, 0.4);
-      --node-bg: #1F2937;
-      --node-border: #374151;
-      --edge-stroke: #4B5563;
+      --accent-glow: rgba(59, 130, 246, 0.45);
+      --node-bg: #131B2E;
+      --node-border: #1E293B;
+      --edge-stroke: #475569;
       --edge-active: #60A5FA;
-      --badge-bg: #374151;
+      --badge-bg: #1E293B;
     }}
 
     [data-theme="light"] {{
@@ -54,12 +53,12 @@ def compile_to_html(ir: Dict[str, Any]) -> str:
       --text-main: #0F172A;
       --text-muted: #64748B;
       --accent: #2563EB;
-      --accent-glow: rgba(37, 99, 235, 0.2);
+      --accent-glow: rgba(37, 99, 235, 0.25);
       --node-bg: #FFFFFF;
       --node-border: #CBD5E1;
       --edge-stroke: #94A3B8;
       --edge-active: #2563EB;
-      --badge-bg: #E2E8F0;
+      --badge-bg: #F1F5F9;
     }}
 
     * {{ box-sizing: border-box; margin: 0; padding: 0; }}
@@ -79,13 +78,13 @@ def compile_to_html(ir: Dict[str, Any]) -> str:
       top: 0;
       left: 0;
       right: 0;
-      height: 60px;
+      height: 58px;
       background: var(--surface);
       border-bottom: 1px solid var(--surface-border);
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 0 24px;
+      padding: 0 20px;
       z-index: 20;
     }}
 
@@ -105,13 +104,13 @@ def compile_to_html(ir: Dict[str, Any]) -> str:
     }}
     .doc-title {{
       font-size: 0.95rem;
-      font-weight: 600;
+      font-weight: 700;
       color: var(--text-main);
     }}
     .doc-summary {{
       font-size: 0.78rem;
       color: var(--text-muted);
-      max-width: 420px;
+      max-width: 440px;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
@@ -120,18 +119,18 @@ def compile_to_html(ir: Dict[str, Any]) -> str:
     .controls {{
       display: flex;
       align-items: center;
-      gap: 10px;
+      gap: 8px;
     }}
 
     .search-box {{
       background: var(--bg);
       border: 1px solid var(--surface-border);
-      border-radius: 8px;
+      border-radius: 6px;
       padding: 6px 12px;
       color: var(--text-main);
-      font-size: 0.85rem;
+      font-size: 0.82rem;
       outline: none;
-      width: 200px;
+      width: 210px;
       transition: all 0.2s;
     }}
     .search-box:focus {{
@@ -145,27 +144,34 @@ def compile_to_html(ir: Dict[str, Any]) -> str:
       color: var(--text-main);
       padding: 6px 12px;
       border-radius: 6px;
-      font-size: 0.82rem;
+      font-size: 0.8rem;
+      font-weight: 600;
       cursor: pointer;
       display: flex;
       align-items: center;
       gap: 6px;
-      transition: all 0.2s;
+      transition: all 0.15s;
     }}
     .btn:hover {{
       background: var(--badge-bg);
-      border-color: var(--text-muted);
+      border-color: var(--accent);
     }}
 
-    /* Main Viewport */
+    /* Main Viewport & Dot Grid */
     #viewport {{
       position: absolute;
-      top: 60px;
+      top: 58px;
       bottom: 0;
       left: 0;
       right: 0;
       cursor: grab;
       overflow: hidden;
+      background-color: var(--bg);
+      background-image: radial-gradient(rgba(255, 255, 255, 0.08) 1px, transparent 1px);
+      background-size: 24px 24px;
+    }}
+    [data-theme="light"] #viewport {{
+      background-image: radial-gradient(rgba(0, 0, 0, 0.08) 1px, transparent 1px);
     }}
     #viewport:active {{ cursor: grabbing; }}
 
@@ -175,20 +181,22 @@ def compile_to_html(ir: Dict[str, Any]) -> str:
       display: block;
     }}
 
-    /* Graph Elements */
+    /* Graph Tiers */
     .tier-box {{
-      fill: none;
-      stroke-dasharray: 4 4;
+      fill: var(--surface);
+      fill-opacity: 0.3;
+      stroke-dasharray: 5 5;
       stroke-width: 1.5;
-      rx: 12;
+      rx: 14;
     }}
     .tier-label {{
-      font-size: 11px;
-      font-weight: 700;
+      font-size: 10px;
+      font-weight: 800;
       text-transform: uppercase;
       letter-spacing: 0.08em;
     }}
 
+    /* Node Cards */
     .node-group {{
       cursor: pointer;
       transition: transform 0.15s ease, opacity 0.25s ease;
@@ -197,18 +205,19 @@ def compile_to_html(ir: Dict[str, Any]) -> str:
       fill: var(--node-bg);
       stroke: var(--node-border);
       stroke-width: 1.5;
-      rx: 8;
+      rx: 10;
       transition: all 0.2s ease;
-      filter: drop-shadow(0 4px 6px rgba(0,0,0,0.18));
+      filter: drop-shadow(0 4px 12px rgba(0,0,0,0.3));
     }}
     .node-group:hover .node-rect {{
       stroke: var(--accent);
-      filter: drop-shadow(0 0 12px var(--accent-glow));
+      filter: drop-shadow(0 0 16px var(--accent-glow));
     }}
     .node-title {{
       font-size: 12.5px;
       font-weight: 700;
       fill: var(--text-main);
+      letter-spacing: -0.01em;
     }}
     .node-tech {{
       font-size: 9.5px;
@@ -222,64 +231,95 @@ def compile_to_html(ir: Dict[str, Any]) -> str:
 
     /* Path Tracing Highlights */
     .node-group.is-selected .node-rect {{
-      stroke: var(--accent);
+      stroke: var(--accent) !important;
       stroke-width: 2.5;
-      filter: drop-shadow(0 0 16px var(--accent-glow));
+      filter: drop-shadow(0 0 20px var(--accent-glow));
     }}
     .node-group.is-upstream .node-rect {{
-      stroke: #10B981;
-      stroke-width: 2;
-      filter: drop-shadow(0 0 10px rgba(16, 185, 129, 0.4));
+      stroke: #10B981 !important;
+      stroke-width: 2.2;
+      filter: drop-shadow(0 0 14px rgba(16, 185, 129, 0.45));
     }}
     .node-group.is-downstream .node-rect {{
-      stroke: #F59E0B;
-      stroke-width: 2;
-      filter: drop-shadow(0 0 10px rgba(245, 158, 11, 0.4));
+      stroke: #F59E0B !important;
+      stroke-width: 2.2;
+      filter: drop-shadow(0 0 14px rgba(245, 158, 11, 0.45));
     }}
     .node-group.is-dimmed {{
-      opacity: 0.15;
+      opacity: 0.12;
     }}
 
     /* Edges */
     .edge-path {{
       fill: none;
-      stroke: var(--edge-stroke);
-      stroke-width: 1.8;
+      stroke-width: 2;
       transition: all 0.25s ease;
     }}
     .edge-path.is-active {{
       stroke: var(--edge-active) !important;
-      stroke-width: 2.8;
-      filter: drop-shadow(0 0 8px var(--accent-glow));
+      stroke-width: 3.2;
+      filter: drop-shadow(0 0 10px var(--accent-glow));
     }}
     .edge-path.is-dimmed {{
       opacity: 0.08;
     }}
 
     .edge-label {{
-      font-size: 9px;
-      font-weight: 600;
+      font-size: 8.5px;
+      font-weight: 700;
       fill: var(--text-main);
       text-anchor: middle;
       pointer-events: none;
     }}
     .edge-label-bg {{
-      fill: var(--surface);
+      fill: var(--bg);
       rx: 4;
       stroke-width: 1;
+    }}
+
+    /* Floating Navigation Controls (Bottom-Left) */
+    .floating-dock {{
+      position: absolute;
+      bottom: 24px;
+      left: 24px;
+      background: var(--surface);
+      border: 1px solid var(--surface-border);
+      border-radius: 8px;
+      padding: 4px;
+      display: flex;
+      gap: 4px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+      z-index: 25;
+    }}
+    .dock-btn {{
+      background: transparent;
+      border: none;
+      color: var(--text-main);
+      font-size: 0.85rem;
+      padding: 6px 10px;
+      border-radius: 6px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      transition: all 0.15s;
+    }}
+    .dock-btn:hover {{
+      background: var(--badge-bg);
+      color: var(--accent);
     }}
 
     /* Side Detail Drawer */
     #drawer {{
       position: absolute;
-      top: 60px;
-      right: -380px;
-      width: 360px;
+      top: 58px;
+      right: -400px;
+      width: 380px;
       bottom: 0;
       background: var(--surface);
       border-left: 1px solid var(--surface-border);
       padding: 24px;
-      box-shadow: -8px 0 24px rgba(0,0,0,0.3);
+      box-shadow: -10px 0 30px rgba(0,0,0,0.5);
       transition: right 0.3s cubic-bezier(0.16, 1, 0.3, 1);
       z-index: 30;
       overflow-y: auto;
@@ -294,15 +334,18 @@ def compile_to_html(ir: Dict[str, Any]) -> str:
       margin-bottom: 16px;
     }}
     .drawer-title {{
-      font-size: 1.15rem;
+      font-size: 1.2rem;
       font-weight: 700;
       color: var(--text-main);
+      display: flex;
+      align-items: center;
+      gap: 8px;
     }}
     .drawer-close {{
       background: transparent;
       border: none;
       color: var(--text-muted);
-      font-size: 1.2rem;
+      font-size: 1.3rem;
       cursor: pointer;
       padding: 4px;
     }}
@@ -319,7 +362,7 @@ def compile_to_html(ir: Dict[str, Any]) -> str:
       margin-top: 18px;
     }}
     .drawer-label {{
-      font-size: 0.75rem;
+      font-size: 0.74rem;
       font-weight: 700;
       text-transform: uppercase;
       letter-spacing: 0.05em;
@@ -331,21 +374,11 @@ def compile_to_html(ir: Dict[str, Any]) -> str:
       line-height: 1.5;
       color: var(--text-main);
     }}
-    .file-tag {{
-      display: inline-block;
-      font-family: monospace;
-      font-size: 0.75rem;
-      background: var(--badge-bg);
-      color: var(--accent);
-      padding: 3px 6px;
-      border-radius: 4px;
-      margin: 2px 4px 2px 0;
-    }}
     .connection-pill {{
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 6px 10px;
+      padding: 7px 10px;
       background: var(--bg);
       border: 1px solid var(--surface-border);
       border-radius: 6px;
@@ -360,8 +393,8 @@ def compile_to_html(ir: Dict[str, Any]) -> str:
     /* MiniMap in Bottom-Right Corner */
     #minimap-card {{
       position: absolute;
-      bottom: 20px;
-      right: 20px;
+      bottom: 24px;
+      right: 24px;
       width: 170px;
       height: 110px;
       background: var(--surface);
@@ -374,7 +407,7 @@ def compile_to_html(ir: Dict[str, Any]) -> str:
       flex-direction: column;
     }}
     .minimap-header {{
-      font-size: 9px;
+      font-size: 8.5px;
       font-weight: 700;
       text-transform: uppercase;
       color: var(--text-muted);
@@ -398,48 +431,6 @@ def compile_to_html(ir: Dict[str, Any]) -> str:
       stroke: var(--accent);
       stroke-width: 1;
     }}
-
-    /* Modal Help */
-    .modal-overlay {{
-      position: fixed;
-      top: 0; left: 0; right: 0; bottom: 0;
-      background: rgba(0, 0, 0, 0.7);
-      backdrop-filter: blur(4px);
-      display: none;
-      align-items: center;
-      justify-content: center;
-      z-index: 100;
-    }}
-    .modal-overlay.open {{ display: flex; }}
-    .modal-card {{
-      background: var(--surface);
-      border: 1px solid var(--surface-border);
-      border-radius: 12px;
-      width: 440px;
-      padding: 24px;
-      box-shadow: 0 20px 40px rgba(0,0,0,0.5);
-    }}
-    .modal-card h3 {{
-      font-size: 1.1rem;
-      margin-bottom: 12px;
-      color: var(--text-main);
-    }}
-    .key-row {{
-      display: flex;
-      justify-content: space-between;
-      padding: 6px 0;
-      border-bottom: 1px solid var(--surface-border);
-      font-size: 0.85rem;
-    }}
-    .kbd-key {{
-      background: var(--bg);
-      border: 1px solid var(--surface-border);
-      padding: 2px 6px;
-      border-radius: 4px;
-      font-family: monospace;
-      font-weight: 700;
-      color: var(--accent);
-    }}
   </style>
 </head>
 <body data-theme="dark">
@@ -454,10 +445,7 @@ def compile_to_html(ir: Dict[str, Any]) -> str:
     </div>
     <div class="controls">
       <input type="text" id="search-input" class="search-box" placeholder="🔍 Search components... (/)" />
-      <button class="btn" id="orient-btn" title="Toggle Layout (O)">↔️ LR / TB</button>
       <button class="btn" id="theme-btn" title="Toggle Theme (D)">🌓 Theme</button>
-      <button class="btn" id="reset-btn" title="Reset View (R)">🎯 Center</button>
-      <button class="btn" id="help-btn" title="Keyboard Shortcuts (?)">❓ Keys</button>
       <button class="btn" id="export-svg-btn" title="Download standalone SVG">📥 SVG</button>
     </div>
   </header>
@@ -471,9 +459,8 @@ def compile_to_html(ir: Dict[str, Any]) -> str:
         <marker id="arrow-active" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
           <path d="M 0 1.5 L 8 5 L 0 8.5 z" fill="var(--edge-active)" />
         </marker>
-        <!-- Drop Shadow Filter -->
         <filter id="shadowFilter" x="-10%" y="-10%" width="120%" height="120%">
-          <feDropShadow dx="0" dy="4" stdDeviation="5" flood-color="#000" flood-opacity="0.3"/>
+          <feDropShadow dx="0" dy="4" stdDeviation="6" flood-color="#000" flood-opacity="0.4"/>
         </filter>
       </defs>
       <g id="scene-root">
@@ -484,11 +471,19 @@ def compile_to_html(ir: Dict[str, Any]) -> str:
     </svg>
   </div>
 
+  <!-- Floating Navigation Dock (Archify Style) -->
+  <div class="floating-dock">
+    <button class="dock-btn" id="zoom-in-btn" title="Zoom In">+</button>
+    <button class="dock-btn" id="zoom-out-btn" title="Zoom Out">-</button>
+    <button class="dock-btn" id="reset-btn" title="Fit to View">⛶ Fit</button>
+    <button class="dock-btn" id="orient-btn" title="Toggle Orientation (O)">↔️ Flip</button>
+  </div>
+
   <!-- MiniMap -->
   <div id="minimap-card">
     <div class="minimap-header">
       <span>Overview</span>
-      <span id="minimap-stats">Nodes: {len(ir.get('nodes', []))}</span>
+      <span id="minimap-stats">{len(ir.get('nodes', []))} Nodes</span>
     </div>
     <svg id="minimap-canvas">
       <g id="minimap-elements"></g>
@@ -508,12 +503,12 @@ def compile_to_html(ir: Dict[str, Any]) -> str:
     
     <div class="drawer-section">
       <div class="drawer-label">Cloud Provider / Role</div>
-      <div class="drawer-text" id="d-service" style="color: var(--accent); font-weight:600;">Service Name</div>
+      <div class="drawer-text" id="d-service" style="color: var(--accent); font-weight:700;">Service Name</div>
     </div>
 
     <div class="drawer-section">
-      <div class="drawer-label">Structurizr Theme Tag (C4)</div>
-      <div class="drawer-text" id="d-structurizr" style="font-family:monospace; color:var(--accent); font-size:0.8rem;">Tag Name</div>
+      <div class="drawer-label">Structurizr C4 Theme Tag</div>
+      <div class="drawer-text" id="d-structurizr" style="font-family:monospace; color:var(--accent); font-size:0.8rem;">🏷️ Tag</div>
     </div>
 
     <div class="drawer-section">
@@ -524,11 +519,6 @@ def compile_to_html(ir: Dict[str, Any]) -> str:
     <div class="drawer-section">
       <div class="drawer-label">Description</div>
       <div class="drawer-text" id="d-desc">Description text...</div>
-    </div>
-
-    <div class="drawer-section" id="d-files-sec">
-      <div class="drawer-label">Key Source Files</div>
-      <div id="d-files"></div>
     </div>
 
     <div class="drawer-section">
@@ -542,29 +532,12 @@ def compile_to_html(ir: Dict[str, Any]) -> str:
     </div>
   </div>
 
-  <!-- Keyboard Shortcuts Modal -->
-  <div class="modal-overlay" id="help-modal">
-    <div class="modal-card">
-      <h3>⌨️ Keyboard Shortcuts</h3>
-      <div class="key-row"><span>Search components</span> <span class="kbd-key">/</span></div>
-      <div class="key-row"><span>Toggle Orientation (LR / TB)</span> <span class="kbd-key">O</span></div>
-      <div class="key-row"><span>Toggle Dark / Light Theme</span> <span class="kbd-key">D</span></div>
-      <div class="key-row"><span>Reset Zoom & Center</span> <span class="kbd-key">R</span></div>
-      <div class="key-row"><span>Close drawer / modal</span> <span class="kbd-key">Esc</span></div>
-      <div class="key-row"><span>Show this help menu</span> <span class="kbd-key">?</span></div>
-      <div style="text-align: right; margin-top: 18px;">
-        <button class="btn" id="modal-close-btn">Close</button>
-      </div>
-    </div>
-  </div>
-
   <script>
     const IR = {ir_json_str};
 
-    // Layout configuration
-    let currentOrientation = "horizontal"; // "horizontal" (LR) or "vertical" (TB)
-    const NODE_WIDTH = 220;
-    const NODE_HEIGHT = 80;
+    let currentOrientation = "horizontal";
+    const NODE_WIDTH = 230;
+    const NODE_HEIGHT = 92;
 
     const PROTOCOL_COLORS = {json.dumps(PROTOCOL_COLORS)};
     const nodePositions = {{}};
@@ -576,7 +549,6 @@ def compile_to_html(ir: Dict[str, Any]) -> str:
     const edgesLayer = document.getElementById("edges-layer");
     const nodesLayer = document.getElementById("nodes-layer");
 
-    // Group nodes by tier
     const tiersOrder = IR.tiers.map(t => t.id);
     const nodesByTier = {{}};
     tiersOrder.forEach(t => nodesByTier[t] = []);
@@ -587,13 +559,11 @@ def compile_to_html(ir: Dict[str, Any]) -> str:
     }});
 
     function computeLayout() {{
-      // Clear positions
       Object.keys(nodePositions).forEach(k => delete nodePositions[k]);
 
       if (currentOrientation === "horizontal") {{
-        // Columns = Tiers (LR), Rows = Nodes in tier
-        const COL_GAP = 130;
-        const ROW_GAP = 30;
+        const COL_GAP = 140;
+        const ROW_GAP = 28;
         const PADDING_LEFT = 70;
         const PADDING_TOP = 80;
 
@@ -618,9 +588,8 @@ def compile_to_html(ir: Dict[str, Any]) -> str:
           currX += NODE_WIDTH + COL_GAP;
         }});
       }} else {{
-        // Rows = Tiers (TB), Cols = Nodes in tier
         const ROW_GAP = 120;
-        const COL_GAP = 30;
+        const COL_GAP = 28;
         const PADDING_TOP = 80;
         const PADDING_LEFT = 60;
 
@@ -653,7 +622,7 @@ def compile_to_html(ir: Dict[str, Any]) -> str:
       edgesLayer.innerHTML = "";
       nodesLayer.innerHTML = "";
 
-      // 1. Render Tier Group Boxes
+      // 1. Tiers
       tiersOrder.forEach((tId) => {{
         const tierObj = IR.tiers.find(t => t.id === tId);
         const tierNodes = nodesByTier[tId];
@@ -678,30 +647,29 @@ def compile_to_html(ir: Dict[str, Any]) -> str:
         rect.setAttribute("width", (maxX - minX) + pad * 2);
         rect.setAttribute("height", (maxY - minY) + pad * 2 + 20);
         rect.setAttribute("stroke", tierObj ? tierObj.color : "#4B5563");
-        rect.setAttribute("stroke-opacity", "0.35");
+        rect.setAttribute("stroke-opacity", "0.25");
         tiersLayer.appendChild(rect);
 
         const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
         text.setAttribute("class", "tier-label");
         text.setAttribute("x", minX - pad + 10);
         text.setAttribute("y", minY - pad);
-        text.setAttribute("fill", tierObj ? tierObj.color : "#9CA3AF");
+        text.setAttribute("fill", tierObj ? tierObj.color : "#94A3B8");
         text.textContent = tierObj ? tierObj.label : tId;
         tiersLayer.appendChild(text);
       }});
 
-      // 2. Render Edges (Smooth Bezier Curves)
+      // 2. Edges
       IR.edges.forEach((edge) => {{
         const source = nodePositions[edge.from];
         const target = nodePositions[edge.to];
         if (!source || !target) return;
 
         let x1, y1, x2, y2, pathD;
-        const proto = (edge.protocol || "https").toLowerCase();
+        const proto = (edge.protocol || "https").lower ? (edge.protocol || "https").toLowerCase() : "https";
         const strokeColor = PROTOCOL_COLORS[proto] || "var(--edge-stroke)";
 
         if (currentOrientation === "horizontal") {{
-          // Exit right, enter left
           x1 = source.x + source.width;
           y1 = source.y + source.height / 2;
           x2 = target.x;
@@ -709,7 +677,6 @@ def compile_to_html(ir: Dict[str, Any]) -> str:
           const dx = Math.abs(x2 - x1) * 0.5;
           pathD = `M ${{x1}} ${{y1}} C ${{x1 + dx}} ${{y1}}, ${{x2 - dx}} ${{y2}}, ${{x2}} ${{y2}}`;
         }} else {{
-          // Exit bottom, enter top
           x1 = source.x + source.width / 2;
           y1 = source.y + source.height;
           x2 = target.x + target.width / 2;
@@ -728,7 +695,6 @@ def compile_to_html(ir: Dict[str, Any]) -> str:
         path.dataset.to = edge.to;
         edgesLayer.appendChild(path);
 
-        // Edge label badge
         if (edge.label) {{
           const midX = (x1 + x2) / 2;
           const midY = (y1 + y2) / 2;
@@ -739,7 +705,7 @@ def compile_to_html(ir: Dict[str, Any]) -> str:
           
           lbl.setAttribute("class", "edge-label");
           lbl.setAttribute("x", midX);
-          lbl.setAttribute("y", midY + 3);
+          lbl.setAttribute("y", midY + 3.5);
           lbl.textContent = edge.label;
 
           const estWidth = edge.label.length * 5.8 + 10;
@@ -757,7 +723,7 @@ def compile_to_html(ir: Dict[str, Any]) -> str:
         }}
       }});
 
-      // 3. Render Nodes with Cloud Icons & Provider Badges
+      // 3. Nodes (Foolproof Vector SVG Glyphs)
       IR.nodes.forEach(node => {{
         const pos = nodePositions[node.id];
         if (!pos) return;
@@ -780,85 +746,82 @@ def compile_to_html(ir: Dict[str, Any]) -> str:
 
         // Top Stripe
         const stripe = document.createElementNS("http://www.w3.org/2000/svg", "path");
-        stripe.setAttribute("d", `M 0 6 Q 0 0 6 0 L ${{pos.width - 6}} 0 Q ${{pos.width}} 0 ${{pos.width}} 6 L ${{pos.width}} 3 L 0 3 Z`);
+        stripe.setAttribute("d", `M 0 10 Q 0 0 10 0 L ${{pos.width - 10}} 0 Q ${{pos.width}} 0 ${{pos.width}} 10 L ${{pos.width}} 4 L 0 4 Z`);
         stripe.setAttribute("fill", brandColor);
 
-        // Provider Badge
+        // Icon Container Box
+        const iconBox = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+        iconBox.setAttribute("x", 12);
+        iconBox.setAttribute("y", 14);
+        iconBox.setAttribute("width", 34);
+        iconBox.setAttribute("height", 34);
+        iconBox.setAttribute("rx", 8);
+        iconBox.setAttribute("fill", "var(--surface)");
+        iconBox.setAttribute("stroke", brandColor);
+        iconBox.setAttribute("stroke-opacity", "0.35");
+
+        // Embedded Vector SVG (100% Foolproof, Never Fails)
+        const iconSvg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+        iconSvg.setAttribute("x", 17);
+        iconSvg.setAttribute("y", 19);
+        iconSvg.setAttribute("width", 24);
+        iconSvg.setAttribute("height", 24);
+        iconSvg.setAttribute("viewBox", "0 0 24 24");
+        
+        const iconPath = document.createElementNS("http://www.w3.org/2000/svg", "path");
+        iconPath.setAttribute("d", meta.icon || "M12 2L2 7v10l10 5 10-5V7L12 2z");
+        iconPath.setAttribute("fill", brandColor);
+        iconSvg.appendChild(iconPath);
+
+        // Provider Badge Pill
         const provBg = document.createElementNS("http://www.w3.org/2000/svg", "rect");
-        provBg.setAttribute("x", pos.width - 56);
-        provBg.setAttribute("y", 10);
-        provBg.setAttribute("width", 46);
-        provBg.setAttribute("height", 14);
-        provBg.setAttribute("rx", 3);
+        provBg.setAttribute("x", pos.width - 60);
+        provBg.setAttribute("y", 14);
+        provBg.setAttribute("width", 48);
+        provBg.setAttribute("height", 17);
+        provBg.setAttribute("rx", 8.5);
         provBg.setAttribute("fill", "var(--bg)");
         provBg.setAttribute("stroke", brandColor);
-        provBg.setAttribute("stroke-opacity", "0.6");
+        provBg.setAttribute("stroke-opacity", "0.5");
 
         const provTxt = document.createElementNS("http://www.w3.org/2000/svg", "text");
-        provTxt.setAttribute("x", pos.width - 33);
-        provTxt.setAttribute("y", 20);
+        provTxt.setAttribute("x", pos.width - 36);
+        provTxt.setAttribute("y", 25.5);
         provTxt.setAttribute("fill", brandColor);
-        provTxt.setAttribute("font-size", "7.5px");
+        provTxt.setAttribute("font-size", "8px");
         provTxt.setAttribute("font-weight", "700");
         provTxt.setAttribute("text-anchor", "middle");
         provTxt.textContent = providerName;
 
-        // Structurizr Theme Icon with Vector Fallback
-        if (meta.structurizr_icon) {{
-          const img = document.createElementNS("http://www.w3.org/2000/svg", "image");
-          img.setAttribute("x", 12);
-          img.setAttribute("y", 14);
-          img.setAttribute("width", 20);
-          img.setAttribute("height", 20);
-          img.setAttribute("href", meta.structurizr_icon);
-          g.appendChild(img);
-        }} else {{
-          const iconSvg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-          iconSvg.setAttribute("x", 10);
-          iconSvg.setAttribute("y", 12);
-          iconSvg.setAttribute("width", 20);
-          iconSvg.setAttribute("height", 20);
-          iconSvg.setAttribute("viewBox", "0 0 24 24");
-          
-          const iconPath = document.createElementNS("http://www.w3.org/2000/svg", "path");
-          iconPath.setAttribute("d", meta.icon || "M12 2 3 7v10l9 5 9-5V7l-9-5z");
-          iconPath.setAttribute("fill", "none");
-          iconPath.setAttribute("stroke", brandColor);
-          iconPath.setAttribute("stroke-width", "2");
-          iconPath.setAttribute("stroke-linecap", "round");
-          iconPath.setAttribute("stroke-linejoin", "round");
-          iconSvg.appendChild(iconPath);
-          g.appendChild(iconSvg);
-        }}
-
         // Title
         const title = document.createElementNS("http://www.w3.org/2000/svg", "text");
         title.setAttribute("class", "node-title");
-        title.setAttribute("x", 36);
-        title.setAttribute("y", 25);
-        title.textContent = node.label.length > 17 ? node.label.slice(0, 16) + '..' : node.label;
+        title.setAttribute("x", 54);
+        title.setAttribute("y", 32);
+        title.textContent = node.label.length > 18 ? node.label.slice(0, 17) + '..' : node.label;
 
         // Tech Subtitle
         const tech = document.createElementNS("http://www.w3.org/2000/svg", "text");
         tech.setAttribute("class", "node-tech");
-        tech.setAttribute("x", 12);
-        tech.setAttribute("y", 50);
+        tech.setAttribute("x", 14);
+        tech.setAttribute("y", 62);
         const techStr = node.tech || "Service";
-        tech.textContent = techStr.length > 27 ? techStr.slice(0, 26) + '..' : techStr;
+        tech.textContent = techStr.length > 28 ? techStr.slice(0, 27) + '..' : techStr;
 
         // Role / Description
         const desc = document.createElementNS("http://www.w3.org/2000/svg", "text");
         desc.setAttribute("class", "node-desc");
-        desc.setAttribute("x", 12);
-        desc.setAttribute("y", 68);
+        desc.setAttribute("x", 14);
+        desc.setAttribute("y", 78);
         const descStr = node.description || meta.service_name || "";
-        desc.textContent = descStr.length > 32 ? descStr.slice(0, 31) + '..' : descStr;
+        desc.textContent = descStr.length > 34 ? descStr.slice(0, 33) + '..' : descStr;
 
         g.appendChild(rect);
         g.appendChild(stripe);
+        g.appendChild(iconBox);
+        g.appendChild(iconSvg);
         g.appendChild(provBg);
         g.appendChild(provTxt);
-        g.appendChild(iconSvg);
         g.appendChild(title);
         g.appendChild(tech);
         g.appendChild(desc);
@@ -906,7 +869,7 @@ def compile_to_html(ir: Dict[str, Any]) -> str:
       const newScale = Math.min(Math.max(scale * zoomFactor, 0.25), 3.0);
       
       const mouseX = e.clientX;
-      const mouseY = e.clientY - 60;
+      const mouseY = e.clientY - 58;
       panX = mouseX - (mouseX - panX) * (newScale / scale);
       panY = mouseY - (mouseY - panY) * (newScale / scale);
       scale = newScale;
@@ -954,7 +917,7 @@ def compile_to_html(ir: Dict[str, Any]) -> str:
       const vpRect = document.getElementById("minimap-viewport");
       
       const vpW = window.innerWidth;
-      const vpH = window.innerHeight - 60;
+      const vpH = window.innerHeight - 58;
       const visibleW = vpW / scale;
       const visibleH = vpH / scale;
       const visibleX = -panX / scale;
@@ -1032,20 +995,6 @@ def compile_to_html(ir: Dict[str, Any]) -> str:
       document.getElementById("d-structurizr").textContent = `🏷️ ${{meta.structurizr_tag || "Microservice"}}`;
       document.getElementById("d-tech").textContent = node.tech || "None specified";
       document.getElementById("d-desc").textContent = node.description || "No detailed description provided.";
-
-      const filesContainer = document.getElementById("d-files");
-      filesContainer.innerHTML = "";
-      if (node.files && node.files.length) {{
-        node.files.forEach(f => {{
-          const sp = document.createElement("span");
-          sp.className = "file-tag";
-          sp.textContent = f;
-          filesContainer.appendChild(sp);
-        }});
-        document.getElementById("d-files-sec").style.display = "block";
-      }} else {{
-        document.getElementById("d-files-sec").style.display = "none";
-      }}
 
       const upContainer = document.getElementById("d-upstream");
       upContainer.innerHTML = "";
@@ -1125,32 +1074,15 @@ def compile_to_html(ir: Dict[str, Any]) -> str:
       updateTransform();
     }};
 
-    // Keyboard Shortcuts Modal
-    const helpModal = document.getElementById("help-modal");
-    document.getElementById("help-btn").onclick = () => helpModal.classList.add("open");
-    document.getElementById("modal-close-btn").onclick = () => helpModal.classList.remove("open");
-    helpModal.onclick = (e) => {{ if (e.target === helpModal) helpModal.classList.remove("open"); }};
+    document.getElementById("zoom-in-btn").onclick = () => {{
+      scale = Math.min(scale * 1.2, 3.0);
+      updateTransform();
+    }};
 
-    window.addEventListener("keydown", (e) => {{
-      if (e.target === searchInput && e.key !== "Escape") return;
-
-      if (e.key === "Escape") {{
-        closeDrawer();
-        helpModal.classList.remove("open");
-        searchInput.blur();
-      }} else if (e.key === "/") {{
-        e.preventDefault();
-        searchInput.focus();
-      }} else if (e.key === "?" || (e.shiftKey && e.key === "/")) {{
-        helpModal.classList.toggle("open");
-      }} else if (e.key.toLowerCase() === "d") {{
-        document.getElementById("theme-btn").click();
-      }} else if (e.key.toLowerCase() === "r") {{
-        document.getElementById("reset-btn").click();
-      }} else if (e.key.toLowerCase() === "o") {{
-        document.getElementById("orient-btn").click();
-      }}
-    }});
+    document.getElementById("zoom-out-btn").onclick = () => {{
+      scale = Math.max(scale * 0.8, 0.25);
+      updateTransform();
+    }};
 
     document.getElementById("export-svg-btn").onclick = () => {{
       const svg = document.getElementById("diagram-canvas");
@@ -1164,7 +1096,24 @@ def compile_to_html(ir: Dict[str, Any]) -> str:
       a.click();
     }};
 
-    // Initial render
+    // Keyboard Shortcuts
+    window.addEventListener("keydown", (e) => {{
+      if (e.target === searchInput && e.key !== "Escape") return;
+      if (e.key === "Escape") {{
+        closeDrawer();
+        searchInput.blur();
+      }} else if (e.key === "/") {{
+        e.preventDefault();
+        searchInput.focus();
+      }} else if (e.key.toLowerCase() === "d") {{
+        document.getElementById("theme-btn").click();
+      }} else if (e.key.toLowerCase() === "r") {{
+        document.getElementById("reset-btn").click();
+      }} else if (e.key.toLowerCase() === "o") {{
+        document.getElementById("orient-btn").click();
+      }}
+    }});
+
     window.addEventListener("DOMContentLoaded", () => {{
       renderScene();
       updateTransform();

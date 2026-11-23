@@ -16,6 +16,7 @@ ENV/
 vizarc_out/
 test_vizarc_out/
 architecture.html
+architecture.svg
 
 # Streamlit
 .streamlit/secrets.toml
