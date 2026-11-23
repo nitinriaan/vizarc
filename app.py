@@ -32,12 +32,10 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-# Custom Styling (Mermaid Live Editor aesthetic & JetBrains Mono)
+# Custom Styling (Mermaid Live Editor aesthetic)
 st.markdown("""
 <style>
-    @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400;1,600&display=swap');
-
-    /* Ultra-clean zero-margin container fitting 16:9 screen */
+    /* Ultra-clean container fitting 16:9 screen */
     .block-container {
         padding-top: 0.6rem !important;
         padding-bottom: 0.8rem !important;
@@ -48,15 +46,11 @@ st.markdown("""
     header[data-testid="stHeader"] {
         display: none;
     }
-    html, body, [class*="css"], textarea, input, select, button, .stMarkdown {
-        font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace !important;
-    }
     /* Buttons */
     button[kind="primary"] {
         background-color: #2563EB !important;
         border-color: #2563EB !important;
-        font-weight: 700 !important;
-        font-family: 'JetBrains Mono', monospace !important;
+        font-weight: 600 !important;
     }
 </style>
 """, unsafe_allow_html=True)

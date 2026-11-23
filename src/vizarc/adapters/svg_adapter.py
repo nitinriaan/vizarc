@@ -132,15 +132,11 @@ def render_svg_diagram(ir: Dict[str, Any], orientation: str = "horizontal") -> s
         canvas_height = curr_y - ROW_GAP + NODE_HEIGHT + FOOTER_HEIGHT + 35
 
     svg_parts = []
-    svg_parts.append(f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {int(canvas_width)} {int(canvas_height)}" width="100%" height="100%" style="background-color: #090D16; font-family: \'JetBrains Mono\', \'Fira Code\', Cascadia Code, Monaco, Menlo, Consolas, monospace;">')
+    svg_parts.append(f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {int(canvas_width)} {int(canvas_height)}" width="100%" height="100%" style="background-color: #090D16; font-family: -apple-system, BlinkMacSystemFont, \'Segoe UI\', Roboto, Helvetica, Arial, sans-serif;">')
 
-    # Definitions: Blueprint Dots Pattern, Shadows, Markers, JetBrains Mono Font
+    # Definitions: Blueprint Dots Pattern, Shadows, Markers
     defs = [
         '<defs>',
-        '  <style>',
-        '    @import url("https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700;800&amp;display=swap");',
-        '    text { font-family: "JetBrains Mono", "Fira Code", Cascadia Code, Monaco, Menlo, Consolas, monospace !important; }',
-        '  </style>',
         '  <!-- Blueprint Dot Grid Pattern -->',
         '  <pattern id="dotGrid" width="24" height="24" patternUnits="userSpaceOnUse">',
         '    <circle cx="2" cy="2" r="1" fill="#1E293B" opacity="0.6"/>',
