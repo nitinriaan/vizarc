@@ -6,9 +6,9 @@
 </p>
 
 <p align="center">
-  <a href="https://www.python.org/downloads/"><img src="https://img.shields.io/badge/python-3.10+-blue.svg" alt="Python 3.10+"/></a>
+  <a href="https://vizarc.streamlit.app/"><img src="https://img.shields.io/badge/Streamlit%20Cloud-Live%20Studio-FF4B4B?logo=streamlit&logoColor=white" alt="Streamlit Cloud"/></a>
+  <a href="https://www.python.org/downloads/"><img src="https://img.shields.io/badge/python-3.12+-blue.svg" alt="Python 3.12+"/></a>
   <a href="https://opensource.org/licenses/MIT"><img src="https://img.shields.io/badge/License-MIT-yellow.svg" alt="License: MIT"/></a>
-  <a href="https://streamlit.io"><img src="https://img.shields.io/badge/Streamlit-FF4B4B?logo=Streamlit&logoColor=white" alt="Streamlit"/></a>
   <a href="#-agent-skill-integration"><img src="https://img.shields.io/badge/Agent%20Skill-Claude%20%7C%20Antigravity%20%7C%20Cursor%20%7C%20Copilot-purple.svg" alt="Built for AI Agents"/></a>
   <a href=".github/workflows/vizarc-diagram.yml"><img src="https://img.shields.io/badge/GitHub%20Action-PR%20Diagrams-black?logo=github" alt="GitHub Action"/></a>
 </p>
@@ -16,6 +16,10 @@
 <p align="center">
   <strong>The "Pandoc & Archify of Software Architecture"</strong><br/>
   Turn any prompt, plan, or codebase into a <strong>Canonical Architecture Model (JSON IR)</strong>, and deterministically compile it into a <strong>Dual-View Interactive Canvas & One-Page Explainer (HTML)</strong>, <strong>Publication-Grade Vector SVG</strong>, <strong>D2 Lang</strong>, <strong>Structurizr C4</strong>, <strong>Mermaid</strong>, <strong>PlantUML</strong>, <strong>Graphviz (DOT)</strong>, <strong>Excalidraw</strong>, and <strong>ASCII</strong> in one single pass.
+</p>
+
+<p align="center">
+  🚀 <strong>Live Cloud Studio:</strong> <a href="https://vizarc.streamlit.app/"><strong>VizArc - Architecture Studio · Streamlit</strong></a>
 </p>
 
 ---
@@ -122,14 +126,24 @@ Instant offline access to production-grade architecture blueprints:
 
 ## 🚀 Quick Start
 
-### 1. Install
+### 🌐 Try Online (Zero Setup)
+Open the hosted live studio directly in your browser:
+👉 **[VizArc - Architecture Studio · Streamlit](https://vizarc.streamlit.app/)**
+
+### 💻 Local Setup
+
+#### Prerequisites
+* **Python 3.12+** (required)
+* Git
+
+#### 1. Clone & Install
 ```bash
 git clone https://github.com/nitinriaan/vizarc.git
 cd vizarc
 pip install -r requirements.txt
 ```
 
-### 2. (Optional) Configure Free Gemini API Key
+#### 2. (Optional) Configure Free Gemini API Key
 Get your free API key from [Google AI Studio](https://aistudio.google.com/):
 ```bash
 cp .env.example .env
@@ -172,14 +186,17 @@ python cli.py scan . --format all --output ./architecture_docs
 
 ## 🌐 Live Architecture Studio (Streamlit)
 
-Launch the Mermaid-style two-pane studio:
+Access the live studio online with zero setup:
+👉 **[VizArc - Architecture Studio · Streamlit](https://vizarc.streamlit.app/)**
+
+Or run locally (Python 3.12+):
 
 ```bash
 streamlit run app.py
 ```
 
-* **Left Pane**: System specification input, 🚀 Generate Canvas, ⚡ Load Preset, and collapsible ⚙️ Settings (Gemini API key, 13 presets, layout orientation).
-* **Right Pane**: Primary interactive canvas with dual-view switcher, live flow motion, instant top-corner SVG & HTML downloads, and on-demand format exporter for D2, Structurizr C4, Mermaid, PlantUML, DOT, Excalidraw, and ASCII.
+* **Left Pane (~19%)**: Official VizArc brand logo, system specification input, 🚀 **Generate Canvas**, ⚡ **Load Preset**, direct **📥 SVG** and **📥 HTML** downloads, and collapsible ⚙️ **Presets & Layout** (13 built-in presets, Horizontal LR / Vertical TB orientation).
+* **Right Pane (~81%)**: Pure 16:9 full-bleed interactive canvas & one-page explainer with dual-view switcher, live flow motion animation, live path tracing, minimap, authentic vector cloud icons, and an on-demand format exporter for D2, Structurizr C4, Mermaid, PlantUML, DOT, Excalidraw, and ASCII.
 
 ---
 

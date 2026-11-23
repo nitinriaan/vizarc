@@ -80,7 +80,7 @@ python cli.py generate "RAG AI Agent system" --format all -o ./dist
 # Render preset template
 python cli.py template microservices-gke --format html
 
-# Launch the Mermaid-style Live Architecture Studio
+# Launch the Mermaid-style Live Architecture Studio (or visit https://vizarc.streamlit.app)
 streamlit run app.py
 ```
 

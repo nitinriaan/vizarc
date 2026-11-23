@@ -1,0 +1,43 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "vizarc"
+version = "0.1.0"
+description = "Universal Architecture Compiler & Interactive Explainer Engine"
+readme = "README.md"
+requires-python = ">=3.12"
+license = { text = "MIT" }
+authors = [
+    { name = "Nitin Kumar", email = "nitinriaan@gmail.com" }
+]
+keywords = [
+    "architecture", "diagrams", "compiler", "c4-model", "d2", "structurizr",
+    "mermaid", "svg", "system-design", "ai-agents"
+]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.12",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Topic :: Software Development :: Documentation",
+]
+dependencies = [
+    "google-generativeai>=0.8.0",
+    "python-dotenv>=1.0.0",
+    "click>=8.1.0",
+    "rich>=13.7.0",
+    "streamlit>=1.35.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/nitinriaan/vizarc"
+"Live Studio" = "https://vizarc.streamlit.app"
+Repository = "https://github.com/nitinriaan/vizarc"
+
+[project.scripts]
+vizarc = "vizarc.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
