@@ -182,7 +182,7 @@ with col_output:
             st.code(renders.get("d2", ""), language="bash")
 
         with tab_c4:
-            st.info("💡 Industry-standard Structurizr C4 DSL. Render with Structurizr CLI or Lite.")
+            st.info("💡 Industry-standard Structurizr C4 DSL. Tagged with official cloud icons from Structurizr Themes Playground (https://playground.structurizr.com/themes).")
             st.code(renders.get("structurizr", ""), language="c")
 
         with tab_mermaid:

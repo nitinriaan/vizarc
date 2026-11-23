@@ -17,7 +17,8 @@ Unlike tools that rely on the LLM to write syntax for every format independently
 
 * 🧠 **Single Source of Truth**: The AI analyzes your codebase or system requirements **once** to produce a typed, validated **Canonical Architecture Model (JSON AST/IR)**.
 * ⚡ **Deterministic Multi-Renderer Compilation**: 9 specialized adapters transform the IR into any diagram language with **zero extra LLM calls and zero hallucinated syntax**.
-* ☁️ **188+ Cloud Service Icons**: Automatic cloud provider detection (AWS, GCP, Azure, Kubernetes, Generic) with official brand colors and 24x24 SVG path glyphs.
+* ☁️ **188+ Cloud Service Icons**: Automatic cloud provider detection (AWS, GCP, Azure, Kubernetes, Generic) with official brand colors, 24x24 SVG path glyphs, and [Structurizr Themes Playground](https://playground.structurizr.com/themes) tags & icons.
+* 🏛️ **Full Structurizr Themes Integration**: Automatically applies C4 tags and imports prebuilt themes (`amazon-web-services-2023.01`, `google-cloud-platform-v1.5`, `microsoft-azure-2023.01`, `kubernetes-v0.3`).
 * 📦 **13 Built-in Architecture Presets**: Instant offline templates for RAG Systems, Serverless AWS, Kafka Event Streaming, Kubernetes Platforms, Microservices, and more.
 * 🤖 **GitHub Actions Automation**: Auto-generates architecture diagrams and posts SVG comments directly to your Pull Requests.
 
@@ -52,7 +53,7 @@ Unlike tools that rely on the LLM to write syntax for every format independently
 | **✨ Interactive HTML** | Interactive exploration, upstream/downstream link tracing, search, minimap & drawer | Exceptional (Web Canvas) | `.html` |
 | **🖼️ Pure Vector SVG** | Standalone vector graphic with cloud badges, protocol colors, and Sugiyama layout | Publication Grade | `.svg` |
 | **⚡ D2 Lang** | Modern declarative system architecture, cloud topologies, and container grouping | Excellent | `.d2` |
-| **🏛️ Structurizr DSL** | Professional **C4 architecture models** (Context, Container, Component) | Excellent | `.dsl` |
+| **🏛️ Structurizr DSL** | Professional **C4 architecture models** with official [Structurizr Themes](https://playground.structurizr.com/themes) (AWS, Azure, GCP, K8s) | Excellent | `.dsl` |
 | **🧜‍♂️ Mermaid.js** | GitHub READMEs, Notion, pull request markdown, GitLab | Good | `.mmd` / `.md` |
 | **📐 PlantUML** | Classical enterprise UML and sequence component diagrams | Good | `.puml` |
 | **🕸️ Graphviz (DOT)** | Dependency trees, automated graph layout, high-density relationship mapping | Good | `.dot` |

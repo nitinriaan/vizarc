@@ -512,6 +512,11 @@ def compile_to_html(ir: Dict[str, Any]) -> str:
     </div>
 
     <div class="drawer-section">
+      <div class="drawer-label">Structurizr Theme Tag (C4)</div>
+      <div class="drawer-text" id="d-structurizr" style="font-family:monospace; color:var(--accent); font-size:0.8rem;">Tag Name</div>
+    </div>
+
+    <div class="drawer-section">
       <div class="drawer-label">Tech Stack</div>
       <div class="drawer-text" id="d-tech">Node Tech</div>
     </div>
@@ -798,22 +803,33 @@ def compile_to_html(ir: Dict[str, Any]) -> str:
         provTxt.setAttribute("text-anchor", "middle");
         provTxt.textContent = providerName;
 
-        // SVG Icon glyph
-        const iconSvg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-        iconSvg.setAttribute("x", 10);
-        iconSvg.setAttribute("y", 12);
-        iconSvg.setAttribute("width", 20);
-        iconSvg.setAttribute("height", 20);
-        iconSvg.setAttribute("viewBox", "0 0 24 24");
-        
-        const iconPath = document.createElementNS("http://www.w3.org/2000/svg", "path");
-        iconPath.setAttribute("d", meta.icon || "M12 2 3 7v10l9 5 9-5V7l-9-5z");
-        iconPath.setAttribute("fill", "none");
-        iconPath.setAttribute("stroke", brandColor);
-        iconPath.setAttribute("stroke-width", "2");
-        iconPath.setAttribute("stroke-linecap", "round");
-        iconPath.setAttribute("stroke-linejoin", "round");
-        iconSvg.appendChild(iconPath);
+        // Structurizr Theme Icon with Vector Fallback
+        if (meta.structurizr_icon) {{
+          const img = document.createElementNS("http://www.w3.org/2000/svg", "image");
+          img.setAttribute("x", 12);
+          img.setAttribute("y", 14);
+          img.setAttribute("width", 20);
+          img.setAttribute("height", 20);
+          img.setAttribute("href", meta.structurizr_icon);
+          g.appendChild(img);
+        }} else {{
+          const iconSvg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+          iconSvg.setAttribute("x", 10);
+          iconSvg.setAttribute("y", 12);
+          iconSvg.setAttribute("width", 20);
+          iconSvg.setAttribute("height", 20);
+          iconSvg.setAttribute("viewBox", "0 0 24 24");
+          
+          const iconPath = document.createElementNS("http://www.w3.org/2000/svg", "path");
+          iconPath.setAttribute("d", meta.icon || "M12 2 3 7v10l9 5 9-5V7l-9-5z");
+          iconPath.setAttribute("fill", "none");
+          iconPath.setAttribute("stroke", brandColor);
+          iconPath.setAttribute("stroke-width", "2");
+          iconPath.setAttribute("stroke-linecap", "round");
+          iconPath.setAttribute("stroke-linejoin", "round");
+          iconSvg.appendChild(iconPath);
+          g.appendChild(iconSvg);
+        }}
 
         // Title
         const title = document.createElementNS("http://www.w3.org/2000/svg", "text");
@@ -1013,6 +1029,7 @@ def compile_to_html(ir: Dict[str, Any]) -> str:
 
       document.getElementById("d-title").textContent = node.label;
       document.getElementById("d-service").textContent = `${{(meta.provider || "GENERIC").toUpperCase()}} • ${{meta.service_name || node.label}}`;
+      document.getElementById("d-structurizr").textContent = `🏷️ ${{meta.structurizr_tag || "Microservice"}}`;
       document.getElementById("d-tech").textContent = node.tech || "None specified";
       document.getElementById("d-desc").textContent = node.description || "No detailed description provided.";
 

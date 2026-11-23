@@ -283,6 +283,13 @@ def render_svg_diagram(ir: Dict[str, Any], orientation: str = "horizontal") -> s
         tech = html.escape(node.get("tech", ""))
         desc = html.escape(node.get("description", ""))
 
+        structurizr_icon = meta.get("structurizr_icon", "")
+        icon_element = f'<image href="{structurizr_icon}" x="14" y="16" width="24" height="24"/>' if structurizr_icon else f'''<g transform="translate(14, 16) scale(1)">
+        <svg width="24" height="24" viewBox="0 0 24 24">
+          <path d="{icon_path}" fill="none" stroke="{brand_color}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </g>'''
+
         node_svg = f"""    <g id="node-{n_id}" transform="translate({int(nx)}, {int(ny)})" filter="url(#nodeShadow)">
       <!-- Card Base -->
       <rect x="0" y="0" width="{NODE_WIDTH}" height="{NODE_HEIGHT}" rx="8" fill="#1E293B" stroke="#334155" stroke-width="1.5"/>
@@ -290,13 +297,9 @@ def render_svg_diagram(ir: Dict[str, Any], orientation: str = "horizontal") -> s
       <!-- Top Brand Color Stripe -->
       <path d="M 0 8 Q 0 0 8 0 L {NODE_WIDTH - 8} 0 Q {NODE_WIDTH} 0 {NODE_WIDTH} 8 L {NODE_WIDTH} 4 L 0 4 Z" fill="{brand_color}"/>
       
-      <!-- Icon Glyphs & Provider Badge -->
+      <!-- Icon Glyphs (Structurizr Theme Asset + Vector Fallback) & Provider Badge -->
       <rect x="12" y="14" width="28" height="28" rx="6" fill="#0F172A" stroke="{brand_color}" stroke-opacity="0.4" stroke-width="1"/>
-      <g transform="translate(14, 16) scale(1)">
-        <svg width="24" height="24" viewBox="0 0 24 24">
-          <path d="{icon_path}" fill="none" stroke="{brand_color}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
-      </g>
+      {icon_element}
       
       <!-- Provider Pill -->
       <rect x="{NODE_WIDTH - 64}" y="14" width="52" height="16" rx="4" fill="#0F172A" stroke="{brand_color}" stroke-opacity="0.6" stroke-width="1"/>
@@ -319,7 +322,7 @@ def render_svg_diagram(ir: Dict[str, Any], orientation: str = "horizontal") -> s
     providers_list = " • ".join([p.upper() for p in sorted(providers_used)])
     footer_svg = f"""  <!-- Footer -->
   <g id="footer" transform="translate({PADDING_X}, {int(footer_y)})">
-    <text x="0" y="0" fill="#64748B" font-size="10">Generated with <tspan fill="#3B82F6" font-weight="600">VizArc</tspan> — Universal System Architecture Compiler</text>
+    <text x="0" y="0" fill="#64748B" font-size="10">Generated with <tspan fill="#3B82F6" font-weight="600">VizArc</tspan> — Structurizr Themes &amp; Icons (playground.structurizr.com/themes)</text>
     <text x="{int(canvas_width - PADDING_X*2)}" y="0" fill="#64748B" font-size="10" text-anchor="end">Stack: {providers_list}</text>
   </g>
 </svg>"""
