@@ -71,16 +71,6 @@ with st.sidebar:
     )
     selected_orient = "horizontal" if "Horizontal" in orientation_choice else "vertical"
 
-    st.markdown("---")
-    st.markdown(
-        "**Features:**\n"
-        "- ☁️ 188+ Cloud Service Icons (AWS, GCP, Azure, K8s)\n"
-        "- ⚡ 100% Offline Mode & 13 Presets\n"
-        "- 🎨 Path Tracing, Minimap & Keyboard Shortcuts\n"
-        "- 🤖 GitHub Actions PR Comment Automation\n\n"
-        "[⭐ Star on GitHub](https://github.com/nitinriaan/vizarc)"
-    )
-
 # Selected Template check
 selected_tpl = None
 if chosen_preset != "Custom Prompt":
