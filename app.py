@@ -1,6 +1,8 @@
 """
-VizArc Web Playground (Streamlit)
-Universal Architecture Compiler: One Model -> All 9 Renderers (HTML, SVG, D2, Mermaid, C4, etc.).
+VizArc Live Architecture Studio (Streamlit)
+Mermaid-style two-pane layout:
+- Left pane: System Specification & ⚙️ Settings (API Key, 13 Presets, Layout Orientation)
+- Right pane: Interactive Canvas with top-corner SVG download, and on-demand format export.
 """
 
 import os
@@ -17,186 +19,277 @@ from dotenv import load_dotenv
 
 from vizarc.engine import VizArcEngine
 from vizarc.templates import TEMPLATES, get_template
-from vizarc.adapters import render_ir, render_all_formats
+from vizarc.adapters import render_ir
 from vizarc.adapters.svg_adapter import render_svg_diagram
+from vizarc.compiler import compile_to_html
 
 load_dotenv()
 
 st.set_page_config(
-    page_title="VizArc - Universal Architecture Compiler",
+    page_title="VizArc - Architecture Studio",
     page_icon="📐",
-    layout="wide"
+    layout="wide",
+    initial_sidebar_state="collapsed"
 )
 
-# Custom Styling
+# Custom Styling (Mermaid Live Editor aesthetic)
 st.markdown("""
 <style>
-    .main-title { font-size: 2.2rem; font-weight: 700; color: #1E293B; margin-bottom: 0.2rem; }
-    .sub-title { font-size: 1.02rem; color: #64748B; margin-bottom: 1.5rem; }
-    .badge { background-color: #E2E8F0; color: #334155; padding: 2px 8px; border-radius: 4px; font-size: 0.8rem; font-weight: 600; margin-right: 4px; }
-    .badge-hl { background-color: #DBEAFE; color: #1D4ED8; padding: 2px 8px; border-radius: 4px; font-size: 0.8rem; font-weight: 700; }
+    /* Remove unnecessary default Streamlit top margins */
+    .block-container {
+        padding-top: 1.2rem;
+        padding-bottom: 2rem;
+        padding-left: 2rem;
+        padding-right: 2rem;
+        max-width: 100%;
+    }
+    header[data-testid="stHeader"] {
+        display: none;
+    }
+    .studio-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding-bottom: 12px;
+        margin-bottom: 14px;
+        border-bottom: 1px solid #E2E8F0;
+    }
+    .brand-title {
+        font-size: 1.45rem;
+        font-weight: 800;
+        color: #0F172A;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        letter-spacing: -0.02em;
+    }
+    .badge-pill {
+        font-size: 0.72rem;
+        font-weight: 700;
+        color: #2563EB;
+        background: #EFF6FF;
+        border: 1px solid #DBEAFE;
+        padding: 3px 8px;
+        border-radius: 9999px;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+    }
+    .sub-brand {
+        font-size: 0.85rem;
+        color: #64748B;
+    }
+    /* Buttons */
+    button[kind="primary"] {
+        background-color: #2563EB !important;
+        border-color: #2563EB !important;
+        font-weight: 600 !important;
+    }
 </style>
 """, unsafe_allow_html=True)
 
-st.markdown('<div class="main-title">📐 VizArc</div>', unsafe_allow_html=True)
-st.markdown(
-    '<div class="sub-title">Universal Software Architecture Compiler: One Canonical Model &rarr; '
-    '<span class="badge-hl">Interactive HTML</span> <span class="badge-hl">Pure SVG Vector</span> '
-    '<span class="badge">D2</span> <span class="badge">Structurizr C4</span> '
-    '<span class="badge">Mermaid</span> <span class="badge">PlantUML</span> <span class="badge">Graphviz DOT</span> '
-    '<span class="badge">Excalidraw</span> <span class="badge">ASCII</span></div>',
-    unsafe_allow_html=True
-)
+# Top Navbar
+st.markdown("""
+<div class="studio-header">
+  <div class="brand-title">
+    <span>📐 VizArc</span>
+    <span class="badge-pill">Live Architecture Studio</span>
+  </div>
+  <div class="sub-brand">
+    Interactive Canvas • Structurizr Themes • Standalone SVG Vector
+  </div>
+</div>
+""", unsafe_allow_html=True)
 
-# Sidebar
-with st.sidebar:
-    st.header("⚙️ Configuration")
-    user_api_key = st.text_input(
-        "Google Gemini API Key",
-        value=os.getenv("GEMINI_API_KEY", ""),
-        type="password",
-        help="Get a free key from Google AI Studio (aistudio.google.com). Leave empty to use offline demo mode."
+# Find default template (E-Commerce Platform)
+default_tpl_idx = 0
+for i, t in enumerate(TEMPLATES):
+    if t["id"] == "ecommerce-platform":
+        default_tpl_idx = i
+        break
+
+# Initialize session state with default preset on first load
+if "current_ir" not in st.session_state:
+    initial_tpl = TEMPLATES[default_tpl_idx]
+    st.session_state.current_ir = initial_tpl["ir"]
+    st.session_state.spec_text = initial_tpl["text"]
+    st.session_state.preset_id = initial_tpl["id"]
+
+# Two-Pane Split Layout (Like Mermaid Live Editor)
+col_editor, col_preview = st.columns([1, 2.7], gap="large")
+
+# ==========================================
+# LEFT SIDE PANE: System Specification & ⚙️ Settings
+# ==========================================
+with col_editor:
+    st.markdown("#### 📝 System Specification")
+
+    spec_input = st.text_area(
+        label="System Specification",
+        value=st.session_state.get("spec_text", ""),
+        height=240,
+        placeholder="Describe your system architecture, components, and data flow...",
+        label_visibility="collapsed"
     )
+
+    col_btn_gen, col_btn_load = st.columns([3, 2], gap="small")
     
-    st.markdown("---")
-    st.markdown("### 📐 13 Preset Architectures")
-    preset_names = ["Custom Prompt"] + [f"{t['name']} ({t['id']})" for t in TEMPLATES]
-    chosen_preset = st.selectbox("Load architecture preset:", preset_names)
+    with col_btn_gen:
+        generate_clicked = st.button("🚀 Generate Canvas", type="primary", use_container_width=True)
+    with col_btn_load:
+        load_preset_clicked = st.button("⚡ Load Preset", use_container_width=True)
 
-    orientation_choice = st.radio(
-        "SVG / Diagram Layout:",
-        options=["Horizontal (LR)", "Vertical (TB)"],
-        index=0,
-        horizontal=True
-    )
-    selected_orient = "horizontal" if "Horizontal" in orientation_choice else "vertical"
+    # Settings Gear Expander (in the same left pane)
+    st.markdown("<div style='margin-top: 10px;'></div>", unsafe_allow_html=True)
+    with st.expander("⚙️ Settings & Configuration", expanded=False):
+        st.markdown("##### ⚙️ Configuration")
+        user_api_key = st.text_input(
+            "Google Gemini API Key",
+            value=os.getenv("GEMINI_API_KEY", ""),
+            type="password",
+            help="Your Gemini API key is loaded automatically from .env or .streamlit/secrets.toml."
+        )
 
-# Selected Template check
-selected_tpl = None
-if chosen_preset != "Custom Prompt":
-    tpl_id = chosen_preset.split("(")[-1].replace(")", "").strip()
-    selected_tpl = get_template(tpl_id)
+        st.markdown("---")
+        st.markdown("##### 📐 13 Preset Architectures")
+        preset_names = [f"{t['name']} ({t['id']})" for t in TEMPLATES]
+        
+        # Calculate selected index
+        current_id = st.session_state.get("preset_id", "ecommerce-platform")
+        cur_idx = 0
+        for i, t in enumerate(TEMPLATES):
+            if t["id"] == current_id:
+                cur_idx = i
+                break
 
-col_input, col_output = st.columns([1, 2], gap="medium")
+        chosen_preset_name = st.selectbox(
+            "Load architecture preset:",
+            preset_names,
+            index=cur_idx
+        )
+        selected_tpl_id = chosen_preset_name.split("(")[-1].replace(")", "").strip()
 
-with col_input:
-    st.subheader("1. System Specification")
+        st.markdown("---")
+        st.markdown("##### SVG / Diagram Layout:")
+        layout_choice = st.radio(
+            "SVG / Diagram Layout:",
+            options=["Horizontal (LR)", "Vertical (TB)"],
+            index=0,
+            label_visibility="collapsed"
+        )
+        selected_orientation = "horizontal" if "Horizontal" in layout_choice else "vertical"
 
-    if selected_tpl:
-        default_text = selected_tpl.get("text", "")
-        st.caption(f"**Loaded Preset:** {selected_tpl['name']} — {selected_tpl['description']}")
-    else:
-        default_text = "Microservice architecture with an API Gateway routing to an Auth service and Order service, using PostgreSQL and Redis cache."
+# Action Logic
+if load_preset_clicked:
+    tpl = get_template(selected_tpl_id)
+    if tpl:
+        st.session_state.current_ir = tpl["ir"]
+        st.session_state.spec_text = tpl["text"]
+        st.session_state.preset_id = tpl["id"]
+        st.rerun()
 
-    prompt_input = st.text_area(
-        "Describe your system or architecture requirements:",
-        value=default_text,
-        height=200
-    )
+if generate_clicked:
+    with st.spinner("Analyzing architecture and generating interactive canvas..."):
+        engine = VizArcEngine(api_key=user_api_key or None)
+        ir = engine.generate_ir(prompt=spec_input)
+        st.session_state.current_ir = ir
+        st.session_state.spec_text = spec_input
 
-    col_btn1, col_btn2 = st.columns(2)
-    with col_btn1:
-        compile_btn = st.button("🚀 Compile to All 9 Formats", type="primary", use_container_width=True)
-    with col_btn2:
-        use_preset_ir = st.button("⚡ Render Preset IR (Offline)", use_container_width=True, disabled=not selected_tpl)
+# ==========================================
+# RIGHT SIDE PANE: Interactive Canvas (Majority of page)
+# ==========================================
+with col_preview:
+    current_ir = st.session_state.get("current_ir")
+    
+    if current_ir:
+        # Default: compile interactive HTML & SVG only
+        html_code = compile_to_html(current_ir)
+        svg_code = render_svg_diagram(current_ir, orientation=selected_orientation)
 
-with col_output:
-    st.subheader("2. Multi-Renderer Previews")
-
-    should_run = compile_btn or use_preset_ir
-    if should_run:
-        with st.spinner("Compiling Canonical Architecture Model into all formats..."):
-            if use_preset_ir and selected_tpl:
-                ir = selected_tpl["ir"]
-                renders = render_all_formats(ir)
-                renders["svg"] = render_svg_diagram(ir, orientation=selected_orient)
-                renders["ir"] = json.dumps(ir, indent=2)
-                st.session_state.all_renders = renders
-            else:
-                engine = VizArcEngine(api_key=user_api_key or None)
-                ir = engine.generate_ir(prompt=prompt_input)
-                renders = render_all_formats(ir)
-                renders["svg"] = render_svg_diagram(ir, orientation=selected_orient)
-                renders["ir"] = json.dumps(ir, indent=2)
-                st.session_state.all_renders = renders
-
-    renders = st.session_state.get("all_renders", None)
-
-    if renders:
-        # 9 Format Tabs + IR
-        (
-            tab_html,
-            tab_svg,
-            tab_d2,
-            tab_c4,
-            tab_mermaid,
-            tab_plantuml,
-            tab_graphviz,
-            tab_excalidraw,
-            tab_ascii,
-            tab_json
-        ) = st.tabs([
-            "✨ Interactive Canvas",
-            "🖼️ Pure SVG Vector",
-            "⚡ D2 Lang",
-            "🏛️ Structurizr C4",
-            "🧜‍♂️ Mermaid.js",
-            "📐 PlantUML",
-            "🕸️ Graphviz (DOT)",
-            "🎨 Excalidraw",
-            "📟 ASCII",
-            "📦 Canonical IR"
-        ])
-
-        with tab_html:
-            st.download_button(
-                label="📥 Download Standalone HTML Explainer",
-                data=renders.get("html", ""),
-                file_name="architecture_explainer.html",
-                mime="text/html"
+        # Top Bar: Diagram Title on left, Download SVG & HTML in top-right corner
+        col_title, col_svg_dl, col_html_dl = st.columns([4, 1.2, 1.2], gap="small")
+        
+        with col_title:
+            st.markdown(
+                f"<div style='font-size:1.15rem; font-weight:700; color:#0F172A; padding-top:4px;'>"
+                f"{current_ir.get('title', 'Architecture Diagram')} "
+                f"<span style='font-size:0.75rem; color:#64748B; font-weight:normal;'>({len(current_ir.get('nodes', []))} nodes, {len(current_ir.get('edges', []))} links)</span>"
+                f"</div>",
+                unsafe_allow_html=True
             )
-            components.html(renders.get("html", ""), height=580, scrolling=False)
 
-        with tab_svg:
-            svg_content = renders.get("svg", "")
+        with col_svg_dl:
             st.download_button(
-                label="📥 Download Standalone SVG Vector",
-                data=svg_content,
-                file_name="architecture.svg",
-                mime="image/svg+xml"
+                label="📥 Download SVG",
+                data=svg_code,
+                file_name=f"{current_ir.get('title', 'architecture').lower().replace(' ', '_')}.svg",
+                mime="image/svg+xml",
+                use_container_width=True
             )
-            st.markdown(f'<div style="background:#0B0F19; border-radius:8px; padding:12px; overflow:auto;">{svg_content}</div>', unsafe_allow_html=True)
 
-        with tab_d2:
-            st.info("💡 Declarative D2 syntax. Test online at https://play.d2lang.com")
-            st.code(renders.get("d2", ""), language="bash")
+        with col_html_dl:
+            st.download_button(
+                label="📥 Download HTML",
+                data=html_code,
+                file_name=f"{current_ir.get('title', 'architecture').lower().replace(' ', '_')}.html",
+                mime="text/html",
+                use_container_width=True
+            )
 
-        with tab_c4:
-            st.info("💡 Industry-standard Structurizr C4 DSL. Tagged with official cloud icons from Structurizr Themes Playground (https://playground.structurizr.com/themes).")
-            st.code(renders.get("structurizr", ""), language="c")
+        # Primary Display: Interactive Canvas
+        components.html(html_code, height=640, scrolling=False)
 
-        with tab_mermaid:
-            st.info("💡 Standard Mermaid syntax. Ready to copy into GitHub READMEs or Notion.")
-            st.code(renders.get("mermaid", ""), language="mermaid")
+        # On-Demand Styles Expander: Only generate other formats when user asks for them!
+        st.markdown("<div style='margin-top: 14px;'></div>", unsafe_allow_html=True)
+        with st.expander("🛠️ Export to Other Formats (D2, Structurizr C4, Mermaid, PlantUML, Graphviz DOT, Excalidraw, ASCII...)", expanded=False):
+            st.caption("Deterministic on-demand compilation: VizArc compiles these from the Canonical IR with zero extra LLM calls.")
 
-        with tab_plantuml:
-            st.info("💡 PlantUML component diagram. Test at https://www.planttext.com")
-            st.code(renders.get("plantuml", ""), language="text")
+            target_style = st.selectbox(
+                "Select format to compile:",
+                [
+                    "Choose a format...",
+                    "⚡ D2 Lang",
+                    "🏛️ Structurizr C4 DSL",
+                    "🧜‍♂️ Mermaid.js",
+                    "📐 PlantUML Component",
+                    "🕸️ Graphviz (DOT)",
+                    "🎨 Excalidraw",
+                    "📟 ASCII / Unicode Box Art",
+                    "📦 Canonical Architecture Model (JSON IR)"
+                ]
+            )
 
-        with tab_graphviz:
-            st.info("💡 Graphviz DOT language. Compile with `dot -Tpng arch.dot -o arch.png`")
-            st.code(renders.get("graphviz", ""), language="dot")
+            if target_style != "Choose a format...":
+                style_map = {
+                    "⚡ D2 Lang": ("d2", "bash", "https://play.d2lang.com"),
+                    "🏛️ Structurizr C4 DSL": ("structurizr", "c", "https://playground.structurizr.com"),
+                    "🧜‍♂️ Mermaid.js": ("mermaid", "mermaid", "https://mermaid.live"),
+                    "📐 PlantUML Component": ("plantuml", "text", "https://www.planttext.com"),
+                    "🕸️ Graphviz (DOT)": ("graphviz", "dot", None),
+                    "🎨 Excalidraw": ("excalidraw", "text", "https://excalidraw.com"),
+                    "📟 ASCII / Unicode Box Art": ("ascii", "text", None),
+                    "📦 Canonical Architecture Model (JSON IR)": ("ir", "json", None)
+                }
 
-        with tab_excalidraw:
-            st.info("💡 Paste this into Excalidraw (More Tools > Mermaid to Excalidraw) for an editable hand-drawn canvas.")
-            st.code(renders.get("excalidraw", ""), language="text")
+                fmt_key, lang, playground_url = style_map[target_style]
 
-        with tab_ascii:
-            st.info("💡 Pure Unicode box diagram for terminal outputs and PR descriptions.")
-            st.code(renders.get("ascii", ""), language="text")
+                if fmt_key == "ir":
+                    compiled_output = json.dumps(current_ir, indent=2)
+                else:
+                    compiled_output = render_ir(current_ir, target_format=fmt_key)
 
-        with tab_json:
-            st.info("💡 The underlying Canonical Architecture Model (JSON IR) that fuels all 9 renderers.")
-            st.code(renders.get("ir", "{}"), language="json")
+                col_info, col_copy = st.columns([4, 1])
+                with col_info:
+                    if playground_url:
+                        st.markdown(f"💡 **Tip:** Preview online at [{playground_url}]({playground_url})")
+                with col_copy:
+                    st.download_button(
+                        label=f"💾 Save .{fmt_key}",
+                        data=compiled_output,
+                        file_name=f"architecture.{fmt_key}",
+                        mime="text/plain",
+                        use_container_width=True
+                    )
+
+                st.code(compiled_output, language=lang)
     else:
-        st.info("👈 Enter a system description or select one of the 13 preset templates, then click Compile.")
+        st.info("👈 Enter a system description or load a preset, then click 'Generate Canvas'.")
