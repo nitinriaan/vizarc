@@ -189,7 +189,13 @@ if load_preset_clicked:
 
 if generate_clicked:
     with st.spinner("Analyzing architecture and generating interactive canvas..."):
-        engine = VizArcEngine()
+        api_key = os.getenv("GEMINI_API_KEY")
+        if not api_key:
+            try:
+                api_key = st.secrets.get("GEMINI_API_KEY")
+            except Exception:
+                pass
+        engine = VizArcEngine(api_key=api_key)
         ir = engine.generate_ir(prompt=spec_input)
         st.session_state.current_ir = ir
         st.session_state.spec_text = spec_input
