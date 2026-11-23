@@ -1,6 +1,5 @@
 <p align="center">
   <a href="https://github.com/nitinriaan/vizarc">
-    <img src="assets/logo-light.png#gh-light-mode-only" alt="VizArc - Architecture, Visualized" width="680">
     <img src="assets/logo-dark.png#gh-dark-mode-only" alt="VizArc - Architecture, Visualized" width="680">
   </a>
 </p>
