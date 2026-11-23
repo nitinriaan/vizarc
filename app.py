@@ -235,8 +235,8 @@ with col_preview:
                 use_container_width=True
             )
 
-        # Primary Display: Interactive Canvas
-        components.html(html_code, height=640, scrolling=False)
+        # Primary Display: Interactive Canvas & One-Page Explainer (Archify Spec)
+        components.html(html_code, height=680, scrolling=False)
 
         # On-Demand Styles Expander: Only generate other formats when user asks for them!
         st.markdown("<div style='margin-top: 14px;'></div>", unsafe_allow_html=True)

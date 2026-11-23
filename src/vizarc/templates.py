@@ -341,7 +341,78 @@ TEMPLATES: List[Dict[str, Any]] = [
         "text": "Storefront, CloudFront, Load Balancer, Product Service, Cart Service, Order Service, PostgreSQL, Redis Cache, Elasticsearch, Stripe Payments, S3 Assets, CloudWatch",
         "ir": {
             "title": "High-Volume E-Commerce Platform",
-            "summary": "Scalable retail architecture with decoupled cart, checkout, payment, and inventory services.",
+            "summary": "Scalable retail architecture with decoupled cart, checkout, payment, and inventory services designed for global flash sales.",
+            "archetype": "architecture",
+            "decisions": [
+                {
+                    "decision": "Decoupled Microservice Domain Boundaries",
+                    "rationale": "Separates high-frequency read catalog operations from write-heavy shopping cart and payment checkout flows, ensuring isolated autoscaling.",
+                    "tradeoff": "Requires distributed tracing and eventual consistency handling across services.",
+                    "status": "Accepted"
+                },
+                {
+                    "decision": "In-Memory Session Caching with Redis",
+                    "rationale": "Buffers active shopping carts and user sessions with sub-millisecond read/write latency, reducing database query overhead by 90%.",
+                    "tradeoff": "Requires cart serialization and scheduled persistent backup to avoid session loss.",
+                    "status": "Accepted"
+                },
+                {
+                    "decision": "PCI-DSS Compliant Stripe Offloading",
+                    "rationale": "Delegates card tokenization and sensitive fraud detection directly to Stripe, reducing regulatory compliance surface area.",
+                    "tradeoff": "Introduces third-party dependency on Stripe API availability and webhook delivery.",
+                    "status": "Accepted"
+                }
+            ],
+            "flow_steps": [
+                {
+                    "step": 1,
+                    "title": "Storefront Ingress & TLS Termination",
+                    "from": "storefront",
+                    "to": "cloudfront",
+                    "protocol": "HTTPS",
+                    "description": "User requests route to the nearest CloudFront Edge PoP for SSL handshake termination and static asset caching."
+                },
+                {
+                    "step": 2,
+                    "title": "Catalog Discovery & Search",
+                    "from": "cloudfront",
+                    "to": "product_svc",
+                    "protocol": "HTTPS",
+                    "description": "Catalog queries dispatched to Go Product Catalog Service with sub-10ms Elasticsearch faceted filtering."
+                },
+                {
+                    "step": 3,
+                    "title": "In-Memory Cart Mutation",
+                    "from": "cloudfront",
+                    "to": "cart_svc",
+                    "protocol": "HTTPS",
+                    "description": "Item additions and quantities updated immediately in low-latency Redis-backed session store."
+                },
+                {
+                    "step": 4,
+                    "title": "Checkout Submission & Validation",
+                    "from": "cloudfront",
+                    "to": "order_svc",
+                    "protocol": "HTTPS",
+                    "description": "Cart finalized; checkout request routed to Order Service to reserve stock and validate inventory."
+                },
+                {
+                    "step": 5,
+                    "title": "Payment Token Authorization",
+                    "from": "order_svc",
+                    "to": "stripe",
+                    "protocol": "HTTPS",
+                    "description": "Secure API exchange authorizes customer payment method via Stripe REST API."
+                },
+                {
+                    "step": 6,
+                    "title": "Transactional ACID Commit",
+                    "from": "order_svc",
+                    "to": "postgres",
+                    "protocol": "SQL",
+                    "description": "Order records, line items, and invoice state atomically persisted in Aurora PostgreSQL cluster."
+                }
+            ],
             "tiers": [
                 {"id": "client", "label": "Storefront", "color": "#0EA5E9"},
                 {"id": "gateway", "label": "Routing & CDN", "color": "#8C4FFF"},

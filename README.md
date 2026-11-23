@@ -1,25 +1,28 @@
-# 📐 VizArc: Universal Software Architecture Compiler
+# 📐 VizArc: Universal Software Architecture Compiler & Explainer
 
 [![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Streamlit](https://img.shields.io/badge/Streamlit-FF4B4B?logo=Streamlit&logoColor=white)](https://streamlit.io)
-[![Built for AI Agents](https://img.shields.io/badge/Agent%20Skill-Claude%20%7C%20Antigravity%20%7C%20Cursor-purple.svg)](#-using-as-an-ai-agent-skill)
+[![Built for AI Agents](https://img.shields.io/badge/Agent%20Skill-Claude%20%7C%20Antigravity%20%7C%20Cursor%20%7C%20Copilot-purple.svg)](#-agent-skill-integration)
 [![GitHub Action](https://img.shields.io/badge/GitHub%20Action-PR%20Diagrams-black?logo=github)](.github/workflows/vizarc-diagram.yml)
 
-> **The "Pandoc of Software Architecture"**  
-> Turn any prompt, plan, or codebase into a **Canonical Architecture Model (JSON IR)**, and deterministically compile it into **Interactive HTML, Pure Vector SVG, D2 Lang, Structurizr C4, Mermaid, PlantUML, Graphviz (DOT), Excalidraw, and ASCII** in one single pass.
+> **The "Pandoc & Archify of Software Architecture"**  
+> Turn any prompt, plan, or codebase into a **Canonical Architecture Model (JSON IR)**, and deterministically compile it into a **Dual-View Interactive Canvas & One-Page Explainer (HTML)**, **Publication-Grade Vector SVG**, **D2 Lang**, **Structurizr C4**, **Mermaid**, **PlantUML**, **Graphviz (DOT)**, **Excalidraw**, and **ASCII** in one single pass.
 
 ---
 
 ## 🚀 What Makes VizArc Different?
 
-Unlike tools that rely on the LLM to write syntax for every format independently (causing syntax bugs, missing tags, and inconsistent diagrams), VizArc implements the **Universal Compiler Pattern** (inspired by LLVM, Pandoc, and tools like [Archify](https://archify.si/) & [VizArch](https://github.com/hemv-857/vizarch)):
+Unlike tools that rely on the LLM to write syntax for every format independently (causing syntax errors, missing tags, and inconsistent diagrams), VizArc implements the **Universal Compiler Pattern** (inspired by LLVM, Pandoc, and [Archify](https://archify.si/)):
 
 * 🧠 **Single Source of Truth**: The AI analyzes your codebase or system requirements **once** to produce a typed, validated **Canonical Architecture Model (JSON AST/IR)**.
+* 📄 **Dual-View Interactive Explainer (Archify Spec)**:
+  - **📐 Diagram Canvas**: Interactive vector canvas with pan/zoom, live animated edge flow motion, authentic cloud service icons, upstream/downstream link tracing, and a live minimap.
+  - **📄 One-Page Architectural Explainer**: Conclusion-first executive whitepaper containing an Executive Summary, Architecture Decisions & Trade-Offs (ADRs), End-to-End Stepper Lifecycle, Component Inventory, and Network Communication Matrix.
 * ⚡ **Deterministic Multi-Renderer Compilation**: 9 specialized adapters transform the IR into any diagram language with **zero extra LLM calls and zero hallucinated syntax**.
-* ☁️ **188+ Cloud Service Icons**: Automatic cloud provider detection (AWS, GCP, Azure, Kubernetes, Generic) with official brand colors, 24x24 SVG path glyphs, and [Structurizr Themes Playground](https://playground.structurizr.com/themes) tags & icons.
+* ☁️ **188+ Cloud Service Icons (100% Offline-Proof)**: Embedded authentic 24x24 SVG vector paths for AWS, GCP, Azure, Kubernetes, PostgreSQL, Redis, Kafka, Docker, and more. Never fails in offline environments or `file:///` downloads!
 * 🏛️ **Full Structurizr Themes Integration**: Automatically applies C4 tags and imports prebuilt themes (`amazon-web-services-2023.01`, `google-cloud-platform-v1.5`, `microsoft-azure-2023.01`, `kubernetes-v0.3`).
-* 📦 **13 Built-in Architecture Presets**: Instant offline templates for RAG Systems, Serverless AWS, Kafka Event Streaming, Kubernetes Platforms, Microservices, and more.
+* 📦 **13 Built-in Architecture Presets**: Instant offline templates for RAG Systems, Serverless AWS, Kafka Event Streaming, Kubernetes Platforms, Microservices, and E-Commerce.
 * 🤖 **GitHub Actions Automation**: Auto-generates architecture diagrams and posts SVG comments directly to your Pull Requests.
 
 ---
@@ -35,13 +38,14 @@ Unlike tools that rely on the LLM to write syntax for every format independently
                                       ▼
                      ┌─────────────────────────────────┐
                      │    Canonical Architecture IR    │
-                     │         (Pure JSON AST)         │
+                     │    (Decisions, Stepper, AST)    │
                      └────────────────┬────────────────┘
                                       │
      ┌───────────┬───────────┬────────┼───────────┬───────────┬────────────┬─────────────┬───────────┐
      ▼           ▼           ▼        ▼           ▼           ▼            ▼             ▼           ▼
 [Interactive]  [Pure]      [D2]   [Mermaid]  [Structurizr] [PlantUML]  [Graphviz]  [Excalidraw]  [ASCII]
-    HTML       Vector SVG   Lang                 (C4)       (Component)  (DOT)      (Hand-drawn)  (Box Art)
+  Dual-View  Vector SVG    Lang                 (C4)       (Component)  (DOT)      (Hand-drawn)  (Box Art)
+(Canvas+Doc)
 ```
 
 ---
@@ -50,7 +54,7 @@ Unlike tools that rely on the LLM to write syntax for every format independently
 
 | Format / Engine | Best Use | Visual Quality | File Output |
 | :--- | :--- | :--- | :--- |
-| **✨ Interactive HTML** | Interactive exploration, upstream/downstream link tracing, search, minimap & drawer | Exceptional (Web Canvas) | `.html` |
+| **✨ Interactive HTML** | Dual-view canvas + one-page explainer, flow motion, link tracing, search, minimap & drawer | Exceptional (Web Canvas) | `.html` |
 | **🖼️ Pure Vector SVG** | Standalone vector graphic with cloud badges, protocol colors, and Sugiyama layout | Publication Grade | `.svg` |
 | **⚡ D2 Lang** | Modern declarative system architecture, cloud topologies, and container grouping | Excellent | `.d2` |
 | **🏛️ Structurizr DSL** | Professional **C4 architecture models** with official [Structurizr Themes](https://playground.structurizr.com/themes) (AWS, Azure, GCP, K8s) | Excellent | `.dsl` |
@@ -64,14 +68,23 @@ Unlike tools that rely on the LLM to write syntax for every format independently
 
 ## 🌟 Flagship Features
 
-### 1. Interactive One-Page HTML Explainer
-A zero-dependency, double-clickable interactive canvas that runs in any web browser:
-* **🔍 Pan & Smooth Zoom**: Infinite viewport navigation.
-* **↔️ Directional Layout Toggle**: Flip between Horizontal (LR) and Vertical (TB) with `O`.
-* **🎯 Upstream & Downstream Link Tracing**: Click any node to light up incoming callers (**green**) and outgoing calls (**orange**), with glowing connection paths while dimming unrelated nodes.
-* **🗺️ Live MiniMap**: Floating overview in the bottom-right corner.
-* **📋 Component Drawer**: Displays provider badges, tech stack tags, role descriptions, and source files.
-* **⌨️ Keyboard Shortcuts**: `/` to search, `D` for theme, `R` to center, `O` to toggle layout, `?` for help.
+### 1. Dual-View Mode: Interactive Canvas + One-Page Explainer
+A zero-dependency, double-clickable file that runs locally in any web browser (`file:///...`):
+* **📐 Canvas Mode**:
+  - **🔍 Pan & Smooth Zoom**: Infinite viewport navigation with mousewheel or gestures.
+  - **⚡ Animated Flow Motion**: Real-time flowing dashes along active edges (`M` shortcut).
+  - **↔️ Directional Layout Toggle**: Flip between Horizontal (LR) and Vertical (TB) with `O`.
+  - **🎯 Upstream & Downstream Link Tracing**: Click any node to light up incoming callers (**green**) and outgoing calls (**amber**), with glowing connection paths while dimming unrelated nodes.
+  - **🗺️ Live MiniMap**: Floating overview with live viewport tracking.
+  - **📋 Component Drawer**: Displays provider badges, tech stack tags, role descriptions, and upstream/downstream connection pills.
+* **📄 One-Page Explainer Mode**:
+  - **Executive Summary**: High-level verdict and system characteristics.
+  - **Architecture Decisions & Trade-Offs (ADRs)**: What was chosen, why it was chosen, and accepted trade-offs.
+  - **End-to-End Stepper**: Step-by-step transaction walkthrough with clickable "Inspect on Canvas" shortcuts.
+  - **Component Inventory**: Detailed service cards with embedded vector icons.
+  - **Protocols Matrix**: Clean table of all inter-service communications.
+* **Export Options**: One-click download of standalone `.svg`, high-resolution `.png` (canvas rasterization), or clean print/PDF whitepaper (`Ctrl+P`).
+* **⌨️ Keyboard Shortcuts**: `1` (Canvas), `2` (Explainer), `/` (Search), `D` (Theme), `M` (Flow Motion), `R` (Center), `O` (Layout), `F` (Fullscreen).
 
 ### 2. Standalone Pure SVG Vector Renderer
 Clean, responsive SVG generated with zero external runtime dependencies:
@@ -82,17 +95,17 @@ Clean, responsive SVG generated with zero external runtime dependencies:
 
 ### 3. 13 Production Architecture Presets
 Instant offline access to production-grade architecture blueprints:
-1. `serverless-aws`: CloudFront → API Gateway → Lambda → DynamoDB + S3 + SNS
-2. `rag-system`: Chat UI → Gateway → Orchestrator → Bedrock LLM + Vector DB + S3
-3. `microservices-gke`: Cloud LB → GKE Cluster → Microservices → Cloud SQL + Pub/Sub
-4. `fullstack-nextjs`: Vercel Frontend → Next.js API Routes → PostgreSQL + Redis + Stripe
-5. `event-streaming-kafka`: Producer API → Kafka Cluster → Analytics + Notifications + Audit
-6. `monolith-aws`: CloudFront → ALB → EC2 Monolith → RDS + ElastiCache + S3
-7. `k8s-platform`: Ingress → Web & API Services → Deployments → PVC + ConfigMaps
-8. `event-driven-aws`: API Gateway → Lambda → EventBridge → SQS → Worker → DynamoDB
-9. `data-lakehouse`: Kinesis Stream → Lambda Ingest → S3 Lake → Glue ETL → Redshift + Athena
-10. `ml-pipeline`: S3 Data → Step Functions → SageMaker Job → Model Registry → Inference API
-11. `ecommerce-platform`: CloudFront → ALB → Microservices → PostgreSQL + Redis + Stripe
+1. `ecommerce-platform`: CloudFront → ALB → Microservices → PostgreSQL + Redis + Stripe
+2. `serverless-aws`: CloudFront → API Gateway → Lambda → DynamoDB + S3 + SNS
+3. `rag-system`: Chat UI → Gateway → Orchestrator → Bedrock LLM + Vector DB + S3
+4. `microservices-gke`: Cloud LB → GKE Cluster → Microservices → Cloud SQL + Pub/Sub
+5. `fullstack-nextjs`: Vercel Frontend → Next.js API Routes → PostgreSQL + Redis + Stripe
+6. `event-streaming-kafka`: Producer API → Kafka Cluster → Analytics + Notifications + Audit
+7. `monolith-aws`: CloudFront → ALB → EC2 Monolith → RDS + ElastiCache + S3
+8. `k8s-platform`: Ingress → Web & API Services → Deployments → PVC + ConfigMaps
+9. `event-driven-aws`: API Gateway → Lambda → EventBridge → SQS → Worker → DynamoDB
+10. `data-lakehouse`: Kinesis Stream → Lambda Ingest → S3 Lake → Glue ETL → Redshift + Athena
+11. `ml-pipeline`: S3 Data → Step Functions → SageMaker Job → Model Registry → Inference API
 12. `iot-platform`: IoT Devices → AWS IoT Core → Kinesis → Lambda → DynamoDB + SNS Alerts
 13. `web3-blockchain`: dApp Frontend → Cloudflare CDN → RPC Node → Smart Contract + Graph Indexer
 
@@ -124,13 +137,13 @@ cp .env.example .env
 # List all 13 preset architectures
 python cli.py templates
 
-# Render preset to SVG
-python cli.py template rag-system --format svg -o rag.svg
+# Render preset to Interactive Dual-View HTML
+python cli.py template ecommerce-platform --format html -o ecommerce.html
 
-# Render preset to Interactive HTML and open in browser
-python cli.py template serverless-aws --format html --open
+# Render preset to Vector SVG
+python cli.py template serverless-aws --format svg -o serverless.svg
 
-# Compile preset into all 9 formats
+# Compile preset into all 9 formats simultaneously
 python cli.py template microservices-gke --format all -o ./gke_export
 ```
 
@@ -138,11 +151,6 @@ python cli.py template microservices-gke --format all -o ./gke_export
 ```bash
 # Compiles HTML, SVG, D2, Structurizr C4, Mermaid, PlantUML, Graphviz, Excalidraw, and ASCII
 python cli.py generate "Microservices payment platform with Stripe, Kafka, and Postgres" --format all --output ./dist
-```
-
-### Generate Standalone SVG Vector
-```bash
-python cli.py generate "AWS serverless topology with Lambda and DynamoDB" --format svg --orientation horizontal -o arch.svg
 ```
 
 ### Scan a Local Codebase & Compile
@@ -153,17 +161,16 @@ python cli.py scan . --format all --output ./architecture_docs
 
 ---
 
-## 🌐 Free Web Playground (Streamlit)
+## 🌐 Live Architecture Studio (Streamlit)
 
-Launch the multi-renderer studio locally:
+Launch the Mermaid-style two-pane studio:
 
 ```bash
 streamlit run app.py
 ```
 
-* Multi-tab viewer: Switch between **Interactive Canvas, Pure SVG Vector, D2, Structurizr C4, Mermaid, PlantUML, Graphviz, Excalidraw, ASCII, and Canonical JSON IR** with zero latency.
-* Preset gallery: Instant selection of all 13 architecture templates.
-* Download buttons: One-click export for standalone HTML explainers and vector SVGs.
+* **Left Pane**: System specification input, 🚀 Generate Canvas, ⚡ Load Preset, and collapsible ⚙️ Settings (Gemini API key, 13 presets, layout orientation).
+* **Right Pane**: Primary interactive canvas with dual-view switcher, live flow motion, instant top-corner SVG & HTML downloads, and on-demand format exporter for D2, Structurizr C4, Mermaid, PlantUML, DOT, Excalidraw, and ASCII.
 
 ---
 
@@ -178,46 +185,7 @@ Microservices architecture with API Gateway, Auth Service, Order Service, and Po
 ```
 ````
 
-The GitHub Action automatically:
-1. Runs VizArc to compile the Canonical Model.
-2. Renders publication-grade SVG and HTML artifacts.
-3. Posts the architecture diagram as a comment directly on the PR!
-
----
-
-## 📦 Project Layout
-
-```text
-vizarc/
-├── .github/workflows/
-│   └── vizarc-diagram.yml   # GitHub Action for PR comment diagrams
-├── src/
-│   └── vizarc/              # Core Python package (Standard src layout)
-│       ├── __init__.py
-│       ├── engine.py        # Universal Architecture Compiler orchestration
-│       ├── ir.py            # Canonical Architecture Model (JSON AST)
-│       ├── services.py      # 188+ Cloud Service catalog, icons & brand colors
-│       ├── templates.py     # 13 Built-in preset architecture templates
-│       ├── compiler.py      # Interactive HTML Canvas Compiler (minimap, shortcuts)
-│       ├── analyzer.py      # Local repository scanner
-│       └── adapters/        # 9 Deterministic Rendering Adapters
-│           ├── base.py
-│           ├── html_adapter.py        # Interactive HTML with link tracing
-│           ├── svg_adapter.py         # Pure standalone Vector SVG builder
-│           ├── d2_adapter.py          # D2 Lang
-│           ├── structurizr_adapter.py # Structurizr C4 DSL
-│           ├── mermaid_adapter.py     # Mermaid.js
-│           ├── plantuml_adapter.py    # PlantUML Component
-│           ├── graphviz_adapter.py    # Graphviz DOT
-│           ├── excalidraw_adapter.py  # Excalidraw
-│           └── ascii_adapter.py       # Terminal Unicode Boxes
-├── app.py                   # Streamlit Multi-Renderer Playground
-├── cli.py                   # CLI tool (generate, scan, template, templates)
-├── SKILL.md                 # Agent Skill definition (Claude Code & Antigravity)
-├── requirements.txt
-├── .env.example
-└── README.md
-```
+The GitHub Action automatically runs VizArc to compile the architecture and posts publication-grade diagrams directly as a comment on the PR!
 
 ---
 
