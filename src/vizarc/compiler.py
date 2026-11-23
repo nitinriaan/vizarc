@@ -11,6 +11,7 @@ Features Dual-View Mode:
 import json
 from typing import Dict, Any
 from .services import infer_service_metadata, PROTOCOL_COLORS, PROVIDER_COLORS, VECTOR_ICONS
+from .logo_data import LOGO_LIGHT_URI, LOGO_DARK_URI
 
 def compile_to_html(ir: Dict[str, Any]) -> str:
     """
@@ -98,14 +99,29 @@ def compile_to_html(ir: Dict[str, Any]) -> str:
       align-items: center;
       gap: 12px;
     }}
-    .brand-logo {{
-      font-size: 1.15rem;
-      font-weight: 800;
-      color: var(--accent);
+    .brand-logo-link {{
       display: flex;
       align-items: center;
-      gap: 6px;
-      letter-spacing: -0.02em;
+      text-decoration: none;
+    }}
+    .brand-logo-img {{
+      height: 30px;
+      width: auto;
+      max-width: 140px;
+      object-fit: contain;
+      display: block;
+    }}
+    body[data-theme="dark"] .brand-logo-img.logo-light {{
+      display: none !important;
+    }}
+    body[data-theme="dark"] .brand-logo-img.logo-dark {{
+      display: block !important;
+    }}
+    body[data-theme="light"] .brand-logo-img.logo-dark {{
+      display: none !important;
+    }}
+    body[data-theme="light"] .brand-logo-img.logo-light {{
+      display: block !important;
     }}
     .version-tag {{
       font-size: 0.68rem;
@@ -912,7 +928,10 @@ def compile_to_html(ir: Dict[str, Any]) -> str:
   <!-- Top Navigation Header -->
   <header>
     <div class="brand">
-      <div class="brand-logo">📐 VizArc</div>
+      <a href="https://github.com/nitinriaan/vizarc" target="_blank" rel="noopener" class="brand-logo-link" title="VizArc - Architecture, Visualized">
+        <img class="brand-logo-img logo-dark" src="{LOGO_DARK_URI}" alt="VizArc" />
+        <img class="brand-logo-img logo-light" src="{LOGO_LIGHT_URI}" alt="VizArc" />
+      </a>
       <span class="version-tag">Archify Spec</span>
       <div>
         <div class="doc-title">{ir.get('title', 'Architecture Explainer')}</div>

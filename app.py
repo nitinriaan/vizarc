@@ -22,6 +22,7 @@ from vizarc.templates import TEMPLATES, get_template
 from vizarc.adapters import render_ir
 from vizarc.adapters.svg_adapter import render_svg_diagram
 from vizarc.compiler import compile_to_html
+from vizarc.logo_data import LOGO_LIGHT_URI, LOGO_DARK_URI
 
 load_dotenv()
 
@@ -83,6 +84,30 @@ col_editor, col_preview = st.columns([1, 4.2], gap="medium")
 # LEFT SIDE PANE: System Specification, Actions & Downloads
 # ==========================================
 with col_editor:
+    # VizArc Brand Logo (Responsive Light/Dark GitHub-grade SVG/PNG)
+    st.markdown(f"""
+    <div style="margin-bottom: 12px;">
+      <a href="https://github.com/nitinriaan/vizarc" target="_blank" title="VizArc on GitHub" style="text-decoration: none; display: block;">
+        <img src="{LOGO_LIGHT_URI}" class="vizarc-ui-logo-light" alt="VizArc Logo" style="width: 100%; max-width: 200px; display: block;" />
+        <img src="{LOGO_DARK_URI}" class="vizarc-ui-logo-dark" alt="VizArc Logo" style="width: 100%; max-width: 200px; display: none;" />
+      </a>
+    </div>
+    <style>
+      @media (prefers-color-scheme: dark) {{
+        .vizarc-ui-logo-light {{ display: none !important; }}
+        .vizarc-ui-logo-dark {{ display: block !important; }}
+      }}
+      .stApp[data-theme="dark"] .vizarc-ui-logo-light,
+      [data-testid="stAppViewContainer"].dark .vizarc-ui-logo-light {{
+        display: none !important;
+      }}
+      .stApp[data-theme="dark"] .vizarc-ui-logo-dark,
+      [data-testid="stAppViewContainer"].dark .vizarc-ui-logo-dark {{
+        display: block !important;
+      }}
+    </style>
+    """, unsafe_allow_html=True)
+
     st.markdown("#### 📝 Specification")
 
     spec_input = st.text_area(

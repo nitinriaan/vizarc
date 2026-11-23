@@ -1,9 +1,8 @@
 <p align="center">
-  <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="assets/logo-dark.png">
-    <source media="(prefers-color-scheme: light)" srcset="assets/logo-light.png">
-    <img alt="VizArc - Architecture, Visualized" src="assets/logo-light.png" width="680">
-  </picture>
+  <a href="https://github.com/nitinriaan/vizarc">
+    <img src="assets/logo-light.png#gh-light-mode-only" alt="VizArc - Architecture, Visualized" width="680">
+    <img src="assets/logo-dark.png#gh-dark-mode-only" alt="VizArc - Architecture, Visualized" width="680">
+  </a>
 </p>
 
 <p align="center">
