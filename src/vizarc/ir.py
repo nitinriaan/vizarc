@@ -15,7 +15,7 @@ CRITICAL SCHEMA RULES:
 {
   "title": "System Architecture Title",
   "summary": "Clear, publication-grade executive summary of the architecture and key design objectives.",
-  "archetype": "architecture|workflow|dataflow|sequence",
+  "archetype": "architecture|workflow|sequence|dataflow|lifecycle|erd|class|tree|timeline|waterfall",
   "decisions": [
     {
       "decision": "Architecture Decision Name (e.g. Asynchronous Event-Driven Messaging)",
@@ -390,4 +390,362 @@ def get_demo_ir() -> Dict[str, Any]:
             {"from": "order_svc", "to": "orders_db", "label": "Insert Order", "protocol": "SQL"},
             {"from": "order_svc", "to": "event_broker", "label": "Publish 'OrderPlaced'", "protocol": "Kafka"}
         ]
+    }
+
+
+# ==============================================================================
+# 10 ARCHIFY DIAGRAM ARCHETYPES & GUIDANCE ENGINE
+# ==============================================================================
+
+ARCHETYPES: Dict[str, Dict[str, Any]] = {
+    "architecture": {
+        "name": "System Architecture",
+        "description": "Multi-tier services, cloud infra, microservices, component topology",
+        "default_tiers": [
+            {"id": "client", "label": "Client / Edge", "color": "#3B82F6"},
+            {"id": "gateway", "label": "API Gateway & Ingress", "color": "#8B5CF6"},
+            {"id": "services", "label": "Core Services", "color": "#10B981"},
+            {"id": "data", "label": "Data & Persistence", "color": "#F59E0B"}
+        ],
+        "keywords": ["architecture", "microservices", "cloud", "aws", "gcp", "azure", "docker", "k8s", "kubernetes", "api", "backend", "frontend", "serverless"]
+    },
+    "workflow": {
+        "name": "Process Workflow",
+        "description": "Step-by-step human/system processes, approval chains, CI/CD automation",
+        "default_tiers": [
+            {"id": "trigger", "label": "Trigger / Initiation", "color": "#3B82F6"},
+            {"id": "execution", "label": "Processing & Verification", "color": "#10B981"},
+            {"id": "approval", "label": "Approval & Review", "color": "#8B5CF6"},
+            {"id": "completion", "label": "Completion / Output", "color": "#06B6D4"}
+        ],
+        "keywords": ["workflow", "pipeline", "ci/cd", "automation", "approval", "human", "step", "process", "onboarding", "dispatch"]
+    },
+    "sequence": {
+        "name": "Sequence & Handshake",
+        "description": "Chronological messaging, API handshakes, auth protocols, request-response lifecycles",
+        "default_tiers": [
+            {"id": "initiator", "label": "Initiator / Client", "color": "#3B82F6"},
+            {"id": "mediator", "label": "Mediator / Proxy", "color": "#8B5CF6"},
+            {"id": "target", "label": "Target Service", "color": "#10B981"},
+            {"id": "vault", "label": "Identity / Token Store", "color": "#F59E0B"}
+        ],
+        "keywords": ["sequence", "handshake", "oauth", "jwt", "auth", "chronological", "callback", "redirect", "token exchange"]
+    },
+    "dataflow": {
+        "name": "Data Flow & Streaming",
+        "description": "Streaming pipelines, ETL jobs, event ingestion, batch transformation, analytics storage",
+        "default_tiers": [
+            {"id": "sources", "label": "Data Sources", "color": "#3B82F6"},
+            {"id": "ingest", "label": "Ingestion / Streaming", "color": "#8B5CF6"},
+            {"id": "transform", "label": "Processing & Enrichment", "color": "#10B981"},
+            {"id": "lakehouse", "label": "Data Warehouse / Lake", "color": "#F59E0B"}
+        ],
+        "keywords": ["dataflow", "data flow", "etl", "streaming", "kafka", "pipeline", "spark", "flink", "bigquery", "snowflake", "lakehouse", "ingestion"]
+    },
+    "lifecycle": {
+        "name": "State Machine / Lifecycle",
+        "description": "Entity lifecycle states, state transitions, event hooks, terminal states",
+        "default_tiers": [
+            {"id": "initial", "label": "Initial / Created", "color": "#3B82F6"},
+            {"id": "pending", "label": "Pending / In-Progress", "color": "#F59E0B"},
+            {"id": "active", "label": "Active / Fulfilled", "color": "#10B981"},
+            {"id": "terminal", "label": "Terminal / Archived", "color": "#EF4444"}
+        ],
+        "keywords": ["lifecycle", "state machine", "status", "transition", "state", "draft", "active", "cancelled", "settled", "refunded"]
+    },
+    "erd": {
+        "name": "Entity Relationship (ERD)",
+        "description": "Database entities, relational schemas, primary/foreign keys, cardinality",
+        "default_tiers": [
+            {"id": "identity_schema", "label": "Users & Identity Schema", "color": "#3B82F6"},
+            {"id": "core_entities", "label": "Transactional Entities", "color": "#10B981"},
+            {"id": "catalog_entities", "label": "Domain Catalog Entities", "color": "#8B5CF6"},
+            {"id": "audit_entities", "label": "Audit & Analytics Entities", "color": "#F59E0B"}
+        ],
+        "keywords": ["erd", "database", "schema", "table", "foreign key", "primary key", "cardinality", "relational", "entities", "columns", "sql"]
+    },
+    "class": {
+        "name": "Class Hierarchy",
+        "description": "Object-oriented class structures, interfaces, inheritance, member methods & attributes",
+        "default_tiers": [
+            {"id": "interfaces", "label": "Core Interfaces / Abstract", "color": "#8B5CF6"},
+            {"id": "base_classes", "label": "Base Implementations", "color": "#3B82F6"},
+            {"id": "services", "label": "Concrete Domain Classes", "color": "#10B981"},
+            {"id": "models", "label": "Data Value Objects", "color": "#F59E0B"}
+        ],
+        "keywords": ["class", "oop", "inheritance", "interface", "abstract", "polymorphism", "classes", "methods", "hierarchy"]
+    },
+    "tree": {
+        "name": "Hierarchy Tree",
+        "description": "Taxonomy, tree decomposition, nested organizational / directory structure",
+        "default_tiers": [
+            {"id": "root", "label": "Root Category", "color": "#3B82F6"},
+            {"id": "branches", "label": "Primary Modules / Branches", "color": "#8B5CF6"},
+            {"id": "submodules", "label": "Sub-systems", "color": "#10B981"},
+            {"id": "leaves", "label": "Leaf Packages / Assets", "color": "#06B6D4"}
+        ],
+        "keywords": ["tree", "hierarchy", "taxonomy", "directory", "organization", "nested", "breakdown", "wbs", "package tree"]
+    },
+    "timeline": {
+        "name": "Roadmap Timeline",
+        "description": "Milestone delivery, release phases, quarterly roadmap, sprint progress",
+        "default_tiers": [
+            {"id": "phase1", "label": "Phase 1: Foundation (Q1)", "color": "#3B82F6"},
+            {"id": "phase2", "label": "Phase 2: Core Platform (Q2)", "color": "#8B5CF6"},
+            {"id": "phase3", "label": "Phase 3: Scale & Multi-Region (Q3)", "color": "#10B981"},
+            {"id": "phase4", "label": "Phase 4: Autonomous AI (Q4)", "color": "#F59E0B"}
+        ],
+        "keywords": ["timeline", "roadmap", "milestone", "release", "phases", "quarter", "sprint", "schedule", "delivery"]
+    },
+    "waterfall": {
+        "name": "Waterfall Stages",
+        "description": "Sequential dependency stages, stage-gate reviews, transition criteria",
+        "default_tiers": [
+            {"id": "discovery", "label": "1. Discovery & Design", "color": "#3B82F6"},
+            {"id": "build", "label": "2. Construction & Verification", "color": "#10B981"},
+            {"id": "validation", "label": "3. Audit & Security Gate", "color": "#F59E0B"},
+            {"id": "deployment", "label": "4. Production Handover", "color": "#06B6D4"}
+        ],
+        "keywords": ["waterfall", "stage-gate", "sequential", "gate", "handover", "compliance gate", "sign-off", "audit stage"]
+    }
+}
+
+def detect_archetype(prompt: str) -> str:
+    """Auto-detects the best diagram archetype from prompt text."""
+    p_lower = prompt.lower()
+    scores = {}
+    for arch_id, meta in ARCHETYPES.items():
+        score = 0
+        for kw in meta["keywords"]:
+            if kw in p_lower:
+                score += (3 if kw == arch_id else 1)
+        scores[arch_id] = score
+
+    best_arch = max(scores, key=scores.get)
+    return best_arch if scores[best_arch] > 0 else "architecture"
+
+def guide_archetype(prompt: str) -> Dict[str, Any]:
+    """Provides archetype selection guidance and an optimized prompt suggestion."""
+    detected = detect_archetype(prompt)
+    meta = ARCHETYPES.get(detected, ARCHETYPES["architecture"])
+    
+    tier_labels = " -> ".join([t["label"] for t in meta["default_tiers"]])
+    suggested_prompt = (
+        f"Create a {meta['name']} diagram: {prompt.strip()}. "
+        f"Structure across the tiers: [{tier_labels}]. "
+        f"Specify explicit communication protocols and data payloads on all connections."
+    )
+
+    return {
+        "detected_archetype": detected,
+        "archetype_name": meta["name"],
+        "description": meta["description"],
+        "recommended_tiers": meta["default_tiers"],
+        "suggested_prompt": suggested_prompt,
+        "all_archetypes": [
+            {"id": k, "name": v["name"], "description": v["description"]}
+            for k, v in ARCHETYPES.items()
+        ]
+    }
+
+def lint_ir(ir: Dict[str, Any]) -> Dict[str, Any]:
+    """
+    Performs machine-readable static architectural linting of an IR graph.
+    Returns structured diagnostics adhering to the Archify validation spec.
+    """
+    diagnostics = []
+    nodes = ir.get("nodes", [])
+    edges = ir.get("edges", [])
+    tiers = ir.get("tiers", [])
+    archetype = ir.get("archetype", "architecture")
+    tier_ids = {t.get("id") for t in tiers}
+
+    node_ids = {n.get("id") for n in nodes}
+    in_degree = {nid: 0 for nid in node_ids}
+    out_degree = {nid: 0 for nid in node_ids}
+    adj = {nid: [] for nid in node_ids}
+
+    for edge in edges:
+        src = edge.get("from")
+        tgt = edge.get("to")
+        if src in node_ids and tgt in node_ids:
+            out_degree[src] = out_degree.get(src, 0) + 1
+            in_degree[tgt] = in_degree.get(tgt, 0) + 1
+            adj[src].append(tgt)
+        
+        # Check missing or vague protocol
+        proto = (edge.get("protocol") or "").strip()
+        if not proto or proto.lower() in ("generic", "api", "tcp/http", "link"):
+            diagnostics.append({
+                "ruleCode": "WARN_UNSPECIFIED_PROTOCOL",
+                "severity": "warning",
+                "edge": f"{src}->{tgt}",
+                "message": f"Edge from '{src}' to '{tgt}' lacks an explicit protocol (e.g. HTTPS, gRPC, SQL, Kafka).",
+                "supportedFixes": ["specify_protocol"]
+            })
+
+    for node in nodes:
+        nid = node.get("id")
+        ntier = node.get("tier")
+        label = node.get("label", nid)
+
+        # Tier validity
+        if ntier not in tier_ids:
+            diagnostics.append({
+                "ruleCode": "ERR_INVALID_TIER",
+                "severity": "error",
+                "nodeId": nid,
+                "message": f"Node '{label}' is assigned to unknown tier '{ntier}'.",
+                "supportedFixes": ["reassign_tier", "define_tier"]
+            })
+
+        # Orphan node check
+        if in_degree.get(nid, 0) == 0 and out_degree.get(nid, 0) == 0:
+            diagnostics.append({
+                "ruleCode": "ERR_ORPHAN_NODE",
+                "severity": "error",
+                "nodeId": nid,
+                "message": f"Node '{label}' is completely disconnected (0 inbound, 0 outbound connections).",
+                "supportedFixes": ["connect_to_upstream", "connect_to_downstream", "remove_node"]
+            })
+
+        # Dead-end check (inbound but no outbound in non-terminal tiers)
+        is_terminal = ntier in ("data", "completion", "vault", "lakehouse", "terminal", "audit_entities", "leaves", "phase4", "deployment")
+        if in_degree.get(nid, 0) > 0 and out_degree.get(nid, 0) == 0 and not is_terminal:
+            diagnostics.append({
+                "ruleCode": "WARN_DEAD_END_NODE",
+                "severity": "warning",
+                "nodeId": nid,
+                "message": f"Node '{label}' in tier '{ntier}' has inbound traffic but no outgoing connections.",
+                "supportedFixes": ["connect_to_downstream", "mark_as_sink"]
+            })
+
+        # Empty description
+        if not (node.get("description") or "").strip():
+            diagnostics.append({
+                "ruleCode": "INFO_EMPTY_DESCRIPTION",
+                "severity": "info",
+                "nodeId": nid,
+                "message": f"Node '{label}' does not have an architectural responsibility description.",
+                "supportedFixes": ["add_description"]
+            })
+
+        # SPOF check: high centrality
+        total_deg = in_degree.get(nid, 0) + out_degree.get(nid, 0)
+        if total_deg >= 4 and len(nodes) > 4:
+            diagnostics.append({
+                "ruleCode": "WARN_POTENTIAL_SPOF",
+                "severity": "warning",
+                "nodeId": nid,
+                "message": f"Node '{label}' has high connection density ({total_deg} connections) and represents a potential Single Point of Failure (SPOF).",
+                "supportedFixes": ["add_redundancy", "split_responsibilities"]
+            })
+
+    # Cycle detection for acyclic archetypes
+    if archetype in ("workflow", "dataflow", "waterfall", "timeline"):
+        visited = {}
+        rec_stack = {}
+        has_cycle = False
+        cycle_edges = []
+
+        def dfs(u):
+            nonlocal has_cycle
+            visited[u] = True
+            rec_stack[u] = True
+            for v in adj.get(u, []):
+                if not visited.get(v, False):
+                    if dfs(v):
+                        return True
+                elif rec_stack.get(v, False):
+                    has_cycle = True
+                    cycle_edges.append(f"{u}->{v}")
+                    return True
+            rec_stack[u] = False
+            return False
+
+        for nid in node_ids:
+            if not visited.get(nid, False):
+                if dfs(nid):
+                    break
+
+        if has_cycle:
+            diagnostics.append({
+                "ruleCode": "ERR_DIRECTED_CYCLE",
+                "severity": "error",
+                "message": f"Cyclic dependency detected in {archetype} diagram around {cycle_edges}. Pipelines should be directed acyclic graphs (DAGs).",
+                "supportedFixes": ["break_cycle", "switch_archetype_to_architecture"]
+            })
+
+    errors = [d for d in diagnostics if d["severity"] == "error"]
+    warnings = [d for d in diagnostics if d["severity"] == "warning"]
+
+    return {
+        "valid": len(errors) == 0,
+        "archetype": archetype,
+        "node_count": len(nodes),
+        "edge_count": len(edges),
+        "error_count": len(errors),
+        "warning_count": len(warnings),
+        "info_count": len(diagnostics) - len(errors) - len(warnings),
+        "diagnostics": diagnostics
+    }
+
+def compare_architectures(base_ir: Dict[str, Any], head_ir: Dict[str, Any]) -> Dict[str, Any]:
+    """
+    Calculates architectural delta between base and head IR models (Archify compare spec).
+    Detects added, removed, and modified nodes and edges.
+    """
+    base_nodes = {n["id"]: n for n in base_ir.get("nodes", [])}
+    head_nodes = {n["id"]: n for n in head_ir.get("nodes", [])}
+
+    base_edges = {(e["from"], e["to"]): e for e in base_ir.get("edges", [])}
+    head_edges = {(e["from"], e["to"]): e for e in head_ir.get("edges", [])}
+
+    added_nodes = [head_nodes[nid] for nid in head_nodes if nid not in base_nodes]
+    removed_nodes = [base_nodes[nid] for nid in base_nodes if nid not in head_nodes]
+    
+    modified_nodes = []
+    for nid in base_nodes:
+        if nid in head_nodes:
+            b = base_nodes[nid]
+            h = head_nodes[nid]
+            changes = {}
+            for field in ["label", "tier", "tech", "description"]:
+                if b.get(field) != h.get(field):
+                    changes[field] = {"before": b.get(field), "after": h.get(field)}
+            if changes:
+                modified_nodes.append({
+                    "id": nid,
+                    "label": h.get("label", nid),
+                    "changes": changes
+                })
+
+    added_edges = [head_edges[k] for k in head_edges if k not in base_edges]
+    removed_edges = [base_edges[k] for k in base_edges if k not in head_edges]
+
+    summary_parts = []
+    if added_nodes:
+        summary_parts.append(f"+{len(added_nodes)} nodes added")
+    if removed_nodes:
+        summary_parts.append(f"-{len(removed_nodes)} nodes removed")
+    if modified_nodes:
+        summary_parts.append(f"~{len(modified_nodes)} nodes modified")
+    if added_edges:
+        summary_parts.append(f"+{len(added_edges)} connections added")
+    if removed_edges:
+        summary_parts.append(f"-{len(removed_edges)} connections removed")
+
+    summary = ", ".join(summary_parts) if summary_parts else "No structural differences detected."
+
+    return {
+        "base_title": base_ir.get("title", "Base Architecture"),
+        "head_title": head_ir.get("title", "Head Architecture"),
+        "summary": summary,
+        "delta": {
+            "added_nodes": added_nodes,
+            "removed_nodes": removed_nodes,
+            "modified_nodes": modified_nodes,
+            "added_edges": added_edges,
+            "removed_edges": removed_edges
+        }
     }

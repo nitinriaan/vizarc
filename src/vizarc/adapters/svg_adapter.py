@@ -275,27 +275,18 @@ def render_svg_diagram(ir: Dict[str, Any], orientation: str = "horizontal") -> s
       <!-- Top Brand Color Stripe -->
       <path d="M 0 10 Q 0 0 10 0 L {NODE_WIDTH - 10} 0 Q {NODE_WIDTH} 0 {NODE_WIDTH} 10 L {NODE_WIDTH} 4 L 0 4 Z" fill="{brand_color}"/>
       
-      <!-- Icon Container Badge -->
-      <rect x="12" y="14" width="34" height="34" rx="8" fill="#1E293B" stroke="{brand_color}" stroke-opacity="0.35" stroke-width="1"/>
-      <!-- Foolproof Inline SVG Vector Glyph (Never fails to render offline or in file://) -->
-      <g transform="translate(17, 19) scale(0.95)">
-        <svg width="24" height="24" viewBox="0 0 24 24">
-          <path d="{icon_path}" fill="{brand_color}"/>
-        </svg>
-      </g>
-      
       <!-- Provider Pill -->
-      <rect x="{NODE_WIDTH - 60}" y="14" width="48" height="17" rx="8.5" fill="#090D16" stroke="{brand_color}" stroke-opacity="0.5" stroke-width="1"/>
-      <text x="{NODE_WIDTH - 36}" y="25.5" fill="{brand_color}" font-size="8" font-weight="700" text-anchor="middle">{provider}</text>
+      <rect x="{NODE_WIDTH - 64}" y="12" width="52" height="17" rx="8.5" fill="#090D16" stroke="{brand_color}" stroke-opacity="0.5" stroke-width="1"/>
+      <text x="{NODE_WIDTH - 38}" y="23.5" fill="{brand_color}" font-size="8" font-weight="700" text-anchor="middle">{provider}</text>
 
-      <!-- Node Title -->
-      <text x="54" y="32" fill="#F8FAFC" font-size="12.5" font-weight="700">{label[:18] + ('..' if len(label) > 18 else '')}</text>
+      <!-- Node Title (Archify Clean Typographic Card) -->
+      <text x="16" y="28" fill="#F8FAFC" font-size="12.5" font-weight="700">{label[:22] + ('..' if len(label) > 22 else '')}</text>
       
       <!-- Tech Stack -->
-      <text x="14" y="62" fill="#38BDF8" font-size="9.5" font-weight="600">{tech[:28] + ('..' if len(tech) > 28 else '')}</text>
+      <text x="16" y="48" fill="#38BDF8" font-size="9.5" font-weight="600">{tech[:30] + ('..' if len(tech) > 30 else '')}</text>
 
       <!-- Description / Role -->
-      <text x="14" y="78" fill="#94A3B8" font-size="8.5">{desc[:34] + ('..' if len(desc) > 34 else '')}</text>
+      <text x="16" y="70" fill="#94A3B8" font-size="8.5">{desc[:38] + ('..' if len(desc) > 38 else '')}</text>
     </g>"""
         svg_parts.append(node_svg)
     svg_parts.append('  </g>')

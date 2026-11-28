@@ -961,36 +961,12 @@ def compile_to_html(ir: Dict[str, Any]) -> str:
         stripe.setAttribute("d", `M 0 10 Q 0 0 10 0 L ${{pos.width - 10}} 0 Q ${{pos.width}} 0 ${{pos.width}} 10 L ${{pos.width}} 4 L 0 4 Z`);
         stripe.setAttribute("fill", brandColor);
 
-        // Icon Box
-        const iconBox = document.createElementNS("http://www.w3.org/2000/svg", "rect");
-        iconBox.setAttribute("x", 12);
-        iconBox.setAttribute("y", 12);
-        iconBox.setAttribute("width", 32);
-        iconBox.setAttribute("height", 32);
-        iconBox.setAttribute("rx", 7);
-        iconBox.setAttribute("fill", "var(--surface)");
-        iconBox.setAttribute("stroke", brandColor);
-        iconBox.setAttribute("stroke-opacity", "0.4");
-
-        // Embedded Vector SVG (100% Offline-proof)
-        const iconSvg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-        iconSvg.setAttribute("x", 16);
-        iconSvg.setAttribute("y", 16);
-        iconSvg.setAttribute("width", 24);
-        iconSvg.setAttribute("height", 24);
-        iconSvg.setAttribute("viewBox", "0 0 24 24");
-        
-        const iconPath = document.createElementNS("http://www.w3.org/2000/svg", "path");
-        iconPath.setAttribute("d", meta.icon || "M12 2L2 7v10l10 5 10-5V7L12 2z");
-        iconPath.setAttribute("fill", brandColor);
-        iconSvg.appendChild(iconPath);
-
-        // Provider Badge Pill
+        // Provider Badge Pill (Top Right)
         const provBg = document.createElementNS("http://www.w3.org/2000/svg", "rect");
         provBg.setAttribute("id", `node-prov-bg-${{node.id}}`);
-        provBg.setAttribute("x", pos.width - 62);
+        provBg.setAttribute("x", pos.width - 64);
         provBg.setAttribute("y", 12);
-        provBg.setAttribute("width", 50);
+        provBg.setAttribute("width", 52);
         provBg.setAttribute("height", 16);
         provBg.setAttribute("rx", 8);
         provBg.setAttribute("fill", "var(--bg)");
@@ -999,7 +975,7 @@ def compile_to_html(ir: Dict[str, Any]) -> str:
 
         const provTxt = document.createElementNS("http://www.w3.org/2000/svg", "text");
         provTxt.setAttribute("id", `node-prov-txt-${{node.id}}`);
-        provTxt.setAttribute("x", pos.width - 37);
+        provTxt.setAttribute("x", pos.width - 38);
         provTxt.setAttribute("y", 23);
         provTxt.setAttribute("fill", brandColor);
         provTxt.setAttribute("font-size", "7.5px");
@@ -1007,29 +983,29 @@ def compile_to_html(ir: Dict[str, Any]) -> str:
         provTxt.setAttribute("text-anchor", "middle");
         provTxt.textContent = providerName;
 
-        // Title
+        // Title (Archify Clean Typographic Card)
         const title = document.createElementNS("http://www.w3.org/2000/svg", "text");
         title.setAttribute("class", "node-title");
         title.setAttribute("id", `node-title-${{node.id}}`);
-        title.setAttribute("x", 52);
-        title.setAttribute("y", 28);
-        title.textContent = node.label.length > 20 ? node.label.slice(0, 19) + '..' : node.label;
+        title.setAttribute("x", 16);
+        title.setAttribute("y", 27);
+        title.textContent = node.label.length > 22 ? node.label.slice(0, 21) + '..' : node.label;
 
         // Tech Subtitle
         const tech = document.createElementNS("http://www.w3.org/2000/svg", "text");
         tech.setAttribute("class", "node-tech");
         tech.setAttribute("id", `node-tech-${{node.id}}`);
-        tech.setAttribute("x", 52);
+        tech.setAttribute("x", 16);
         tech.setAttribute("y", 43);
         const techStr = node.tech || meta.service_name || "Service";
-        tech.textContent = techStr.length > 25 ? techStr.slice(0, 24) + '..' : techStr;
+        tech.textContent = techStr.length > 28 ? techStr.slice(0, 27) + '..' : techStr;
 
         // Role Description
         const desc = document.createElementNS("http://www.w3.org/2000/svg", "text");
         desc.setAttribute("class", "node-desc");
         desc.setAttribute("id", `node-desc-${{node.id}}`);
-        desc.setAttribute("x", 12);
-        desc.setAttribute("y", 64);
+        desc.setAttribute("x", 16);
+        desc.setAttribute("y", 63);
         const descStr = node.description || meta.service_name || "";
         desc.textContent = descStr.length > 38 ? descStr.slice(0, 37) + '..' : descStr;
 
@@ -1047,7 +1023,7 @@ def compile_to_html(ir: Dict[str, Any]) -> str:
 
         const statusTxt = document.createElementNS("http://www.w3.org/2000/svg", "text");
         statusTxt.setAttribute("id", `node-status-txt-${{node.id}}`);
-        statusTxt.setAttribute("x", 12);
+        statusTxt.setAttribute("x", 16);
         statusTxt.setAttribute("y", pos.height - 7.5);
         statusTxt.setAttribute("fill", "var(--text-muted)");
         statusTxt.setAttribute("font-size", "8.2px");
@@ -1056,8 +1032,6 @@ def compile_to_html(ir: Dict[str, Any]) -> str:
 
         g.appendChild(rect);
         g.appendChild(stripe);
-        g.appendChild(iconBox);
-        g.appendChild(iconSvg);
         g.appendChild(provBg);
         g.appendChild(provTxt);
         g.appendChild(title);

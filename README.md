@@ -126,70 +126,113 @@ Instant offline access to production-grade architecture blueprints:
 
 ## 🚀 Quick Start
 
-### 🌐 Try Online (Zero Setup)
-Open the hosted live studio directly in your browser:
-👉 **[VizArc - Architecture Studio · Streamlit](https://vizarc.streamlit.app/)**
+**Prerequisites:** **Python 3.12+** and **Git**
 
-### 💻 Local Setup
+### Path 1: Install as an AI Agent Skill (Claude Code, Google Antigravity, OpenAI Codex)
+*(Recommended — works across all your repositories with **zero external API keys**; the agent authors the Canonical IR and `vizarc compile` renders deterministically offline.)*
 
-#### Prerequisites
-* **Python 3.12+** (required)
-* Git
-
-#### 1. Clone & Install
+#### 1. Clone, Install CLI & Register Skill
 ```bash
 git clone https://github.com/nitinriaan/vizarc.git
 cd vizarc
-pip install -r requirements.txt
+pip install -e .
+vizarc install-skill --platform all --scope global
 ```
 
-#### 2. (Optional) Configure Free Gemini API Key
-Get your free API key from [Google AI Studio](https://aistudio.google.com/):
+Or install selectively for a single platform:
 ```bash
-cp .env.example .env
-# Edit .env and paste: GEMINI_API_KEY=your_key_here
+vizarc install-skill --platform claude       # -> ~/.claude/skills/vizarc/
+vizarc install-skill --platform antigravity  # -> ~/.gemini/antigravity/skills/vizarc/
+vizarc install-skill --platform codex        # -> ~/.codex/skills/vizarc/
 ```
-*(Note: VizArc includes a built-in offline engine and 13 presets, so you can run it immediately without an API key!)*
+
+| Platform | Project-Local Path (Auto-Discovered) | User-Global Path | Alternative / Plugin |
+| :--- | :--- | :--- | :--- |
+| **Claude Code** | `.claude/skills/vizarc/SKILL.md` | `~/.claude/skills/vizarc/SKILL.md` | `claude --plugin-dir /path/to/vizarc` |
+| **Google Antigravity** | `.agent/skills/vizarc/SKILL.md` | `~/.gemini/antigravity/skills/vizarc/SKILL.md` | Also supports `.agents/skills/vizarc/` |
+| **OpenAI Codex** | `.agents/skills/vizarc/SKILL.md` | `~/.codex/skills/vizarc/SKILL.md` | Invoke via `$vizarc` or prompt |
+
+#### 2. Verify Installation
+```bash
+# Validate YAML frontmatter, metadata constraints, and relative links for all 3 platforms
+python shared/scripts/validate_skills.py
+
+# Check Python dependencies, presets, and installed global skills
+vizarc doctor
+
+# Smoke-test offline IR compilation & static architecture linting
+vizarc template ecommerce-platform --format html -o test_arch.html
+vizarc validate test_arch.html
+```
+
+Then open any repository in Claude Code, Antigravity, or Codex and ask:
+> *"Use VizArc to visualize this codebase's architecture into `architecture.html`."*
+
+---
+
+### Path 2: Full Standalone CLI (Terminal & CI)
+If you want to run VizArc directly from the command line or CI pipelines without an AI coding agent:
+
+1. **Install the CLI** (after cloning the repo):
+   ```bash
+   pip install -e .
+   ```
+2. **(Optional) Configure a Free Gemini API Key** from [Google AI Studio](https://aistudio.google.com/) for `vizarc generate` and `vizarc scan`:
+   ```bash
+   cp .env.example .env
+   # Edit .env and paste: GEMINI_API_KEY=your_key_here
+   ```
+   *(Note: `vizarc compile`, `vizarc template`, `vizarc validate`, `vizarc compare`, and `vizarc diagnose` work 100% offline with no API key!)*
 
 ---
 
 ## 💻 CLI Usage
 
+### Compile Agent-Authored IR (Zero API Key)
+```bash
+# Compile a Canonical Architecture IR JSON file into Interactive HTML, SVG, or all 9 formats
+vizarc compile arch_ir.json --format html --strict -o architecture.html
+vizarc compile arch_ir.json --format svg --orientation horizontal -o architecture.svg
+vizarc compile arch_ir.json --format all -o ./vizarc_out
+```
+
 ### View & Render Presets (100% Offline)
 ```bash
 # List all 13 preset architectures
-python cli.py templates
+vizarc templates
 
 # Render preset to Interactive Dual-View HTML
-python cli.py template ecommerce-platform --format html -o ecommerce.html
+vizarc template ecommerce-platform --format html -o ecommerce.html
 
 # Render preset to Vector SVG
-python cli.py template serverless-aws --format svg -o serverless.svg
+vizarc template serverless-aws --format svg -o serverless.svg
 
 # Compile preset into all 9 formats simultaneously
-python cli.py template microservices-gke --format all -o ./gke_export
+vizarc template microservices-gke --format all -o ./gke_export
 ```
 
-### Compile from Prompt to All Formats
+### Compile from Prompt, Scan, Diagnose & Validate
 ```bash
 # Compiles HTML, SVG, D2, Structurizr C4, Mermaid, PlantUML, Graphviz, Excalidraw, and ASCII
-python cli.py generate "Microservices payment platform with Stripe, Kafka, and Postgres" --format all --output ./dist
-```
+vizarc generate "Microservices payment platform with Stripe, Kafka, and Postgres" --format all --output ./dist
 
-### Scan a Local Codebase & Compile
-```bash
-# Automatically detects frameworks, routes, models, and Docker configs
-python cli.py scan . --format all --output ./architecture_docs
+# Scan a local codebase & compile
+vizarc scan . --format all --output ./architecture_docs
+
+# Diagnose cycles & coupling hotspots, validate graphs, or diff two architectures
+vizarc diagnose .
+vizarc validate architecture.html
+vizarc compare base_arch.html head_arch.html
 ```
 
 ---
 
-## 🌐 Live Architecture Studio (Streamlit)
+## 🌐 Live Demo (Streamlit Studio)
 
-Access the live studio online with zero setup:
+Want a quick browser demo before installing locally? Try the hosted Streamlit studio:
 👉 **[VizArc - Architecture Studio · Streamlit](https://vizarc.streamlit.app/)**
 
-Or run locally (Python 3.12+):
+Or run the demo UI locally:
 
 ```bash
 streamlit run app.py

@@ -37,27 +37,31 @@ Unless the user explicitly asks for raw markdown or SVG:
    - **Ingress / Gateway**: API Gateway, Reverse Proxy, CloudFront/Cloudflare
    - **Services Layer**: Microservices, Lambda, Queues, Background Workers
    - **Data Layer**: PostgreSQL, DynamoDB, Redis Caches, S3 Buckets
-3. Run:
+3. Either write a Canonical Architecture IR JSON file and compile deterministically (zero external LLM calls needed):
    ```bash
-   python cli.py generate "..." --format html --output architecture.html
+   vizarc compile arch_ir.json --format html --strict --output architecture.html
+   ```
+   Or run the CLI analyzer/generator directly:
+   ```bash
+   vizarc generate "..." --format html --output architecture.html
    ```
 4. Tell the user: *"Generated interactive architecture explainer in `architecture.html`. Double-click to open in your browser to explore the interactive canvas, animate flow paths, or toggle the One-Page Architectural Explainer."*
 
 ### 2. Standalone Vector SVG Mode (`--format svg`)
 When the user wants a crisp, publication-grade image for a GitHub README or PR:
 ```bash
-python cli.py generate "..." --format svg --orientation horizontal -o architecture.svg
+vizarc generate "..." --format svg --orientation horizontal -o architecture.svg
 ```
 
 ### 3. Preset Architectures (100% Offline)
 To instantly generate any of the 13 built-in production architectures:
 ```bash
 # List all 13 preset templates
-python cli.py templates
+vizarc templates
 
 # Render preset directly (no API key needed)
-python cli.py template ecommerce-platform --format html -o ecommerce.html
-python cli.py template serverless-aws --format svg -o serverless.svg
+vizarc template ecommerce-platform --format html -o ecommerce.html
+vizarc template serverless-aws --format svg -o serverless.svg
 ```
 
 ---
@@ -65,20 +69,31 @@ python cli.py template serverless-aws --format svg -o serverless.svg
 ## CLI Quick Reference
 
 ```bash
+# Compile a Canonical Architecture IR JSON file directly (zero API key required)
+vizarc compile arch_ir.json --format html --strict -o architecture.html
+
 # Generate interactive HTML architecture canvas + one-page explainer
-python cli.py generate "Microservices payment gateway with Stripe and Kafka" --output architecture.html
+vizarc generate "Microservices payment gateway with Stripe and Kafka" --output architecture.html
 
 # Generate standalone SVG vector graphic with embedded cloud service icons
-python cli.py generate "AWS serverless topology with Lambda and DynamoDB" --format svg -o arch.svg
+vizarc generate "AWS serverless topology with Lambda and DynamoDB" --format svg -o arch.svg
 
 # Scan local codebase and generate an interactive architecture explainer
-python cli.py scan . --format html --output architecture.html
+vizarc scan . --format html --output architecture.html
+
+# Diagnose codebase cycles & coupling hotspots, or validate/compare architectures
+vizarc diagnose .
+vizarc validate architecture.html
+vizarc compare base_arch.html head_arch.html
 
 # Compile into ALL 9 formats simultaneously (HTML, SVG, D2, C4, Mermaid, PlantUML, DOT, Excalidraw, ASCII)
-python cli.py generate "RAG AI Agent system" --format all -o ./dist
+vizarc generate "RAG AI Agent system" --format all -o ./dist
 
 # Render preset template
-python cli.py template microservices-gke --format html
+vizarc template microservices-gke --format html
+
+# Install VizArc as a global Claude Code skill (~/.claude/skills/vizarc)
+vizarc install-skill
 
 # Launch the Mermaid-style Live Architecture Studio (or visit https://vizarc.streamlit.app)
 streamlit run app.py

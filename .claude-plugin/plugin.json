@@ -1,0 +1,23 @@
+{
+  "name": "vizarc",
+  "version": "0.4.0",
+  "description": "Universal Architecture Compiler & Interactive Explainer skill. Compiles Canonical Architecture IR into interactive dual-view HTML explainers, vector SVGs, D2, Mermaid, Structurizr C4, PlantUML, Graphviz, Excalidraw, and ASCII.",
+  "author": {
+    "name": "Nitin Kumar",
+    "email": "nitinriaan@gmail.com"
+  },
+  "repository": "https://github.com/nitinriaan/vizarc",
+  "license": "MIT",
+  "skills": [
+    "./.claude/skills/vizarc"
+  ],
+  "keywords": [
+    "architecture",
+    "diagrams",
+    "c4-model",
+    "mermaid",
+    "d2",
+    "svg",
+    "system-design"
+  ]
+}

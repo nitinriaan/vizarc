@@ -1,0 +1,43 @@
+---
+name: vizarc
+description: Turn any idea, plan, or codebase into an interactive dual-view HTML explainer, pure vector SVG, or declarative diagram (D2, Mermaid, Structurizr C4, PlantUML, Graphviz DOT, Excalidraw, ASCII). Use when the user asks to visualize a codebase, create an architecture diagram, document system trade-offs, trace service dependencies, compare architecture diffs, or render preset cloud topologies.
+license: MIT
+compatibility: Requires Python 3.12+ and the vizarc CLI installed (`pip install -e .`). Works offline without API keys via `vizarc compile` and `vizarc template`.
+metadata:
+  author: nitinriaan
+  version: "0.4.0"
+---
+
+# VizArc — Universal Architecture Compiler & Explainer (Google Antigravity)
+
+VizArc compiles a single **Canonical Architecture Model (JSON IR)** deterministically into:
+- **Interactive HTML (`html`)**: Dual-view canvas (pan/zoom, animated flow motion, 188+ embedded cloud icons, upstream/downstream tracing, minimap) + One-Page Architectural Explainer (executive summary, ADRs, transaction stepper, protocol matrix).
+- **Pure Vector SVG (`svg`)**: Publication-grade vector diagram for READMEs, PRs, and slides (`--orientation horizontal|vertical`).
+- **Declarative & Text Formats**: `d2`, `mermaid`, `structurizr` (C4 DSL), `plantuml`, `graphviz` (DOT), `excalidraw`, `ascii`, `ir` (normalized JSON), or `all`.
+
+## Primary Workflow (Zero External API Key Needed)
+
+When running inside Google Antigravity, analyze the codebase or specification with your native search and file-reading tools, author a Canonical Architecture IR JSON, and compile it deterministically with `vizarc compile`:
+
+1. **Inspect the codebase or requirements**:
+   - Search and read key source files to identify entrypoints, services, queues, databases, external APIs, and exact file paths.
+   - Optionally run `vizarc diagnose .` in the terminal to detect circular dependencies, coupling hotspots, and the recommended archetype.
+2. **Author the Canonical Architecture IR JSON**:
+   - Read [ir-schema.md](../../../shared/references/ir-schema.md) for the exact IR schema, 10 archetypes (`architecture`, `workflow`, `sequence`, `dataflow`, `lifecycle`, `erd`, `class`, `tree`, `timeline`, `waterfall`), tier IDs, and static lint rules.
+   - Populate `decisions` (ADRs), `flow_steps`, `tiers`, `nodes` (with real `files`), and `edges` (with explicit `protocol` values like `HTTPS`, `gRPC`, `REST`, `SQL`, `Kafka`, `Redis`).
+3. **Compile & validate deterministically**:
+   ```bash
+   vizarc compile arch_ir.json --format html --strict -o architecture.html
+   vizarc compile arch_ir.json --format svg --orientation horizontal -o architecture.svg
+   vizarc compile arch_ir.json --format all -o ./vizarc_out
+   ```
+   - Remove temporary IR JSON files if the user only asked for the rendered diagram.
+4. **Report results**:
+   - Link to the generated file(s), summarize any findings from `vizarc diagnose .` or `vizarc validate`, and remind the user that `.html` files open offline in any browser (`1` Canvas, `2` Explainer, `M` Flow Motion, `O` Flip Orientation).
+
+## Alternative CLI Workflows
+
+- **13 Offline Preset Architectures**: `vizarc templates` and `vizarc template <id> --format html -o out.html`
+- **Automated Repo Scan / Prompt Generation** (uses `GEMINI_API_KEY` if set): `vizarc scan .`, `vizarc generate "..."`, `vizarc guide "..."`
+- **Validate & Compare**: `vizarc validate architecture.html` and `vizarc compare base.html head.html`
+- **Environment Diagnostic**: `vizarc doctor`
