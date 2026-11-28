@@ -1,0 +1,32 @@
+{
+  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
+  "name": "vizarc",
+  "description": "VizArc: Universal Architecture Compiler & Interactive Explainer skill for Claude Code.",
+  "owner": {
+    "name": "Nitin Kumar",
+    "email": "nitinriaan@gmail.com"
+  },
+  "plugins": [
+    {
+      "name": "vizarc",
+      "version": "0.4.0",
+      "description": "Turn any codebase, plan, or prompt into a Dual-View Interactive HTML Explainer, Story Video (.webm), Vector SVG, D2, Structurizr C4, Mermaid, PlantUML, Graphviz DOT, Excalidraw, or ASCII diagram.",
+      "author": {
+        "name": "Nitin Kumar",
+        "email": "nitinriaan@gmail.com"
+      },
+      "source": "./",
+      "category": "development",
+      "homepage": "https://github.com/nitinriaan/vizarc",
+      "keywords": [
+        "architecture",
+        "diagrams",
+        "c4-model",
+        "mermaid",
+        "d2",
+        "svg",
+        "system-design"
+      ]
+    }
+  ]
+}

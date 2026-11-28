@@ -74,7 +74,18 @@ Instead of letting an LLM hallucinate diagram syntax separately for every format
 ### Path 1: Install as an AI Agent Skill (Claude Code, Google Antigravity, Codex, Cursor, Copilot, OpenCode)
 *(Recommended — works across all your repositories with **zero external API keys**; the agent authors the Canonical IR and `vizarc compile` renders deterministically offline.)*
 
-#### 1. Clone, Install CLI & Register Skill
+#### 1A. Claude Code Marketplace Install *(No Repo Clone Needed)*
+Install the `vizarc` CLI engine, then add VizArc directly inside Claude Code:
+```bash
+pip install git+https://github.com/nitinriaan/vizarc.git
+```
+In Claude Code:
+```text
+/plugin marketplace add nitinriaan/vizarc
+/plugin install vizarc@vizarc
+```
+
+#### 1B. Multi-Platform Install via `vizarc install-skill` (Claude Code, Antigravity, Codex, Cursor, Copilot, OpenCode)
 ```bash
 git clone https://github.com/nitinriaan/vizarc.git
 cd vizarc

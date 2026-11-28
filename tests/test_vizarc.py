@@ -109,3 +109,15 @@ def test_cli_install_skill_project_scope(tmp_path: Path, monkeypatch):
     ):
         assert (tmp_path / rel).exists(), f"Missing installed skill: {rel}"
         assert (tmp_path / rel).parent.joinpath("references/ir-schema.md").exists()
+
+
+def test_claude_marketplace_and_plugin_manifests():
+    repo_root = Path(__file__).resolve().parent.parent
+    plugin = json.loads((repo_root / ".claude-plugin" / "plugin.json").read_text(encoding="utf-8"))
+    mkt = json.loads((repo_root / ".claude-plugin" / "marketplace.json").read_text(encoding="utf-8"))
+
+    assert plugin["name"] == "vizarc"
+    assert (repo_root / plugin["skills"][0] / "SKILL.md").exists()
+    assert mkt["name"] == "vizarc"
+    assert mkt["plugins"][0]["name"] == "vizarc"
+    assert mkt["plugins"][0]["source"] == "./"

@@ -626,6 +626,21 @@ SKILL_PLATFORMS = {
 }
 
 
+RAW_REPO_BASE = "https://raw.githubusercontent.com/nitinriaan/vizarc/main"
+
+
+def _fetch_text_resource(local_path: Path, repo_rel: Path) -> str:
+    """Read skill resource from local repo if present, else fetch from GitHub main."""
+    if local_path.exists():
+        return local_path.read_text(encoding="utf-8")
+
+    import urllib.request
+
+    url = f"{RAW_REPO_BASE}/{repo_rel.as_posix()}"
+    with urllib.request.urlopen(url, timeout=15) as resp:
+        return resp.read().decode("utf-8")
+
+
 @main.command(name="install-skill")
 @click.option(
     "--platform", "-p",
@@ -640,20 +655,27 @@ SKILL_PLATFORMS = {
     help="Install globally (~/.claude, ~/.gemini/antigravity, ~/.codex), project-locally, or both.",
 )
 def install_skill(platform: str, scope: str):
-    """Install the VizArc skill for Claude Code, Google Antigravity, and/or OpenAI Codex."""
+    """Install the VizArc skill for Claude Code, Google Antigravity, OpenAI Codex, Cursor, Copilot, or OpenCode."""
     repo_root = Path(__file__).resolve().parent.parent.parent
-    shared_refs = repo_root / "shared" / "references"
-    if not shared_refs.exists():
-        console.print(f"[bold red]Error:[/bold red] Shared references directory not found at {shared_refs}")
+    local_schema_path = repo_root / "shared" / "references" / "ir-schema.md"
+
+    try:
+        ir_schema_text = _fetch_text_resource(local_schema_path, Path("shared/references/ir-schema.md"))
+    except Exception as exc:
+        console.print(f"[bold red]Error:[/bold red] Failed to load shared IR schema: {exc}")
         sys.exit(1)
 
     selected = list(SKILL_PLATFORMS.keys()) if platform.lower() == "all" else [platform.lower()]
 
     for plat in selected:
         cfg = SKILL_PLATFORMS[plat]
-        source_skill_file = repo_root / cfg["repo_rel"] / "SKILL.md"
-        if not source_skill_file.exists():
-            console.print(f"[bold red]Error:[/bold red] Missing {cfg['label']} SKILL.md at {source_skill_file}")
+        repo_skill_rel = cfg["repo_rel"] / "SKILL.md"
+        source_skill_file = repo_root / repo_skill_rel
+
+        try:
+            raw_skill = _fetch_text_resource(source_skill_file, repo_skill_rel)
+        except Exception as exc:
+            console.print(f"[bold red]Error:[/bold red] Failed to load {cfg['label']} SKILL.md: {exc}")
             sys.exit(1)
 
         targets = []
@@ -662,18 +684,20 @@ def install_skill(platform: str, scope: str):
         if scope in ("project", "both"):
             targets.append(Path.cwd() / cfg["project_dir"])
 
-        skill_content = source_skill_file.read_text(encoding="utf-8").replace(
+        skill_content = raw_skill.replace(
             "../../../shared/references/ir-schema.md",
             "references/ir-schema.md",
         )
 
         for dest in targets:
-            if dest.resolve() == source_skill_file.parent.resolve():
+            if source_skill_file.exists() and dest.resolve() == source_skill_file.parent.resolve():
                 console.print(f"[dim]Skipping identical repo directory for {cfg['label']}: {dest}[/dim]")
                 continue
             dest.mkdir(parents=True, exist_ok=True)
             (dest / "SKILL.md").write_text(skill_content, encoding="utf-8")
-            shutil.copytree(shared_refs, dest / "references", dirs_exist_ok=True)
+            refs_dir = dest / "references"
+            refs_dir.mkdir(parents=True, exist_ok=True)
+            (refs_dir / "ir-schema.md").write_text(ir_schema_text, encoding="utf-8")
             console.print(f"[bold green]✔ Installed {cfg['label']} skill to:[/bold green] {dest}")
 
 

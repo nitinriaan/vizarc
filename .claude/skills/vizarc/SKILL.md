@@ -2,7 +2,7 @@
 name: vizarc
 description: Turn any idea, plan, or codebase into an interactive dual-view HTML explainer, pure vector SVG, or declarative diagram (D2, Mermaid, Structurizr C4, PlantUML, Graphviz DOT, Excalidraw, ASCII). Use when the user asks to visualize a codebase, create an architecture diagram, document system trade-offs, trace service dependencies, compare architecture diffs, or render preset cloud topologies.
 license: MIT
-compatibility: Requires Python 3.12+ and the vizarc CLI installed (`pip install -e .`). Works offline without API keys via `vizarc compile` and `vizarc template`.
+compatibility: Requires Python 3.12+ and the vizarc CLI (`pip install git+https://github.com/nitinriaan/vizarc.git` or `pip install -e .`). Works offline without API keys via `vizarc compile` and `vizarc template`.
 argument-hint: "[prompt, path, or output format]"
 allowed-tools: Bash(vizarc *), Read, Glob, Grep, Write
 metadata:

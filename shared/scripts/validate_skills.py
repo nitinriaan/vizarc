@@ -142,6 +142,37 @@ def validate_claude_plugin() -> List[str]:
     return errors
 
 
+def validate_claude_marketplace() -> List[str]:
+    """Validate .claude-plugin/marketplace.json structure and plugin source paths."""
+    manifest = REPO_ROOT / ".claude-plugin" / "marketplace.json"
+    if not manifest.exists():
+        return [f"Missing Claude marketplace manifest: {manifest}"]
+    try:
+        data = json.loads(manifest.read_text(encoding="utf-8"))
+    except json.JSONDecodeError as exc:
+        return [f"Invalid JSON in marketplace.json: {exc}"]
+
+    errors: List[str] = []
+    if not data.get("name"):
+        errors.append("marketplace.json missing required 'name'.")
+    if not isinstance(data.get("owner"), dict) or not data["owner"].get("name"):
+        errors.append("marketplace.json missing 'owner.name'.")
+    plugins = data.get("plugins", [])
+    if not isinstance(plugins, list) or not plugins:
+        errors.append("marketplace.json must declare a non-empty 'plugins' array.")
+        return errors
+
+    for entry in plugins:
+        if not entry.get("name"):
+            errors.append("marketplace.json plugin entry missing 'name'.")
+        src = entry.get("source")
+        if isinstance(src, str) and src.startswith("./"):
+            plugin_manifest = (REPO_ROOT / src / ".claude-plugin" / "plugin.json").resolve()
+            if not plugin_manifest.exists():
+                errors.append(f"marketplace.json plugin source '{src}' missing .claude-plugin/plugin.json")
+    return errors
+
+
 def main() -> int:
     has_failures = False
     print("VizArc Cross-Platform Skill Validator")
@@ -166,6 +197,15 @@ def main() -> int:
             print(f"       - {err}")
     else:
         print("[PASS] claude-plugin (.claude-plugin/plugin.json)")
+
+    mkt_errs = validate_claude_marketplace()
+    if mkt_errs:
+        has_failures = True
+        print("[FAIL] claude-mkt    (.claude-plugin/marketplace.json)")
+        for err in mkt_errs:
+            print(f"       - {err}")
+    else:
+        print("[PASS] claude-mkt    (.claude-plugin/marketplace.json)")
 
     return 1 if has_failures else 0
 
