@@ -1,6 +1,6 @@
 <p align="center">
   <a href="https://github.com/nitinriaan/vizarc">
-    <img src="assets/logos/vizarc-horizontal-light.png#gh-light-mode-only" alt="VizArc - Architecture, Visualized" width="680">
+    <img src="assets/social/vizarc-banner-white-1920x600.png" alt="VizArc - Architecture, Visualized" width="760">
   </a>
 </p>
 
