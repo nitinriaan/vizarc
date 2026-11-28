@@ -388,18 +388,30 @@ def guide(prompt: str):
 
 @main.command()
 @click.argument("target", required=True, type=click.Path(exists=True))
-def validate(target: str):
-    """Machine-readable architectural static analysis (Archify validate spec)."""
+@click.option(
+    "--orientation", "-O",
+    type=click.Choice(["horizontal", "vertical"], case_sensitive=False),
+    default="horizontal",
+    help="Orientation used for SVG layout collision checking.",
+)
+@click.option(
+    "--no-layout",
+    is_flag=True,
+    default=False,
+    help="Skip SVG bounding-box & label-clearance checks.",
+)
+def validate(target: str, orientation: str, no_layout: bool):
+    """Machine-readable architectural static and layout clearance analysis."""
     engine = VizArcEngine()
     content = Path(target).read_text(encoding="utf-8")
 
     try:
-        results = engine.validate(content)
+        results = engine.validate(content, check_layout=not no_layout, orientation=orientation)
     except Exception as e:
         console.print(f"[bold red]Validation Error:[/bold red] Failed to parse {target}: {e}")
         sys.exit(1)
 
-    console.print(f"\n[bold cyan]VizArc Static Architecture Validator[/bold cyan] -> {target}")
+    console.print(f"\n[bold cyan]VizArc Static & Layout Validator[/bold cyan] -> {target}")
     console.print(
         f"  Archetype: [bold green]{results['archetype']}[/bold green] | Nodes: {results['node_count']} | Edges: {results['edge_count']}"
     )
@@ -408,7 +420,7 @@ def validate(target: str):
     )
 
     if not results["diagnostics"]:
-        console.print("[bold green]✔ Architecture passed all static validation checks! 100% compliant.[/bold green]\n")
+        console.print("[bold green]✔ Architecture passed all static & layout validation checks! 100% compliant.[/bold green]\n")
         return
 
     table = Table(title="Architectural Diagnostics", border_style="cyan")
@@ -430,11 +442,51 @@ def validate(target: str):
         sys.exit(1)
 
 
+@main.command(name="browser-check")
+@click.argument("target", required=True, type=click.Path(exists=True))
+def browser_check(target: str):
+    """Verify generated VizArc HTML rendering via DOM & headless browser checks."""
+    engine = VizArcEngine()
+    report = engine.browser_check(target)
+
+    console.print(f"\n[bold cyan]VizArc Browser QA Check[/bold cyan] -> {target}")
+    console.print(f"  Engine: [bold]{report['browser']}[/bold] | Expected: {report['expected_nodes']} nodes, {report['expected_edges']} edges")
+    if report["rendered_nodes"] is not None:
+        console.print(
+            f"  Rendered DOM: {report['rendered_nodes']} nodes, {report['rendered_edges']} edges | Explainer: {'✔' if report['explainer_rendered'] else '✖'}"
+        )
+
+    if report["issues"]:
+        for issue in report["issues"]:
+            console.print(f"  [bold red]✖ [{issue['check']}][/bold red] {issue['message']}")
+        sys.exit(1)
+
+    console.print("[bold green]✔ HTML explainer passed browser QA checks![/bold green]\n")
+
+
 @main.command()
 @click.argument("base_path", required=True, type=click.Path(exists=True))
 @click.argument("head_path", required=True, type=click.Path(exists=True))
-def compare(base_path: str, head_path: str):
-    """Architecture delta and diff analyzer (Archify compare spec)."""
+@click.option(
+    "--format", "-f",
+    type=click.Choice(["terminal", "html", "json"], case_sensitive=False),
+    default="terminal",
+    help="Output format: terminal summary, interactive Before/Delta/After HTML, or JSON.",
+)
+@click.option(
+    "--output", "-o",
+    type=click.Path(writable=True),
+    default=None,
+    help="Output file path (defaults to architecture_diff.html for --format html).",
+)
+@click.option(
+    "--open", "open_browser",
+    is_flag=True,
+    default=False,
+    help="Open generated HTML diff in browser.",
+)
+def compare(base_path: str, head_path: str, format: str, output: Optional[str], open_browser: bool):
+    """Architecture delta and visual diff analyzer (terminal, JSON, or Before/Delta/After HTML)."""
     engine = VizArcEngine()
 
     try:
@@ -444,7 +496,27 @@ def compare(base_path: str, head_path: str):
         console.print(f"[bold red]Compare Error:[/bold red] {e}")
         sys.exit(1)
 
+    fmt = format.lower()
+    if fmt == "html":
+        html_out = engine.compare_html(base_ir, head_ir)
+        out_path = Path(output or "architecture_diff.html")
+        out_path.parent.mkdir(parents=True, exist_ok=True)
+        out_path.write_text(html_out, encoding="utf-8")
+        console.print(f"[bold green]✔ Visual architecture diff saved to:[/bold green] {out_path.resolve()}")
+        if open_browser:
+            webbrowser.open(f"file://{out_path.resolve()}")
+        return
+
     diff = engine.compare(base_ir, head_ir)
+    if fmt == "json":
+        payload = json.dumps(diff, indent=2)
+        if output:
+            Path(output).write_text(payload, encoding="utf-8")
+            console.print(f"[bold green]✔ JSON diff saved to:[/bold green] {Path(output).resolve()}")
+        else:
+            console.print(payload)
+        return
+
     delta = diff["delta"]
 
     console.print(Panel(
@@ -533,15 +605,33 @@ SKILL_PLATFORMS = {
         "global_dir": Path.home() / ".codex" / "skills" / "vizarc",
         "project_dir": Path(".agents") / "skills" / "vizarc",
     },
+    "cursor": {
+        "label": "Cursor",
+        "repo_rel": Path(".agents") / "skills" / "vizarc",
+        "global_dir": Path.home() / ".cursor" / "skills" / "vizarc",
+        "project_dir": Path(".cursor") / "skills" / "vizarc",
+    },
+    "copilot": {
+        "label": "GitHub Copilot",
+        "repo_rel": Path(".agents") / "skills" / "vizarc",
+        "global_dir": Path.home() / ".copilot" / "skills" / "vizarc",
+        "project_dir": Path(".github") / "skills" / "vizarc",
+    },
+    "opencode": {
+        "label": "OpenCode",
+        "repo_rel": Path(".agents") / "skills" / "vizarc",
+        "global_dir": Path.home() / ".config" / "opencode" / "skills" / "vizarc",
+        "project_dir": Path(".opencode") / "skills" / "vizarc",
+    },
 }
 
 
 @main.command(name="install-skill")
 @click.option(
     "--platform", "-p",
-    type=click.Choice(["claude", "antigravity", "codex", "all"], case_sensitive=False),
+    type=click.Choice(["claude", "antigravity", "codex", "cursor", "copilot", "opencode", "all"], case_sensitive=False),
     default="all",
-    help="Target AI coding platform (claude, antigravity, codex, or all).",
+    help="Target AI coding platform (or 'all').",
 )
 @click.option(
     "--scope", "-s",

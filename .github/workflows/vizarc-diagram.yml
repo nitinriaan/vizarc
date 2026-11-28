@@ -1,4 +1,4 @@
-name: VizArc Architecture Diagram Generator
+name: VizArc PR Architecture Walkthrough
 
 on:
   pull_request:
@@ -10,22 +10,25 @@ permissions:
   pull-requests: write
 
 jobs:
-  generate-diagram:
+  architecture-walkthrough:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout Repository
+      - name: Checkout PR Head
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
 
-      - name: Set up Python
+      - name: Set up Python 3.12
         uses: actions/setup-python@v5
         with:
           python-version: "3.12"
           cache: "pip"
 
-      - name: Install Dependencies
+      - name: Install VizArc
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
+          pip install -e . --no-deps
 
       - name: Extract Architecture Specification
         id: extract
@@ -35,45 +38,71 @@ jobs:
             const pr = context.payload.pull_request;
             const body = pr ? pr.body || "" : "";
             const match = body.match(/```vizarc\s*([\s\S]*?)```/);
-            const prompt = match ? match[1].trim() : "System architecture overview of recent pull request changes";
-            core.setOutput('prompt', prompt);
+            core.setOutput('has_prompt', match ? 'true' : 'false');
+            core.setOutput('prompt', match ? match[1].trim() : '');
 
-      - name: Generate Architecture Diagram SVG & HTML
+      - name: Compile, Validate & Browser-Check Walkthrough
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
-          PYTHONPATH: src
+          HAS_PROMPT: ${{ steps.extract.outputs.has_prompt }}
+          VIZARC_PROMPT: ${{ steps.extract.outputs.prompt }}
         run: |
-          PROMPT="${{ steps.extract.outputs.prompt }}"
-          echo "Generating architecture diagram for prompt: $PROMPT"
-          python cli.py generate "$PROMPT" --format svg -o pr-architecture.svg
-          python cli.py generate "$PROMPT" --format html -o pr-architecture.html
+          mkdir -p vizarc_pr_out
+          if [ "$HAS_PROMPT" = "true" ]; then
+            vizarc generate "$VIZARC_PROMPT" --format all -o ./vizarc_pr_out
+          else
+            vizarc scan . --format all -o ./vizarc_pr_out
+          fi
+          vizarc validate ./vizarc_pr_out/architecture.html || true
+          vizarc browser-check ./vizarc_pr_out/architecture.html || true
 
-      - name: Upload Architecture Artifacts
+      - name: Collect Changed Files Summary
+        id: diff
+        run: |
+          if git rev-parse HEAD^ >/dev/null 2>&1; then
+            CHANGED=$(git diff --name-only HEAD^ HEAD | head -n 25)
+          else
+            CHANGED=$(git ls-files | head -n 25)
+          fi
+          {
+            echo "files<<__VIZARC_EOF__"
+            echo "$CHANGED"
+            echo "__VIZARC_EOF__"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Upload Architecture Walkthrough Artifacts
         uses: actions/upload-artifact@v4
         with:
           name: vizarc-diagrams
-          path: |
-            pr-architecture.svg
-            pr-architecture.html
+          path: vizarc_pr_out/
 
-      - name: Post Architecture Diagram Comment on PR
+      - name: Post Live Mermaid & Walkthrough Comment on PR
         if: github.event_name == 'pull_request'
+        env:
+          CHANGED_FILES: ${{ steps.diff.outputs.files }}
         uses: actions/github-script@v7
         with:
           script: |
             const fs = require('fs');
-            const svgContent = fs.existsSync('pr-architecture.svg') ? fs.readFileSync('pr-architecture.svg', 'utf8') : '';
-            
-            const commentBody = `### 📐 VizArc Architecture Diagram
-> Automatically compiled from PR description using **[VizArc](https://github.com/nitinriaan/vizarc)**.
+            const mermaid = fs.existsSync('vizarc_pr_out/architecture.mmd')
+              ? fs.readFileSync('vizarc_pr_out/architecture.mmd', 'utf8').trim()
+              : '';
+            const changedFiles = (process.env.CHANGED_FILES || '').trim();
+            const runUrl = `${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`;
 
-\`\`\`xml
-${svgContent.slice(0, 500)}...
-\`\`\`
-
-📁 **Full Artifacts Available:**
-- Download \`pr-architecture.svg\` vector graphic from GitHub Actions run.
-- Download \`pr-architecture.html\` interactive 3D canvas with path tracing and zoom.`;
+            const commentBody = [
+              '### 📐 VizArc PR Architecture Walkthrough',
+              '',
+              mermaid ? '```mermaid\n' + mermaid + '\n```' : '_No Mermaid diagram generated._',
+              '',
+              '<details>',
+              '<summary><strong>Changed Files & Walkthrough Artifacts</strong></summary>',
+              '',
+              changedFiles ? '```\n' + changedFiles + '\n```' : '_No file diff available._',
+              '',
+              `- Download \`vizarc-diagrams\` from the [GitHub Actions run](${runUrl}) for the interactive **Dual-View HTML Explainer**, **Story Video (.webm) recorder**, **Vector SVG**, **D2**, and **Structurizr C4** outputs.`,
+              '</details>'
+            ].join('\n');
 
             await github.rest.issues.createComment({
               owner: context.repo.owner,

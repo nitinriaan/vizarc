@@ -26,7 +26,7 @@ Instead of letting an LLM hallucinate diagram syntax separately for every format
 * **Single Source of Truth**: Analyze a system once into a typed, validated **Canonical Architecture Model (JSON IR)**—authored directly by your AI coding agent (zero extra API keys) or via `vizarc scan` / `vizarc generate`.
 * **Deterministic Multi-Format Compilation**: 9 adapters compile the same IR into interactive HTML, vector SVG, and declarative formats with zero extra LLM calls.
 * **188+ Offline Cloud Icons**: Embedded inline SVG glyphs for AWS, GCP, Azure, Kubernetes, databases, and queues—works 100% offline.
-* **Static Validation & Diffing**: Built-in linting (`vizarc validate`), cycle/coupling diagnostics (`vizarc diagnose`), and architecture diffs (`vizarc compare`).
+* **Static & Visual QA**: Built-in graph linting + SVG bounding-box collision checks (`vizarc validate`), headless browser verification (`vizarc browser-check`), cycle/coupling diagnostics (`vizarc diagnose`), and interactive Before/Delta/After visual diffs (`vizarc compare --format html`).
 
 ---
 
@@ -61,7 +61,7 @@ Instead of letting an LLM hallucinate diagram syntax separately for every format
 
 ## 🌟 Flagship Features
 
-* **Dual-View Interactive HTML**: Zero-dependency offline file with pan/zoom, animated edge flow (`M`), LR/TB layout flip (`O`), upstream/downstream path tracing, live minimap, node inspector drawer, and one-click `.svg` / `.png` / PDF (`Ctrl+P`) export—paired with an executive **One-Page Explainer** (ADRs, transaction stepper, service catalog, protocol matrix). Shortcuts: `1` Canvas, `2` Explainer, `/` Search, `D` Theme, `R` Reset, `F` Fullscreen.
+* **Dual-View Interactive HTML**: Zero-dependency offline file with pan/zoom, animated edge flow (`M`), Live Flow Route Player with narrative captions, LR/TB layout flip (`O`), upstream/downstream path tracing, live minimap, node inspector drawer, and one-click `.svg` / `.png` / **`.webm` Story Video** / PDF (`Ctrl+P`) export—paired with an executive **One-Page Explainer** (ADRs, interactive transaction stepper, service catalog, protocol matrix). Shortcuts: `1` Canvas, `2` Explainer, `/` Search, `D` Theme, `R` Reset, `F` Fullscreen.
 * **Standalone Vector SVG**: Crisp Sugiyama-layered vector diagrams with embedded AWS/GCP/Azure/K8s badges and color-coded protocol connectors (`HTTPS`, `SQL`, `Kafka`, `Redis`).
 * **13 Offline Production Presets**: `ecommerce-platform`, `serverless-aws`, `rag-system`, `microservices-gke`, `fullstack-nextjs`, `event-streaming-kafka`, `monolith-aws`, `k8s-platform`, `event-driven-aws`, `data-lakehouse`, `ml-pipeline`, `iot-platform`, `web3-blockchain`.
 
@@ -71,7 +71,7 @@ Instead of letting an LLM hallucinate diagram syntax separately for every format
 
 **Prerequisites:** **Python 3.12+** and **Git**
 
-### Path 1: Install as an AI Agent Skill (Claude Code, Google Antigravity, OpenAI Codex)
+### Path 1: Install as an AI Agent Skill (Claude Code, Google Antigravity, Codex, Cursor, Copilot, OpenCode)
 *(Recommended — works across all your repositories with **zero external API keys**; the agent authors the Canonical IR and `vizarc compile` renders deterministically offline.)*
 
 #### 1. Clone, Install CLI & Register Skill
@@ -87,6 +87,9 @@ Or install selectively for a single platform:
 vizarc install-skill --platform claude       # -> ~/.claude/skills/vizarc/
 vizarc install-skill --platform antigravity  # -> ~/.gemini/antigravity/skills/vizarc/
 vizarc install-skill --platform codex        # -> ~/.codex/skills/vizarc/
+vizarc install-skill --platform cursor       # -> ~/.cursor/skills/vizarc/
+vizarc install-skill --platform copilot      # -> ~/.copilot/skills/vizarc/
+vizarc install-skill --platform opencode     # -> ~/.config/opencode/skills/vizarc/
 ```
 
 | Platform | Project-Local Path (Auto-Discovered) | User-Global Path | Alternative / Plugin |
@@ -94,18 +97,20 @@ vizarc install-skill --platform codex        # -> ~/.codex/skills/vizarc/
 | **Claude Code** | `.claude/skills/vizarc/SKILL.md` | `~/.claude/skills/vizarc/SKILL.md` | `claude --plugin-dir /path/to/vizarc` |
 | **Google Antigravity** | `.agent/skills/vizarc/SKILL.md` | `~/.gemini/antigravity/skills/vizarc/SKILL.md` | Also supports `.agents/skills/vizarc/` |
 | **OpenAI Codex** | `.agents/skills/vizarc/SKILL.md` | `~/.codex/skills/vizarc/SKILL.md` | Invoke via `$vizarc` or prompt |
+| **Cursor / Copilot / OpenCode** | `.agents/skills/vizarc/SKILL.md` | `~/.cursor/`, `~/.copilot/`, `~/.config/opencode/` | `vizarc install-skill --scope project` |
 
 #### 2. Verify Installation
 ```bash
-# Validate YAML frontmatter, metadata constraints, and relative links for all 3 platforms
+# Validate YAML frontmatter, metadata constraints, and relative links across platforms
 python shared/scripts/validate_skills.py
 
 # Check Python dependencies, presets, and installed global skills
 vizarc doctor
 
-# Smoke-test offline IR compilation & static architecture linting
+# Smoke-test offline IR compilation, layout QA & browser rendering
 vizarc template ecommerce-platform --format html -o test_arch.html
 vizarc validate test_arch.html
+vizarc browser-check test_arch.html
 ```
 
 Open any repository in Claude Code, Antigravity, or Codex and ask:
@@ -146,13 +151,14 @@ vizarc template serverless-aws --format svg -o serverless.svg
 vizarc template microservices-gke --format all -o ./gke_export
 ```
 
-### Generate, Scan, Diagnose & Validate
+### Generate, Scan, Diagnose, QA & Visual Diff
 ```bash
-vizarc generate "Microservices payment platform with Stripe, Kafka, and Postgres" --format all -o ./dist
-vizarc scan . --format all -o ./architecture_docs
+vizarc generate "Microservices payment platform with Stripe, Kafka, and Postgres" --format all --output ./dist
+vizarc scan . --format all --output ./architecture_docs
 vizarc diagnose .
 vizarc validate architecture.html
-vizarc compare base_arch.html head_arch.html
+vizarc browser-check architecture.html
+vizarc compare base_arch.html head_arch.html --format html -o architecture_diff.html
 ```
 
 ---

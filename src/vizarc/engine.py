@@ -142,13 +142,17 @@ class VizArcEngine:
         """
         return guide_archetype(prompt)
 
-    def validate(self, ir_data: Any) -> Dict[str, Any]:
+    def validate(
+        self,
+        ir_data: Any,
+        check_layout: bool = True,
+        orientation: str = "horizontal",
+    ) -> Dict[str, Any]:
         """
-        Machine-readable architectural static analysis (Archify validate spec):
-        Performs rule-based verification and returns structured diagnostics.
+        Machine-readable architectural static + layout analysis:
+        Performs rule-based IR verification plus SVG geometry clearance checks.
         """
         if isinstance(ir_data, str):
-            # Attempt to parse as JSON or extract embedded IR from HTML
             cleaned = ir_data.strip()
             if cleaned.startswith("{"):
                 ir_data = json.loads(cleaned)
@@ -161,14 +165,41 @@ class VizArcEngine:
             else:
                 raise ValueError("Input string is neither valid JSON nor contains embedded IR.")
 
-        return lint_ir(ir_data)
+        report = lint_ir(ir_data)
+        if check_layout:
+            from .qa import check_svg_layout
+
+            layout_diags = check_svg_layout(ir_data, orientation=orientation)
+            if layout_diags:
+                report["diagnostics"].extend(layout_diags)
+                errors = [d for d in report["diagnostics"] if d["severity"] == "error"]
+                warnings = [d for d in report["diagnostics"] if d["severity"] == "warning"]
+                report["error_count"] = len(errors)
+                report["warning_count"] = len(warnings)
+                report["info_count"] = len(report["diagnostics"]) - len(errors) - len(warnings)
+                report["valid"] = len(errors) == 0
+
+        return report
+
+    def browser_check(self, html_path: str) -> Dict[str, Any]:
+        """Verify generated HTML rendering integrity via structural & headless browser checks."""
+        from .qa import run_browser_check
+
+        return run_browser_check(html_path)
 
     def compare(self, base_ir: Dict[str, Any], head_ir: Dict[str, Any]) -> Dict[str, Any]:
         """
-        Architecture delta and diff analyzer (Archify compare spec):
+        Architecture delta and diff analyzer:
         Computes changes between two architecture specifications.
         """
         return compare_architectures(base_ir, head_ir)
+
+    def compare_html(self, base_ir: Dict[str, Any], head_ir: Dict[str, Any]) -> str:
+        """Render an interactive Before / Delta / After visual diff HTML page."""
+        from .diff_renderer import render_visual_diff_html
+
+        diff = self.compare(base_ir, head_ir)
+        return render_visual_diff_html(base_ir, head_ir, diff)
 
     def diagnose(self, codebase_path: str = ".") -> Dict[str, Any]:
         """

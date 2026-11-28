@@ -33,11 +33,11 @@ When running inside Google Antigravity, analyze the codebase or specification wi
    ```
    - Remove temporary IR JSON files if the user only asked for the rendered diagram.
 4. **Report results**:
-   - Link to the generated file(s), summarize any findings from `vizarc diagnose .` or `vizarc validate`, and remind the user that `.html` files open offline in any browser (`1` Canvas, `2` Explainer, `M` Flow Motion, `O` Flip Orientation).
+   - Link to the generated file(s), run `vizarc validate architecture.html` (static + SVG layout collision checks) and `vizarc browser-check architecture.html` when validating HTML, and remind the user that `.html` files open offline in any browser (`1` Canvas, `2` One-Page Explainer, `M` Motion, `O` Flip Orientation, `🎥 Story` WebM video export, `🖨️ PDF` print).
 
 ## Alternative CLI Workflows
 
 - **13 Offline Preset Architectures**: `vizarc templates` and `vizarc template <id> --format html -o out.html`
 - **Automated Repo Scan / Prompt Generation** (uses `GEMINI_API_KEY` if set): `vizarc scan .`, `vizarc generate "..."`, `vizarc guide "..."`
-- **Validate & Compare**: `vizarc validate architecture.html` and `vizarc compare base.html head.html`
+- **Validate, Browser QA & Visual Diffs**: `vizarc validate architecture.html`, `vizarc browser-check architecture.html`, and `vizarc compare base.html head.html --format html -o diff.html`
 - **Environment Diagnostic**: `vizarc doctor`

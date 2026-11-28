@@ -599,6 +599,201 @@ def compile_to_html(ir: Dict[str, Any]) -> str:
       border-color: var(--accent);
       background: var(--badge-bg);
     }}
+
+    /* Dual-View Switcher & One-Page Explainer */
+    .view-switcher {{
+      display: inline-flex;
+      background: var(--bg);
+      border: 1px solid var(--surface-border);
+      border-radius: 8px;
+      padding: 2px;
+      gap: 2px;
+    }}
+    .view-tab {{
+      border: none;
+      background: transparent;
+      color: var(--text-muted);
+      font-size: 0.75rem;
+      font-weight: 700;
+      padding: 5px 10px;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }}
+    .view-tab.active {{
+      background: var(--accent);
+      color: #FFFFFF;
+    }}
+    #story-caption-bar {{
+      position: absolute;
+      top: 16px;
+      left: 50%;
+      transform: translateX(-50%);
+      max-width: min(720px, 88vw);
+      background: rgba(15, 23, 42, 0.92);
+      backdrop-filter: blur(12px);
+      border: 1px solid var(--accent);
+      border-radius: 10px;
+      padding: 10px 16px;
+      z-index: 32;
+      display: none;
+      box-shadow: 0 10px 28px rgba(0,0,0,0.45);
+    }}
+    [data-theme="light"] #story-caption-bar {{
+      background: rgba(255, 255, 255, 0.95);
+    }}
+    .story-caption-title {{
+      font-size: 0.82rem;
+      font-weight: 750;
+      color: var(--accent);
+      margin-bottom: 2px;
+    }}
+    .story-caption-body {{
+      font-size: 0.78rem;
+      color: var(--text-main);
+      line-height: 1.4;
+    }}
+    #explainer-view {{
+      position: absolute;
+      top: 58px;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      overflow-y: auto;
+      background: var(--bg);
+      padding: 28px 24px 60px;
+      user-select: text;
+    }}
+    .exp-container {{
+      max-width: 1080px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }}
+    .exp-hero {{
+      background: var(--surface);
+      border: 1px solid var(--surface-border);
+      border-radius: 14px;
+      padding: 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 20px;
+      flex-wrap: wrap;
+    }}
+    .exp-hero h1 {{
+      font-size: 1.55rem;
+      font-weight: 800;
+      margin: 6px 0 8px;
+      color: var(--text-main);
+    }}
+    .exp-hero p {{
+      font-size: 0.95rem;
+      line-height: 1.6;
+      color: var(--text-muted);
+      max-width: 720px;
+    }}
+    .exp-stats {{
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }}
+    .exp-stat {{
+      background: var(--bg);
+      border: 1px solid var(--surface-border);
+      border-radius: 10px;
+      padding: 10px 14px;
+      min-width: 86px;
+      text-align: center;
+    }}
+    .exp-stat-num {{
+      font-size: 1.25rem;
+      font-weight: 800;
+      color: var(--accent);
+    }}
+    .exp-stat-lbl {{
+      font-size: 0.68rem;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      font-weight: 700;
+    }}
+    .exp-section-title {{
+      font-size: 1.05rem;
+      font-weight: 750;
+      color: var(--text-main);
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }}
+    .exp-grid {{
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 14px;
+    }}
+    .exp-card {{
+      background: var(--surface);
+      border: 1px solid var(--surface-border);
+      border-radius: 12px;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }}
+    .exp-card-head {{
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+    }}
+    .exp-pill {{
+      font-size: 0.68rem;
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 999px;
+      background: var(--badge-bg);
+      color: var(--accent);
+      border: 1px solid var(--surface-border);
+    }}
+    .exp-table {{
+      width: 100%;
+      border-collapse: collapse;
+      background: var(--surface);
+      border: 1px solid var(--surface-border);
+      border-radius: 12px;
+      overflow: hidden;
+      font-size: 0.84rem;
+    }}
+    .exp-table th, .exp-table td {{
+      padding: 10px 14px;
+      border-bottom: 1px solid var(--surface-border);
+      text-align: left;
+    }}
+    .exp-table th {{
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-muted);
+      background: var(--bg);
+    }}
+    .file-tag {{
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      font-size: 0.72rem;
+      background: var(--bg);
+      border: 1px solid var(--surface-border);
+      border-radius: 4px;
+      padding: 2px 6px;
+      color: var(--text-muted);
+      display: inline-block;
+      margin: 2px 4px 2px 0;
+    }}
+    @media print {{
+      html, body {{ overflow: visible !important; height: auto !important; background: #FFFFFF !important; color: #0F172A !important; }}
+      header, #canvas-view {{ display: none !important; }}
+      #explainer-view {{ display: block !important; position: static !important; padding: 0 !important; background: #FFFFFF !important; }}
+      .exp-card, .exp-hero, .exp-table {{ break-inside: avoid; border-color: #CBD5E1 !important; background: #FFFFFF !important; }}
+    }}
   </style>
 </head>
 <body data-theme="dark">
@@ -610,7 +805,10 @@ def compile_to_html(ir: Dict[str, Any]) -> str:
         <img class="brand-logo-img logo-dark" src="{LOGO_DARK_URI}" alt="VizArc" />
         <img class="brand-logo-img logo-light" src="{LOGO_LIGHT_URI}" alt="VizArc" />
       </a>
-      <span class="version-tag">Interactive Canvas</span>
+      <div class="view-switcher" role="tablist" aria-label="View Mode">
+        <button class="view-tab active" id="tab-canvas" title="Diagram Canvas (Key: 1)">📐 Canvas</button>
+        <button class="view-tab" id="tab-explainer" title="One-Page Architectural Explainer (Key: 2)">📄 Explainer</button>
+      </div>
       <div>
         <div class="doc-title">{ir.get('title', 'Architecture Canvas')}</div>
         <div class="doc-summary" title="{ir.get('summary', '')}">{ir.get('summary', '')}</div>
@@ -619,11 +817,13 @@ def compile_to_html(ir: Dict[str, Any]) -> str:
 
     <!-- Right Controls -->
     <div class="controls">
-      <button class="btn active-toggle" id="motion-btn" title="Toggle Flow Motion Animation (Key: M)">⚡ Flow Motion</button>
+      <button class="btn active-toggle" id="motion-btn" title="Toggle Flow Motion Animation (Key: M)">⚡ Motion</button>
       <input type="text" id="search-input" class="search-box" placeholder="🔍 Search (/)" />
       <button class="btn" id="theme-btn" title="Toggle Dark/Light Theme (Key: D)">🌓 Theme</button>
       <button class="btn" id="export-svg-btn" title="Download standalone SVG">📥 SVG</button>
       <button class="btn" id="export-png-btn" title="Export High-Res PNG">🖼️ PNG</button>
+      <button class="btn" id="export-video-btn" title="Record & download animated Story Video (.webm)">🎥 Story</button>
+      <button class="btn" id="print-btn" title="Print / Export One-Page PDF (Ctrl+P)">🖨️ PDF</button>
       <button class="btn" id="fullscreen-btn" title="Toggle Fullscreen (Key: F)">⛶</button>
     </div>
   </header>
@@ -669,6 +869,12 @@ def compile_to_html(ir: Dict[str, Any]) -> str:
         <g id="minimap-elements"></g>
         <rect id="minimap-viewport" class="minimap-viewport-rect" x="0" y="0" width="0" height="0"></rect>
       </svg>
+    </div>
+
+    <!-- Story Mode Narrative Caption -->
+    <div id="story-caption-bar">
+      <div class="story-caption-title" id="story-caption-title"></div>
+      <div class="story-caption-body" id="story-caption-body"></div>
     </div>
 
     <!-- Floating Workflow Route Player (Archify Workflow Standard) -->
@@ -719,6 +925,11 @@ def compile_to_html(ir: Dict[str, Any]) -> str:
         <div id="d-flow-steps"></div>
       </div>
 
+      <div class="drawer-section" id="d-files-section" style="display: none;">
+        <div class="drawer-label">Source Files</div>
+        <div id="d-files"></div>
+      </div>
+
       <div class="drawer-section">
         <div class="drawer-label">Incoming Traffic (Upstream)</div>
         <div id="d-upstream"></div>
@@ -730,6 +941,13 @@ def compile_to_html(ir: Dict[str, Any]) -> str:
       </div>
     </div>
   </div>
+
+  <!-- ==========================================
+       ONE-PAGE ARCHITECTURAL EXPLAINER VIEW
+       ========================================== -->
+  <section id="explainer-view" style="display: none;">
+    <div class="exp-container" id="explainer-root"></div>
+  </section>
 
   <script>
     const IR = {ir_json_str};
@@ -1275,6 +1493,25 @@ def compile_to_html(ir: Dict[str, Any]) -> str:
         flowSection.style.display = "none";
       }}
 
+      // Source Files in Drawer
+      const filesSec = document.getElementById("d-files-section");
+      const filesBox = document.getElementById("d-files");
+      if (filesSec && filesBox) {{
+        const nodeFiles = Array.isArray(node.files) ? node.files.filter(Boolean) : [];
+        if (nodeFiles.length > 0) {{
+          filesSec.style.display = "block";
+          filesBox.innerHTML = "";
+          nodeFiles.forEach(fp => {{
+            const tag = document.createElement("span");
+            tag.className = "file-tag";
+            tag.textContent = fp;
+            filesBox.appendChild(tag);
+          }});
+        }} else {{
+          filesSec.style.display = "none";
+        }}
+      }}
+
       // Upstream list
       const upContainer = document.getElementById("d-upstream");
       upContainer.innerHTML = inEdges.length ? "" : "<span style='color:var(--text-muted); font-size:0.8rem;'>No incoming calls (Ingress node)</span>";
@@ -1328,6 +1565,14 @@ def compile_to_html(ir: Dict[str, Any]) -> str:
       if (stepDesc) {{
         stepDesc.textContent = `${{step.title || (step.from + ' → ' + step.to)}} [${{step.protocol || 'HTTPS'}}]`;
         stepDesc.title = step.description || "";
+      }}
+      const capBar = document.getElementById("story-caption-bar");
+      const capTitle = document.getElementById("story-caption-title");
+      const capBody = document.getElementById("story-caption-body");
+      if (capBar && capTitle && capBody) {{
+        capBar.style.display = "block";
+        capTitle.textContent = `Step ${{step.step || (index + 1)}}/${{flowSteps.length}} · ${{step.title || (step.from + ' → ' + step.to)}} [${{step.protocol || 'HTTPS'}}]`;
+        capBody.textContent = step.description || "Executing transition along active dependency edge.";
       }}
 
       const targetEdgeId = `edge-${{step.from}}-${{step.to}}`;
@@ -1477,6 +1722,8 @@ def compile_to_html(ir: Dict[str, Any]) -> str:
       const stepDesc = document.getElementById("player-step-desc");
       if (stepLabel) stepLabel.textContent = `Flow Steps: ${{flowSteps.length}}`;
       if (stepDesc) stepDesc.textContent = "Click ▶ or ▶ Auto to animate transaction flow";
+      const capBar = document.getElementById("story-caption-bar");
+      if (capBar) capBar.style.display = "none";
 
       // Restore all nodes to default state
       (IR.nodes || []).forEach(node => {{
@@ -1635,7 +1882,7 @@ def compile_to_html(ir: Dict[str, Any]) -> str:
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
-      a.download = `${{(IR.title || 'architecture').toLowerCase().replace(/\s+/g, '_')}}.svg`;
+      a.download = `${{(IR.title || 'architecture').toLowerCase().replace(/\\s+/g, '_')}}.svg`;
       a.click();
       URL.revokeObjectURL(url);
     }};
@@ -1666,7 +1913,7 @@ def compile_to_html(ir: Dict[str, Any]) -> str:
       img.onload = () => {{
         ctx.drawImage(img, 0, 0);
         const a = document.createElement("a");
-        a.download = `${{(IR.title || 'architecture').toLowerCase().replace(/\s+/g, '_')}}.png`;
+        a.download = `${{(IR.title || 'architecture').toLowerCase().replace(/\\s+/g, '_')}}.png`;
         a.href = canvas.toDataURL("image/png");
         a.click();
       }};
@@ -1674,11 +1921,276 @@ def compile_to_html(ir: Dict[str, Any]) -> str:
     }};
 
     // ==========================================
+    // DUAL-VIEW EXPLAINER & STORY VIDEO ENGINE
+    // ==========================================
+    function escapeHtml(str) {{
+      return String(str ?? "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;");
+    }}
+
+    function switchView(mode) {{
+      const canvasEl = document.getElementById("canvas-view");
+      const expEl = document.getElementById("explainer-view");
+      const tabC = document.getElementById("tab-canvas");
+      const tabE = document.getElementById("tab-explainer");
+      if (!canvasEl || !expEl) return;
+
+      const showExp = mode === "explainer";
+      canvasEl.style.display = showExp ? "none" : "block";
+      expEl.style.display = showExp ? "block" : "none";
+      if (tabC) tabC.classList.toggle("active", !showExp);
+      if (tabE) tabE.classList.toggle("active", showExp);
+      if (!showExp) setTimeout(fitToView, 40);
+    }}
+
+    function renderExplainer() {{
+      const root = document.getElementById("explainer-root");
+      if (!root) return;
+
+      const nodes = IR.nodes || [];
+      const edges = IR.edges || [];
+      const tiers = IR.tiers || [];
+      const decisions = IR.decisions || [];
+      const steps = IR.flow_steps || [];
+
+      const adrsHtml = decisions.length
+        ? decisions.map((d, i) => `
+            <div class="exp-card">
+              <div class="exp-card-head">
+                <strong>${{i + 1}}. ${{escapeHtml(d.decision || 'Architecture Decision')}}</strong>
+                <span class="exp-pill">${{escapeHtml(d.status || 'Accepted')}}</span>
+              </div>
+              <div style="font-size:0.84rem; color:var(--text-main); line-height:1.5;">
+                <strong>Rationale:</strong> ${{escapeHtml(d.rationale || '')}}
+              </div>
+              <div style="font-size:0.82rem; color:var(--text-muted); line-height:1.5;">
+                <strong>Trade-offs:</strong> ${{escapeHtml(d.tradeoff || '')}}
+              </div>
+            </div>
+          `).join("")
+        : `<div class="exp-card"><span style="color:var(--text-muted);">No architectural decisions recorded in IR.</span></div>`;
+
+      const stepperHtml = steps.length
+        ? steps.map((s, idx) => `
+            <div class="exp-card">
+              <div class="exp-card-head">
+                <strong>Step ${{s.step || (idx + 1)}}: ${{escapeHtml(s.title || (s.from + ' → ' + s.to))}}</strong>
+                <span class="exp-pill">${{escapeHtml((s.protocol || 'API').toUpperCase())}}</span>
+              </div>
+              <div style="font-size:0.8rem; color:var(--accent); font-weight:600;">
+                ${{escapeHtml((nodesMap[s.from] || {{label: s.from}}).label)}} → ${{escapeHtml((nodesMap[s.to] || {{label: s.to}}).label)}}
+              </div>
+              <div style="font-size:0.83rem; color:var(--text-muted); line-height:1.5;">${{escapeHtml(s.description || '')}}</div>
+              <div>
+                <button class="btn" onclick="inspectStepOnCanvas(${{idx}})" style="font-size:0.75rem; padding:4px 10px;">
+                  📐 Inspect on Canvas →
+                </button>
+              </div>
+            </div>
+          `).join("")
+        : `<div class="exp-card"><span style="color:var(--text-muted);">No flow steps defined.</span></div>`;
+
+      const catalogHtml = nodes.map(n => {{
+        const meta = n._meta || {{}};
+        const files = (n.files || []).map(f => `<span class="file-tag">${{escapeHtml(f)}}</span>`).join("");
+        return `
+          <div class="exp-card">
+            <div class="exp-card-head">
+              <strong>${{escapeHtml(n.label)}}</strong>
+              <span class="exp-pill">${{escapeHtml((meta.provider || n.tier || 'service').toUpperCase())}}</span>
+            </div>
+            <div style="font-size:0.78rem; color:#38BDF8; font-weight:600;">${{escapeHtml(n.tech || meta.service_name || '')}}</div>
+            <div style="font-size:0.83rem; color:var(--text-muted); line-height:1.45;">${{escapeHtml(n.description || '')}}</div>
+            ${{files ? `<div>${{files}}</div>` : ""}}
+          </div>
+        `;
+      }}).join("");
+
+      const matrixRows = edges.map(e => {{
+        const src = (nodesMap[e.from] || {{label: e.from}}).label;
+        const tgt = (nodesMap[e.to] || {{label: e.to}}).label;
+        return `
+          <tr>
+            <td><strong>${{escapeHtml(src)}}</strong></td>
+            <td><strong>${{escapeHtml(tgt)}}</strong></td>
+            <td>${{escapeHtml(e.label || 'Request')}}</td>
+            <td><span class="exp-pill">${{escapeHtml((e.protocol || 'HTTPS').toUpperCase())}}</span></td>
+          </tr>
+        `;
+      }}).join("");
+
+      root.innerHTML = `
+        <div class="exp-hero">
+          <div>
+            <span class="exp-pill">${{escapeHtml((IR.archetype || 'architecture').toUpperCase())}} EXPLAINER</span>
+            <h1>${{escapeHtml(IR.title || 'System Architecture')}}</h1>
+            <p>${{escapeHtml(IR.summary || '')}}</p>
+          </div>
+          <div class="exp-stats">
+            <div class="exp-stat"><div class="exp-stat-num">${{nodes.length}}</div><div class="exp-stat-lbl">Components</div></div>
+            <div class="exp-stat"><div class="exp-stat-num">${{edges.length}}</div><div class="exp-stat-lbl">Edges</div></div>
+            <div class="exp-stat"><div class="exp-stat-num">${{tiers.length}}</div><div class="exp-stat-lbl">Tiers</div></div>
+            <div class="exp-stat"><div class="exp-stat-num">${{decisions.length}}</div><div class="exp-stat-lbl">ADRs</div></div>
+          </div>
+        </div>
+
+        <div>
+          <div class="exp-section-title">⚖️ Architecture Decisions & Trade-Offs (ADRs)</div>
+          <div class="exp-grid">${{adrsHtml}}</div>
+        </div>
+
+        <div>
+          <div class="exp-section-title">⚡ End-to-End Transaction Stepper</div>
+          <div class="exp-grid">${{stepperHtml}}</div>
+        </div>
+
+        <div>
+          <div class="exp-section-title">🧩 Component & Service Catalog</div>
+          <div class="exp-grid">${{catalogHtml}}</div>
+        </div>
+
+        <div>
+          <div class="exp-section-title">🔌 Communication Protocol Matrix</div>
+          <table class="exp-table">
+            <thead><tr><th>Source</th><th>Target</th><th>Interaction</th><th>Protocol</th></tr></thead>
+            <tbody>${{matrixRows || '<tr><td colspan="4">No edges defined.</td></tr>'}}</tbody>
+          </table>
+        </div>
+      `;
+    }}
+
+    window.inspectStepOnCanvas = (idx) => {{
+      switchView("canvas");
+      setTimeout(() => highlightFlowStep(idx), 60);
+    }};
+
+    document.getElementById("tab-canvas").onclick = () => switchView("canvas");
+    document.getElementById("tab-explainer").onclick = () => switchView("explainer");
+    document.getElementById("print-btn").onclick = () => {{
+      switchView("explainer");
+      setTimeout(() => window.print(), 120);
+    }};
+
+    async function recordStoryVideo() {{
+      const btn = document.getElementById("export-video-btn");
+      if (typeof MediaRecorder === "undefined" || !HTMLCanvasElement.prototype.captureStream) {{
+        alert("Story video recording requires a modern browser with MediaRecorder & Canvas captureStream support.");
+        return;
+      }}
+      switchView("canvas");
+      fitToView();
+
+      const W = 1280, H = 720;
+      const offCanvas = document.createElement("canvas");
+      offCanvas.width = W;
+      offCanvas.height = H;
+      const ctx = offCanvas.getContext("2d");
+
+      const mimeType = ["video/webm;codecs=vp9", "video/webm;codecs=vp8", "video/webm"].find(t => MediaRecorder.isTypeSupported(t)) || "video/webm";
+      const stream = offCanvas.captureStream(30);
+      const chunks = [];
+      const recorder = new MediaRecorder(stream, {{ mimeType }});
+      recorder.ondataavailable = ev => {{ if (ev.data && ev.data.size > 0) chunks.push(ev.data); }};
+
+      const donePromise = new Promise(resolve => {{
+        recorder.onstop = () => {{
+          const blob = new Blob(chunks, {{ type: mimeType }});
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement("a");
+          a.href = url;
+          a.download = `${{(IR.title || 'architecture').toLowerCase().replace(/\\s+/g, '_')}}_story.webm`;
+          a.click();
+          URL.revokeObjectURL(url);
+          resolve();
+        }};
+      }});
+
+      const prevLabel = btn.textContent;
+      btn.textContent = "⏺ Recording...";
+      btn.disabled = true;
+      recorder.start(100);
+
+      const drawFrame = (titleText, bodyText, progressRatio) => new Promise(resolve => {{
+        const b = scene.getBBox();
+        const pad = 40;
+        const svgW = Math.max(b.width + pad * 2, 100);
+        const svgH = Math.max(b.height + pad * 2, 100);
+        const clone = document.getElementById("diagram-canvas").cloneNode(true);
+        const cloneScene = clone.querySelector("#scene-root");
+        if (cloneScene) cloneScene.removeAttribute("transform");
+        clone.setAttribute("xmlns", "http://www.w3.org/2000/svg");
+        clone.setAttribute("viewBox", `${{b.x - pad}} ${{b.y - pad}} ${{svgW}} ${{svgH}}`);
+        clone.setAttribute("width", svgW);
+        clone.setAttribute("height", svgH);
+
+        const svgData = new XMLSerializer().serializeToString(clone);
+        const img = new Image();
+        img.onload = () => {{
+          const isLight = document.body.getAttribute("data-theme") === "light";
+          ctx.fillStyle = isLight ? "#F8FAFC" : "#090D16";
+          ctx.fillRect(0, 0, W, H);
+
+          const diagramH = H - 120;
+          const fitScale = Math.min((W - 80) / svgW, (diagramH - 40) / svgH);
+          const drawW = svgW * fitScale;
+          const drawH = svgH * fitScale;
+          ctx.drawImage(img, (W - drawW) / 2, (diagramH - drawH) / 2 + 12, drawW, drawH);
+
+          // Lower-third narrative bar
+          ctx.fillStyle = isLight ? "rgba(255,255,255,0.96)" : "rgba(15,23,42,0.95)";
+          ctx.fillRect(0, H - 110, W, 110);
+          ctx.fillStyle = "#3B82F6";
+          ctx.fillRect(0, H - 110, Math.round(W * progressRatio), 4);
+          ctx.font = "bold 20px -apple-system, BlinkMacSystemFont, Segoe UI, sans-serif";
+          ctx.fillStyle = isLight ? "#0F172A" : "#F8FAFC";
+          ctx.fillText(titleText.slice(0, 95), 36, H - 68);
+          ctx.font = "15px -apple-system, BlinkMacSystemFont, Segoe UI, sans-serif";
+          ctx.fillStyle = isLight ? "#475569" : "#94A3B8";
+          ctx.fillText(bodyText.slice(0, 130), 36, H - 36);
+          resolve();
+        }};
+        img.onerror = () => resolve();
+        img.src = "data:image/svg+xml;base64," + btoa(unescape(encodeURIComponent(svgData)));
+      }});
+
+      try {{
+        resetRouteTrace();
+        await drawFrame(IR.title || "Architecture Story", IR.summary || "System overview", 0.05);
+        await new Promise(r => setTimeout(r, 1100));
+
+        const total = flowSteps.length;
+        for (let i = 0; i < total; i++) {{
+          highlightFlowStep(i);
+          const s = flowSteps[i];
+          await drawFrame(
+            `Step ${{s.step || (i + 1)}}/${{total}}: ${{s.title || (s.from + ' → ' + s.to)}} [${{s.protocol || 'API'}}]`,
+            s.description || "",
+            (i + 1) / Math.max(total, 1)
+          );
+          await new Promise(r => setTimeout(r, 1300));
+        }}
+      }} finally {{
+        recorder.stop();
+        await donePromise;
+        resetRouteTrace();
+        btn.textContent = prevLabel;
+        btn.disabled = false;
+      }}
+    }}
+
+    document.getElementById("export-video-btn").onclick = recordStoryVideo;
+
+    // ==========================================
     // KEYBOARD SHORTCUTS
     // ==========================================
     window.addEventListener("keydown", e => {{
       if (e.target.tagName === "INPUT" || e.target.tagName === "TEXTAREA") return;
       const k = e.key.toLowerCase();
+      if (k === "1") switchView("canvas");
+      if (k === "2") switchView("explainer");
       if (k === "r") fitToView();
       if (k === "m") toggleFlowMotion();
       if (k === "d") document.getElementById("theme-btn").click();
@@ -1692,6 +2204,7 @@ def compile_to_html(ir: Dict[str, Any]) -> str:
 
     // Initial Launch
     renderScene();
+    renderExplainer();
     setTimeout(fitToView, 60);
   </script>
 </body>

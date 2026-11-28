@@ -17,8 +17,13 @@ ENV/
 vizarc-full-brand-kit
 vizarc_out/
 test_vizarc_out/
+vizarc_pr_out/
+ci_out/
 architecture.html
 architecture.svg
+architecture_diff.html
+*_story.webm
+.pytest_cache/
 
 # Streamlit
 .streamlit/secrets.toml
